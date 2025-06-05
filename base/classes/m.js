@@ -15,13 +15,13 @@ export const El = {
   ProxyHandler: (upd, e) => {
     return {
       set(target, key, value) {
-        if (value !== target[key]) {
+        // if (value !== target[key]) {
           // console.log(`Setting ${key} to ${value}`);
           target[key] = value;
           upd(key, value, e);
           return true;
-        }
-        return false;
+        // }
+        // return true;
       }
     }
   },
