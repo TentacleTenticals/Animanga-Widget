@@ -38,7 +38,7 @@ export const widget = {
               line.direction && ['i-dir', line.direction],
               line.gap && ['i-align', line.gap]
             ],
-            class: ['line', 'lang-'+ o.cfg.header.lang, 'flx'].join(' '),
+            class: ['line', 'lang-'+ o.cfg.lang, 'flx'].join(' '),
             func: (l) => {
               line.items.forEach(string => {
                 El.Div({
