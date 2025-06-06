@@ -1,4 +1,4 @@
-import {El} from '../../../base/classes/mjs.js';
+import {El} from '../../../base/classes/m.js';
 
 export class Ani{
   gp = (t, path) => path.reduce((r, k) => k ? r[k] : r, t);
