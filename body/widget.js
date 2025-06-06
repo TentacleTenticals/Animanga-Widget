@@ -1,4 +1,4 @@
-import {El} from '../base/classes/mjs.js';
+import {El} from '../base/classes/m.js';
 import {Def} from './api/def/m.js';
 import {Mal} from './api/mal/m.js';
 import {Ani} from './api/ani/m.js';
