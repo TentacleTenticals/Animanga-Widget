@@ -1,9 +1,20 @@
 export class Ut{
   getType = (o) => o && o.constructor.toString().split(/[\(\) ]/)[1];
-  MyError = class extends Error {
-    constructor(name, message, options) {
-      super(message);
-      this.name = 'MyError' + name && ' ' + name;
+  MyError = class MyError extends Error {
+    constructor(n, cfg, options){
+      super(n[1]);
+      this.name = 'MyError:' + n[0] && ' ' + n[1];
+      if(n[2]){
+        if(n[2].type === 'log'){
+          console.group();
+          console.error(this.name);
+          console.error(this);
+          if(options) for(const o of options){
+            console.log(o, options[o]);
+          }
+          console.groupEnd();
+        }
+      }
       return {error: this, name:this.name, message:this.message, stack:this.stack, options};
     }
   };
@@ -137,7 +148,7 @@ export class Ut{
       if(!token.split('.').length) return;
       var base64Url = token.split('.')[1];
       var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+      var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(c => {
           return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
       }).join(''));
   
