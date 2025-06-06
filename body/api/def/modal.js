@@ -1,4 +1,4 @@
-import {El} from '../../../base/classes/mjs.js';
+import {El} from '../../../base/classes/m.js';
 import {MalModal} from '../mal/modal.js';
 import {AniModal} from '../ani/modal.js';
 import {Ut} from '../../../funcs/utils.js';
