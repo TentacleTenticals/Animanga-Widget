@@ -1,4 +1,4 @@
-export const baseCSS = () => `
+export default () => `
 .flx {
   display: flex;
 
