@@ -299,11 +299,11 @@ export class Def{
             sav => {
               console.log('[MAL Widget] UPDATE', sav);
               const time = El.getTime(sav?.updated_at, 'full');
-              save.target.textContent = 'Saved ✅';
+              save.textContent = 'Saved ✅';
               // if(o.s.mal.statusItem !== sav.status) o.s.mal.statusMal = sav.status;
               // time && (o.s.me.updatedAt = time.date+' '+time.time);
               setTimeout(() => {
-                save.target.textContent = 'Save';
+                save.textContent = 'Save';
               }, 5000);
             }
           )
