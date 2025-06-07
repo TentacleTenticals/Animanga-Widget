@@ -420,7 +420,7 @@ export class Ani{
             plus: (path, item) => {
               El.Button({
                 path: path,
-                class: ['plusEps', 'numBtn', 'btn', item.type].join(' '),
+                class: ['plusEps', 'numBtn', '-btn', item.type].join(' '),
                 text: '+',
                 onclick: (l) => {
                   o.s[name].watchedEps++;
@@ -431,7 +431,7 @@ export class Ani{
             minus: (path, item) => {
               El.Button({
                 path: path,
-                class: ['minusEps', 'numBtn', 'btn', item.type].join(' '),
+                class: ['minusEps', 'numBtn', '-btn', item.type].join(' '),
                 text: '-',
                 onclick: (l) => {
                   if(+el[name]['watchedEps'].value === 0) return;
@@ -500,7 +500,7 @@ export class Ani{
             plus: (path, item) => {
               El.Button({
                 path: path,
-                class: ['plusCh', 'numBtn', 'btn', item.type].join(' '),
+                class: ['plusCh', 'numBtn', '-btn', item.type].join(' '),
                 text: '+',
                 onclick: (l) => {
                   o.s[name].readedCh++;
@@ -511,7 +511,7 @@ export class Ani{
             minus: (path, item) => {
               El.Button({
                 path: path,
-                class: ['minusCh', 'numBtn', 'btn', item.type].join(' '),
+                class: ['minusCh', 'numBtn', '-btn', item.type].join(' '),
                 text: '-',
                 onclick: (l) => {
                   if(+el[name]['readedCh'].value === 0) return;
@@ -554,7 +554,7 @@ export class Ani{
             plus: (path, item) => {
               El.Button({
                 path: path,
-                class: ['plusVol', 'numBtn', 'btn', item.type].join(' '),
+                class: ['plusVol', 'numBtn', '-btn', item.type].join(' '),
                 text: '+',
                 onclick: (l) => {
                   o.s[name].readedVol++;
@@ -565,7 +565,7 @@ export class Ani{
             minus: (path, item) => {
               El.Button({
                 path: path,
-                class: ['minusVol', 'numBtn', 'btn', item.type].join(' '),
+                class: ['minusVol', 'numBtn', '-btn', item.type].join(' '),
                 text: '-',
                 onclick: (l) => {
                   if(+el[name]['readedVol'].value === 0) return;
