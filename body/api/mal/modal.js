@@ -74,6 +74,7 @@ export const MalModal = () => class extends Modal{
     }).then(
       async res => {
         console.log('Tokens', res);
+        console.log('GMI', o);
         api.secrets.accToken = res.access_token;
         api.secrets.refToken = res.refresh_token;
         if(o.GM){
