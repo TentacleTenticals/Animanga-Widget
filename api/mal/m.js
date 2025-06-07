@@ -102,6 +102,7 @@ export class MalApi{
       return text;
     },
     getToken: (o) => {
+      o.secrets?.url && (o.url = o.secrets.url);
       o.method = 'POST';
       o.data = {
         grant_type: 'authorization_code',
@@ -130,6 +131,7 @@ export class MalApi{
       )
     },
     updToken: (o) => {
+      o.secrets?.url && (o.url = o.secrets.url);
       o.method = 'POST';
       o.data = {
         grant_type: 'refresh_token',
