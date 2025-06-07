@@ -1,23 +1,25 @@
 export class Ut{
   getType = (o) => o && o.constructor.toString().split(/[\(\) ]/)[1];
-  MyError = class MyError extends Error {
-    constructor(n, cfg, options){
-      super(n[1]);
-      this.name = 'MyError:' + n[0] && ' ' + n[1];
-      if(n[2]){
-        if(n[2].type === 'log'){
-          console.group();
-          console.error(this.name);
-          console.error(this);
-          if(options) for(const o of options){
-            console.log(o, options[o]);
+  MyError = (n, options) => {
+    class MyError extends Error {
+      constructor(){
+        super(n[1]);
+        this.name = 'MyError:' + n[0] && ' ' + n[1];
+        if(n[2]){
+          if(n[2].type === 'log'){
+            console.group('ERR ' + n[0]+' ' + ':'+n[1]);
+            console.error(this);
+            if(options) for(const o in options){
+              console.log(o, options[o]);
+            }
+            console.groupEnd();
           }
-          console.groupEnd();
         }
+        return {error: this, name:this.name, message:this.message, stack:this.stack, options};
       }
-      return {error: this, name:this.name, message:this.message, stack:this.stack, options};
-    }
-  };
+    };
+    return new MyError();
+  }
   date = {
     get: (time, format) => {
       if(time === null){
