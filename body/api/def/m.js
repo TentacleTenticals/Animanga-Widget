@@ -2,6 +2,7 @@ import {El} from '../../../base/classes/m.js';
 import {MalFc as MalApi} from '../../../api/mal/fc.js';
 import {AniFc as AniApi} from '../../../api/ani/fc.js';
 import {Modal} from './modal.js';
+import {Ut} from '../../../funcs/utils.js';
 
 export class Def{
   lang = {
@@ -139,117 +140,132 @@ export class Def{
     }
   };
   run = (o) => {
+    const runs = [];
     for(const e of o.cfg.api.list){
       if(!e.info.active) continue;
       switch(e.name){
         case 'mal': {
-          new MalApi().fc.search.item.m({
-            type: o.type,
-            title: o.title,
-            query: {
-              limit: 10
-            },
-            login: e.info.login,
-            secrets: e.secrets,
-            textMatch: o.cfg.textMatch
-          }).then(
-            res => {
-              if(e.main){
-                console.log('MAL is main');
-                o.s.save.myRating = res.my_list_status?.score||0;
-                if(o.type === 'anime'){
-                  o.s.save.watchedEps = res.my_list_status?.num_episodes_watched||0;
-                }else{
-                  o.s.save.readedVol = res.my_list_status?.num_volumes_read||0;
-                  o.s.save.readedCh = res.my_list_status?.num_chapters_read||0;
-                }
-              };
+          runs.push(
+            new MalApi().fc.search.item.m({
+              type: o.type,
+              title: o.title,
+              query: {
+                limit: 10
+              },
+              login: e.info.login,
+              secrets: e.secrets,
+              textMatch: o.cfg.textMatch
+            }).then(
+              res => {
+                if(!res) throw new Ut().MyError(['[MAL Load]', 'No data']);
+                if(e.main){
+                  console.log('MAL is main');
+                  o.s.save.myRating = res.my_list_status?.score||0;
+                  if(o.type === 'anime'){
+                    o.s.save.watchedEps = res.my_list_status?.num_episodes_watched||0;
+                  }else{
+                    o.s.save.readedVol = res.my_list_status?.num_volumes_read||0;
+                    o.s.save.readedCh = res.my_list_status?.num_chapters_read||0;
+                  }
+                };
 
-              console.log('MAL RESULT', res);
-              o.s.mal.id = res.id;
-              o.s.mal.rating = res.mean;
-              o.s.mal.link = new MalApi().link.item(o.type, res.id);
-              o.s.mal.popularity = res.popularity;
-              o.s.mal.title = res.title;
-
-              if(o.type === 'anime'){
-                o.s.mal.episodes = res.num_episodes||0;
-              }else{
-                o.s.mal.volumes = res.num_volumes||0;
-                o.s.mal.chapters = res.num_chapters||0;
-              }
-              o.s.mal.status = res.status||'';
-              o.s.mal.broadcast = res.broadcast||'';
-              
-              if(res.my_list_status){
-                const my = res.my_list_status;
-                console.log('MAL SCORE', my);
-                o.s.save.statusItem = my.status||undefined;
-                o.s.save.myRating = my.score||0;
+                console.log('MAL RESULT', res);
+                o.s.mal.id = res.id;
+                o.s.mal.rating = res.mean;
+                o.s.mal.link = new MalApi().link.item(o.type, res.id);
+                o.s.mal.popularity = res.popularity;
+                o.s.mal.title = res.title;
 
                 if(o.type === 'anime'){
-                  o.s.save.watchedEps = my.num_episodes_watched||0;
+                  o.s.mal.episodes = res.num_episodes||0;
                 }else{
-                  o.s.save.readedVol = my.num_volumes_read||0;
-                  o.s.save.readedCh = my.num_chapters_read||0;
+                  o.s.mal.volumes = res.num_volumes||0;
+                  o.s.mal.chapters = res.num_chapters||0;
                 }
+                o.s.mal.status = res.status||'';
+                o.s.mal.broadcast = res.broadcast||'';
+                
+                if(res.my_list_status){
+                  const my = res.my_list_status;
+                  console.log('MAL SCORE', my);
+                  o.s.save.statusItem = my.status||undefined;
+                  o.s.save.myRating = my.score||0;
+
+                  if(o.type === 'anime'){
+                    o.s.save.watchedEps = my.num_episodes_watched||0;
+                  }else{
+                    o.s.save.readedVol = my.num_volumes_read||0;
+                    o.s.save.readedCh = my.num_chapters_read||0;
+                  }
+                }
+                console.log('RRRRRRRR', o.s);
               }
-              console.log('RRRRRRRR', o.s);
-            }
+            )
           )
         }
         break;
         case 'ani': {
-          new AniApi().fc.search.item.m({
-            type: o.type,
-            title: o.title,
-            query: {
-              limit: 10
-            },
-            login: e.info.login,
-            secrets: e.secrets,
-            textMatch: o.cfg.textMatch
-          }).then(
-            res => {
-              console.log('ANI RES', res);
-              if(!res) return;
-              if(e.main){
-                const round10 = (num) => num && Math.round(num / 10) * 10;
-                const full = (num) => num | 0;
-                // full(15 / 10);
-                console.log('ANI is main');
-                o.s.save.myRating = res.mediaListEntry?.score;
-                if(o.type === 'anime'){
-                  o.s.save.watchedEps = res.mediaListEntry?.progress||0;
-                }else{
-                  o.s.save.readedVol = res.mediaListEntry?.progressVolumes||0;
-                  o.s.save.readedCh = res.mediaListEntry?.progress||0;
-                }
-              };
+          if(o.s.mal){
+            console.log('OS', o.s.mal);
+            if(o.s.mal.id) console.log('IDDDDDD', o.s.mal.id);
+          }
+          runs.push(
+            new AniApi().fc.search.item.m({
+              type: o.type,
+              title: o.title,
+              query: {
+                limit: 10
+              },
+              login: e.info.login,
+              secrets: e.secrets,
+              textMatch: o.cfg.textMatch
+            }).then(
+              res => {
+                console.log('ANI RES', res);
+                if(!res) throw new Ut().MyError(['[MAL Load]', 'No data']);
+                if(e.main){
+                  const round10 = (num) => num && Math.round(num / 10) * 10;
+                  const full = (num) => num | 0;
+                  // full(15 / 10);
+                  console.log('ANI is main');
+                  o.s.save.myRating = res.mediaListEntry?.score;
+                  if(o.type === 'anime'){
+                    o.s.save.watchedEps = res.mediaListEntry?.progress||0;
+                  }else{
+                    o.s.save.readedVol = res.mediaListEntry?.progressVolumes||0;
+                    o.s.save.readedCh = res.mediaListEntry?.progress||0;
+                  }
+                };
 
-              o.s.ani.id = res.id;
-              o.s.ani.rating = res.meanScore;
-              o.s.ani.link = new AniApi().link.item(o.type, res.id);
-              // o.s.ani.popularity = res.popularity;
-              // o.s.ani.title = res.title;
-              // if(o.type === 'anime'){
-              //   o.s.ani.watchedEps = res.my_list_status?.num_episodes_watched||0;
-              //   o.s.ani.episodes = res.num_episodes||0;
-              // }else{
-              //   o.s.ani.readedVol = res.my_list_status?.num_volumes_read||0;
-              //   o.s.ani.readedCh = res.my_list_status?.num_chapters_read||0;
-              //   o.s.ani.volumes = res.num_volumes||0;
-              //   o.s.ani.chapters = res.num_chapters||0;
-              // }
-              // o.s.ani.status = res.status||'';
-              // o.s.ani.broadcast = res.broadcast||'';
-              // o.s.ani.statusItem = res.my_list_status?.status||undefined;
-              // o.s.ani.myRating = res.my_list_status?.score||0;
-            }
+                o.s.ani.id = res.id;
+                o.s.ani.rating = res.meanScore;
+                o.s.ani.link = new AniApi().link.item(o.type, res.id);
+                // o.s.ani.popularity = res.popularity;
+                // o.s.ani.title = res.title;
+                // if(o.type === 'anime'){
+                //   o.s.ani.watchedEps = res.my_list_status?.num_episodes_watched||0;
+                //   o.s.ani.episodes = res.num_episodes||0;
+                // }else{
+                //   o.s.ani.readedVol = res.my_list_status?.num_volumes_read||0;
+                //   o.s.ani.readedCh = res.my_list_status?.num_chapters_read||0;
+                //   o.s.ani.volumes = res.num_volumes||0;
+                //   o.s.ani.chapters = res.num_chapters||0;
+                // }
+                // o.s.ani.status = res.status||'';
+                // o.s.ani.broadcast = res.broadcast||'';
+                // o.s.ani.statusItem = res.my_list_status?.status||undefined;
+                // o.s.ani.myRating = res.my_list_status?.score||0;
+              }
+            )
           )
         }
       }
     };
+    Promise.allSettled(runs).then(
+      response => {
+        console.log('Ok');
+      }
+    )
   };
   save = (o) => {
     for(const e of o.cfg.api.list){
