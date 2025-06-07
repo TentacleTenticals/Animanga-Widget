@@ -267,7 +267,7 @@ export class Def{
       }
     )
   };
-  save = (o) => {
+  save = (o, save) => {
     for(const e of o.cfg.api.list){
       if(!e.save.active) continue;
       switch(e.name){
@@ -299,11 +299,11 @@ export class Def{
             sav => {
               console.log('[MAL Widget] UPDATE', sav);
               const time = El.getTime(sav?.updated_at, 'full');
-              btn.target.textContent = 'Saved ✅';
+              save.target.textContent = 'Saved ✅';
               // if(o.s.mal.statusItem !== sav.status) o.s.mal.statusMal = sav.status;
               // time && (o.s.me.updatedAt = time.date+' '+time.time);
               setTimeout(() => {
-                btn.target.textContent = 'Save';
+                save.target.textContent = 'Save';
               }, 5000);
             }
           )
@@ -342,7 +342,7 @@ export class Def{
         title: this.lang[item.lang||string.lang||line.lang]['save'][3],
         func: (e) => el.def.save = e,
         onclick: (btn) => {
-          this.save(o);
+          this.save(o, el.def.save);
         }
       });
       break;
