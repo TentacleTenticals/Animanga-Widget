@@ -260,11 +260,24 @@ export default () => `
       
       .-item {
         gap: 0 3px;
+        align-items: center;
         position: relative;
         min-width: 0;
         padding: 3px 5px 3px 5px;
         font-family: var(--header-item);
         color: var(--col);
+
+        &.title {
+          &:has(.value:empty){
+            display: none;
+          }
+        }
+
+        .value {
+          &:is(:empty) {
+            display: none;
+          }
+        }
 
         &.airpublish {
           background-color: var(--bck-c-green);
