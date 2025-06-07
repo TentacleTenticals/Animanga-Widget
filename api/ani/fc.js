@@ -84,7 +84,7 @@ export class AniFc extends AniApi{
                 items.forEach(e => {
                   e.iTitle = e.title.romaji;
                 });
-                console.log('LOLI', items)
+                // console.log('LOLI', items)
                 const found = new Ut().textMatcher.m(items, o.title, {textMatch: o.textMatch});
                 if(found.ind === null) return;
                 return (items[found.ind]);
@@ -127,7 +127,8 @@ export class AniFc extends AniApi{
               if(!res.data) return;
               if(!res.data.Page) return;
               if(!res.data.Page.media) return;
-              console.log('RRR', res.data.Page.media)
+              if(!res.data.Page.media.length) throw new Ut().MyError(['ANI Search byTitle', 'Not found', {type:'log'}])
+              // console.log('RRR', res.data.Page.media)
               // console.log(ut.getType(res.data.Page.media));
               return res.data.Page.media;
             }
