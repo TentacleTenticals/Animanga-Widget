@@ -122,7 +122,7 @@ export class MalFc extends MalApi{
                   e.iTitle = e.title;
                 });
                 const found = new Ut().textMatcher.m(items, o.title, {textMatch: o.textMatch});
-                if(found.ind === null) return;
+                if(!found||found.ind === null) return;
                 return (items[found.ind]);
               }
             );
