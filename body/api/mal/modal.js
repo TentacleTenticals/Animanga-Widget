@@ -72,10 +72,18 @@ export const MalModal = () => class extends Modal{
     new MalApi().fc.auth.getToken({
       secrets: api.secrets
     }).then(
-      res => {
+      async res => {
         console.log('Tokens', res);
         api.secrets.accToken = res.access_token;
         api.secrets.refToken = res.refresh_token;
+        if(o.GM){
+          const secretsList = await o.GM.getValue('secretsList');
+          if(secretsList[api.name]){
+            secretsList[api.name].accToken = res.access_token;
+            secretsList[api.name].refToken = res.refresh_token;
+          }
+          await o.GM.setValue('secretsList', secretsList);
+        }
         this.api.tk.status(this.el.tokensStatus, api, this.arr(api));
         // checker(api, el.tokensApi);
       }
