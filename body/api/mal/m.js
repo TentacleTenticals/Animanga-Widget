@@ -428,7 +428,7 @@ export class Mal{
             plus: (path, item) => {
               El.Button({
                 path: path,
-                classes: ['plusEps', 'numBtn', 'btn', item.type],
+                classes: ['plusEps', 'numBtn', '-btn', item.type],
                 text: '+',
                 onclick: (l) => {
                   if(o.s.save.watchedEps === undefined) o.s.save.watchedEps = 0;
@@ -439,7 +439,7 @@ export class Mal{
             minus: (path, item) => {
               El.Button({
                 path: path,
-                classes: ['minusEps', 'numBtn', 'btn', item.type],
+                classes: ['minusEps', 'numBtn', '-btn', item.type],
                 text: '-',
                 onclick: (l) => {
                   if(o.s.save.watchedEps === undefined) o.s.save.watchedEps = 0;
@@ -506,7 +506,7 @@ export class Mal{
             plus: (path, item) => {
               El.Button({
                 path: path,
-                class: ['plusCh', 'numBtn', 'btn', item.type].join(' '),
+                class: ['plusCh', 'numBtn', '-btn', item.type].join(' '),
                 text: '+',
                 onclick: (l) => {
                   if(o.s.save.readedCh === undefined) o.s.save.readedCh = 0;
@@ -517,7 +517,7 @@ export class Mal{
             minus: (path, item) => {
               El.Button({
                 path: path,
-                class: ['minusCh', 'numBtn', 'btn', item.type].join(' '),
+                class: ['minusCh', 'numBtn', '-btn', item.type].join(' '),
                 text: '-',
                 onclick: (l) => {
                   if(o.s.save.readedCh === undefined) o.s.save.readedCh = 0;
@@ -558,7 +558,7 @@ export class Mal{
             plus: (path, item) => {
               El.Button({
                 path: path,
-                class: ['plusVol', 'numBtn', 'btn', item.type].join(' '),
+                class: ['plusVol', 'numBtn', '-btn', item.type].join(' '),
                 text: '+',
                 onclick: (l) => {
                   if(o.s.save.readedVol === undefined) o.s.save.readedVol = 0;
@@ -569,7 +569,7 @@ export class Mal{
             minus: (path, item) => {
               El.Button({
                 path: path,
-                class: ['minusVol', 'numBtn', 'btn', item.type].join(' '),
+                class: ['minusVol', 'numBtn', '-btn', item.type].join(' '),
                 text: '-',
                 onclick: (l) => {
                   if(o.s.save.readedVol === undefined) o.s.save.readedVol = 0;
