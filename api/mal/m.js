@@ -173,6 +173,7 @@ export class MalApi{
   user = {
     list: {
       upd: (o) => {
+        o.secrets?.url && (o.url = o.secrets.url);
         o.method = 'PUT';
     
         o.headers = {
