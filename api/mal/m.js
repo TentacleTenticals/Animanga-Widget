@@ -64,7 +64,7 @@ export class MalApi{
       byTitle: (o) => {
         o.secrets?.url && (o.url = o.secrets.url);
         const query = {
-          q: o.title,
+          q: o.title.slice(0, 64),
           query: o.query
         };
         o.headers = {
