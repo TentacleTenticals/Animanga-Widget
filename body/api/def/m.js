@@ -322,7 +322,7 @@ export class Def{
         func: (e) => {
           el.def.reload = e;
           el.def.runner = () => this.run(o);
-          document.getElementById('animanga-widget').addEventListener('rel', () => {
+          el.def.closest('.animanga-widget').addEventListener('rel', () => {
             console.log('q', el.def.reload)
             // el.def.reload.focus();
             this.run(o);
