@@ -299,11 +299,11 @@ export class Def{
             sav => {
               console.log('[MAL Widget] UPDATE', sav);
               const time = El.getTime(sav?.updated_at, 'full');
-              save.textContent = 'Saved ✅';
+              save.target.textContent = 'Saved ✅';
               // if(o.s.mal.statusItem !== sav.status) o.s.mal.statusMal = sav.status;
               // time && (o.s.me.updatedAt = time.date+' '+time.time);
               setTimeout(() => {
-                save.textContent = 'Save';
+                save.target.textContent = 'Save';
               }, 5000);
             }
           )
@@ -322,7 +322,7 @@ export class Def{
         func: (e) => {
           el.def.reload = e;
           el.def.runner = () => this.run(o);
-          p.closest('.animanga-widget').addEventListener('rel', () => {
+          p.closest('#animanga-widget').addEventListener('rel', () => {
             console.log('q', el.def.reload)
             // el.def.reload.focus();
             this.run(o);
