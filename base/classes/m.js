@@ -818,9 +818,9 @@ export const El = {
       if(arr[i].getAttribute('stylename') === name) return true;
     }
   },
-  Css: function(name, css, check) {
+  Css: function(name, css, path, check) {
     if(check && this.styleChecker(name)) return;
-    const main= document.createElement('style');
+    const main= (path||document).createElement('style');
     main.textContent = css;
     if(name) main.setAttribute('stylename', name);
     document.body.appendChild(main);
