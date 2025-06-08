@@ -820,10 +820,10 @@ export const El = {
   },
   Css: function(name, css, path, check) {
     if(check && this.styleChecker(name)) return;
-    const main= (path||document).createElement('style');
+    const main= document.createElement('style');
     main.textContent = css;
     if(name) main.setAttribute('stylename', name);
-    document.body.appendChild(main);
+    (path||document.body).appendChild(main);
   },
   Obs: function({obs, target, cfg, mode, check, type, search, name, msg, func}){
     if(!target) return;
