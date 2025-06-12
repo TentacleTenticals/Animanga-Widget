@@ -475,7 +475,7 @@ export class Def{
   build = (p, line, string, item, el, o) => {
     const name = 'def';
     const _this = this;
-    console.log('PREBUILD', name, p, line, string, item, el, o, _this);
+    console.log('PREBUILD', {name:name, path:p, line:line, string:string, item:item, el:el, o:o, this:_this});
     new (this.class(name, p, line, string, item, el, o, _this))().check()
   };
   class = (name, path, line, string, item, el, o, _this) => class {
