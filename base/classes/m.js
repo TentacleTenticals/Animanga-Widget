@@ -121,6 +121,79 @@ export const El = {
     if(o.focus) main.focus();
     if(o.rtn) return main;
   },
+  Details: function(o){
+    const main=document.createElement('details');
+    if(o.summary) this.summary = this.Summary({
+      path: main,
+      class: o.sClass,
+      text: o.summaryT
+    });
+    if(o.class) main.className = o.class;
+    if(o.classes) main.className = o.classes.filter(e => e).join(' ');
+    if(o.id) main.id = o.id;
+    if(o.text) main.textContent = o.text;
+    if(o.title) main.title = o.title;
+    if(o.attr) main.setAttribute(o.attr[0], o.attr[1]);
+    if(o.attrs) o.attrs.forEach(e => e && e.length && main.setAttribute(e[0], e[1]));
+    if(o.name) main.setAttribute('name', o.name);
+    if(o.group) main.setAttribute('group', o.group);
+    if(o.tab) main.tabIndex = o.tab;
+    if(o.editable) main.setAttribute('contenteditable', true);
+    if(o.style) main.style = o.style;
+    if(o.onclick) main.onmousedown = (e) => e.button === 0 && o.onclick(e);
+    if(o.onRclick) main.oncontextmenu = o.onRclick;
+    if(o.onkeyup) main.onkeyup = o.onkeyup;
+    if(o.onkeydown) main.onkeydown = o.onkeydown;
+    if(o.onwheel) main.onwheel = o.onwheel;
+    if(o.onfocus) main.onfocus = o.onfocus;
+    if(o.onfocusin) main.onfocusin = o.onfocusin;
+    if(o.onfocusout) main.onfocusout = o.onfocusout;
+    if(o.onblur) main.onblur = o.onblur;
+    if(o.onpaste) main.onpaste = o.onpaste;
+    if(o.onmouseenter) main.onmouseenter = o.onmouseenter;
+    if(o.onpointerenter) main.onpointerenter = o.onpointerenter;
+    if(o.replace) o.replace.replaceWith(main);
+    if(o.replaceChildren) o.replaceChildren();
+    o.insert ? o.path.insertAdjacentElement(o.insert, main) : (this.summary ? o.path.appendChild(this.summary) : o.path.appendChild(main));
+
+    if(o.func) o.func(main);
+    if(o.focus) main.focus();
+    if(o.rtn) return main;
+  },
+  Summary: function(o){
+    const main=document.createElement('summary');
+    if(o.class) main.className = o.class;
+    if(o.classes) main.className = o.classes.filter(e => e).join(' ');
+    if(o.id) main.id = o.id;
+    if(o.text) main.textContent = o.text;
+    if(o.title) main.title = o.title;
+    if(o.attr) main.setAttribute(o.attr[0], o.attr[1]);
+    if(o.attrs) o.attrs.forEach(e => e && e.length && main.setAttribute(e[0], e[1]));
+    if(o.name) main.setAttribute('name', o.name);
+    if(o.group) main.setAttribute('group', o.group);
+    if(o.tab) main.tabIndex = o.tab;
+    if(o.editable) main.setAttribute('contenteditable', true);
+    if(o.style) main.style = o.style;
+    if(o.onclick) main.onmousedown = (e) => e.button === 0 && o.onclick(e);
+    if(o.onRclick) main.oncontextmenu = o.onRclick;
+    if(o.onkeyup) main.onkeyup = o.onkeyup;
+    if(o.onkeydown) main.onkeydown = o.onkeydown;
+    if(o.onwheel) main.onwheel = o.onwheel;
+    if(o.onfocus) main.onfocus = o.onfocus;
+    if(o.onfocusin) main.onfocusin = o.onfocusin;
+    if(o.onfocusout) main.onfocusout = o.onfocusout;
+    if(o.onblur) main.onblur = o.onblur;
+    if(o.onpaste) main.onpaste = o.onpaste;
+    if(o.onmouseenter) main.onmouseenter = o.onmouseenter;
+    if(o.onpointerenter) main.onpointerenter = o.onpointerenter;
+    if(o.replace) o.replace.replaceWith(main);
+    if(o.replaceChildren) o.replaceChildren();
+    o.insert ? o.path.insertAdjacentElement(o.insert, main) : o.path.appendChild(main);
+
+    if(o.func) o.func(main);
+    if(o.focus) main.focus();
+    if(o.rtn) return main;
+  },
   Button: function(o){
     const main=document.createElement('button');
     if(o.class) main.className = o.class;
@@ -262,6 +335,7 @@ export const El = {
     });
     const main=document.createElement('select');
     if(o.class) main.className = o.class;
+    if(o.classes) main.className = o.classes.filter(e => e).join(' ');
     if(o.id) main.id=o.id;
     if(o.title) main.title = o.title;
     if(o.name) main.name=o.name;
@@ -417,6 +491,7 @@ export const El = {
     const main=document.createElement('dialog');
     if(o.name) main.name=o.name;
     if(o.class) main.className=o.class;
+    if(o.classes) main.className = o.classes.filter(e => e).join(' ');
     if(o.id) main.id=o.id;
     if(o.text) main.textContent=o.text;
     if(o.onkey) main.onkeydown=(e) => {
@@ -812,8 +887,8 @@ export const El = {
     if(cnts) return getter(cfg, `${cnts}.${name}`);
     else return cfg[name];
   },
-  styleChecker: function(name){
-    for(let i = 0, arr = document.querySelectorAll(`style`); i < arr.length; i++){
+  styleChecker: function(name, path){
+    for(let i = 0, arr = (path||document).querySelectorAll(`style`); i < arr.length; i++){
       if(!arr[i].getAttribute('stylename')) continue;
       if(arr[i].getAttribute('stylename') === name) return true;
     }
