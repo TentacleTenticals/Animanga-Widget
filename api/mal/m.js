@@ -5,6 +5,9 @@ export class MalApi{
   tokenUrl = 'https://myanimelist.net/v1/oauth2/token?';
   authUrl = 'https://myanimelist.net/v1/oauth2/authorize?';
   title = 'https://myanimelist.net/';
+  link = {
+    item: (type, id) => this.title+type+'/'+id
+  };
   dataConverter = (o) => {
     if(!o.data) return;
     if(o.method === 'get') return;
@@ -26,7 +29,7 @@ export class MalApi{
       ...(o.data) && {body: this.dataConverter(o)}
     }).then(
       r => {
-        console.log('[MAL API] R', r);
+        // console.log('[MAL API] R', r);
         if(!r.ok){
           new Ut().MyError(['[MAL API]', 'Err', {type:'log'}], {response:r});
         }else return r.json();
@@ -56,7 +59,7 @@ export class MalApi{
           Url: `${this.url}/${o.type}/${o.id}?${new URLSearchParams(query)}`
         };
 
-        console.log('O id', o);
+        // console.log('O id', o);
         return this.fetch(o);
       }
     },
@@ -73,7 +76,7 @@ export class MalApi{
           Url: `${this.url}/${o.type}?${new URLSearchParams(query)}`
         };
 
-        console.log('Lolo', o);
+        // console.log('Lolo', o);
         return this.fetch(o).then(
           res => {
             if(!res) return;
