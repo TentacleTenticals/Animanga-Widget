@@ -6,9 +6,6 @@ export class MalFc extends MalApi{
   tokenUrl = 'https://myanimelist.net/v1/oauth2/token?';
   authUrl = 'https://myanimelist.net/v1/oauth2/authorize?';
   title = 'https://myanimelist.net/';
-  link = {
-    item: (type, id) => this.title+type+'/'+id
-  };
   fc = {
     auth: {
       cc: (length) => {
@@ -76,14 +73,14 @@ export class MalFc extends MalApi{
       item: {
         m: async (o) => {
           try {
-            const item = await this.fc.search.item.filter.byTitle({
+            const item = await this.fc.searchNFilter.item.byTitle({
               type: o.type,
               title: o.title,
               query: o.query,
               secrets: o.secrets,
               textMatch: o.textMatch
             });
-            if(!item) return;
+            if(!item) new Ut().MyError(['[MAL Search]:M', 'Item not found!', {type:'log'}], {o:o});
   
             const result = await this.fc.search.item.byId({type:o.type, login:o.login, id:item.id, query:{
               fields: ['id', 'title', 'media_type', 'rank', 'rating', 'popularity', 'score', 'mean', 'status', 'broadcast', 'statistics', 'start_date', 'my_list_status', 'num_episodes', 'num_volumes', 'num_chapters', 'recommendations', 'related_manga', 'related_anime', 'priority'].join()
@@ -103,50 +100,49 @@ export class MalFc extends MalApi{
         }).then(
           res => {
             console.log('[MAL byID]', res);
-            // if(!res) return;
-            // if(!res.data) return;
-            // if(!res.data.Media) return;
-            // // if(!res.data.Page.media) return;
-            // // console.log(new Ut().getType(res.data.Page.media));
+            if(!res) new Ut().MyError(['[MAL Search]:ById', 'Item not found!', {type:'log'}], {o:o});
             return res;
           }
-        ),
-        filter: {
-          byTitle: (o) => {
-            // console.log('ITEM', o);
-            return this.fc.search.items.byTitle(o).then(
-              items => {
-                if(!items && !items.length) return;
+        )
+      }
+    },
+    searchNsort: {
+      items: {
+        byTitle: (o) => {
+          return this.fc.search.items.byTitle(o).then(
+            items => {
+              if(!items && !items.length) return;
   
-                items.forEach(e => {
-                  e.iTitle = e.title;
-                });
-                const found = new Ut().textMatcher.m(items, o.title, {textMatch: o.textMatch});
-                if(!found||found.ind === null) return;
-                return (items[found.ind]);
-              }
-            );
-    
-            // try{
-            //   const items = await this.search.items.byTitle(o);
-            //   if(items && items.length){
-            //     items.forEach(e => {
-            //       e.iTitle = e.title;
-            //     });
-            //     const found = new Ut().textMatcher.m(items, o.title, {textMatch: o.textMatch});
-            //     // console.log('RES', items);
-            //     console.log('FOUND', found, items[found.ind]);
-            //     if(found.ind === null) return;
-            //     return (items[found.ind]);
-            //     // const result = await this.search.item.byId({login:false, type:o.type, id:items[found.ind].id, query:{
-            //     //   fields: ['id', 'title', 'media_type', 'rank', 'rating', 'popularity', 'score', 'mean', 'status', 'broadcast', 'statistics', 'start_date', 'my_list_status', 'num_episodes', 'num_volumes', 'num_chapters', 'recommendations', 'related_manga', 'related_anime', 'priority'].join()
-            //     // }, secrets:o.secrets});
-            //     // if(result) return result;
-            //   }
-            // }catch(err){
-            //   console.log('[MAL FC]', err);
-            // }
-          },
+              items.forEach(e => {
+                e.iTitle = e.title;
+              });
+              const found = new Ut().textMatcher.m(items, o.title, {textMatch: o.textMatch});
+              if(!found) new Ut().MyError(['[MAL Sort]:ByTitle', 'Item not sorted!', {type:'log'}], {o:o});
+              // console.log('Founder', found);
+              return found;
+            }
+          );
+        }
+      }
+    },
+    filter: {
+      item: {
+        byTitle: (o) => {
+          // console.log('ITEM', o);
+          return this.fc.search.items.byTitle(o).then(
+            items => {
+              if(!items && !items.length) new Ut().MyError(['[MAL Filter]:ByTitle', 'Item not found!', {type:'log'}], {o:o});;
+  
+              items.forEach(e => {
+                e.iTitle = e.title;
+              });
+              const found = new Ut().textMatcher.m(items, o.title, {textMatch: o.textMatch});
+              if(+found.sorted.result.percents.diff > +o.textMatch.percents) return items[found.sorted.item.ind];
+              else new Ut().MyError(['[MAL Filter]:ByTitle', 'Item not filtered!', {type:'log'}], {data:found});
+              // if(!found||found.ind === null) return;
+              // return (items[found.ind]);
+            }
+          );
         }
       }
     },
