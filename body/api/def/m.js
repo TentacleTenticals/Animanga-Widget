@@ -5,6 +5,7 @@ import {Modal} from './modal.js';
 import {Ut} from '../../../funcs/utils.js';
 
 export class Def{
+  attrs = (o) => Object.entries(o).map(e => [e[0], e[1]]);
   lang = {
     type: (item, v) => {
       if(!item.title && !v) return 1;
@@ -27,14 +28,30 @@ export class Def{
       if(item.title === 'sh') return 1;
     },
     en: {
+      title: ['Animanga Widget', 'AW', '', 'Animaga Widget'],
       status: ['Status', 'St', '📶', 'Status'],
       reload: ['Reload', 'Rl', '🔃', 'Reload'],
-      save: ['Save', 'Sav', '💾', 'Save']
+      save: ['Save', 'Sav', '💾', 'Save'],
+      saveData: ['Last saves', 'LS', '', 'Last saves'],
+      modal: {
+        search: {
+          title: ['Search', 'Sr', '', 'Search'],
+          toDef: ['Back to def', 'To def', '', 'Back to default title']
+        }
+      }
     },
     ru: {
+      title: ['Animanga Widget', 'AW', '', 'Animaga Widget'],
       status: ['Статус', 'Ст', '📶', 'Статус'],
       reload: ['Reload', 'Rl', '🔃', 'Reload'],
-      save: ['Сохранить', 'Сохр', '💾', 'Сохранить']
+      save: ['Сохранить', 'Сохр', '💾', 'Сохранить'],
+      saveData: ['Последние сохранения', 'ПС', '', 'Последние сохранения'],
+      modal: {
+        search: {
+          title: ['Поиск', 'Пск', '', 'Поиск'],
+          toDef: ['Вернуть дефолт', 'Вернуть деф', '', 'Вернуть изначальное значение поиска']
+        }
+      }
     }
   };
   modal = {
@@ -139,6 +156,114 @@ export class Def{
       };
     }
   };
+  search = (o, path, btnMode, item, string, line) => {
+    // o.search.titleUpd = o.title;
+    for(const e of o.cfg.api.list){
+      if(!e.search) continue;
+      switch(e.name){
+        case 'mal': {
+          return new MalApi().fc.searchNsort.items.byTitle({
+            type: o.type,
+            title: o.title,
+            secrets: e.secrets,
+            textMatch: o.cfg.textMatch
+          }).then(
+            res => {
+              res.results.sort((a,b) => (a.result.percents.diff > b.result.percents.diff) ? -1 : ((b.result.percents.diff > a.result.percents.diff) ? 1 : 0))
+              if(!btnMode && o.search.start.mode === 'bestMatch'){
+                const item = res.sorted.item;
+                console.log('ITEMMMMMM', item)
+                // o.title = item.title;
+                // o.search.titleUpd = e.item.title;
+                o.search.malId = item.id;
+                o.malId = item.id;
+                o.s.mal.search = res.sorted.result.percents.diff;
+                this.run(o);
+              }else
+              // if(res) return res;
+
+              if(btnMode||o.search.start.mode === 'modal' || o.search.start.mode === 'lowMatch' && !(+res.sorted.result.percents.diff >= +o.cfg.textMatch.percents)) El.Dialog({
+                path: path,
+                class: 'mdl search-modal flx ver',
+                showM: true,
+                delOnclose: true,
+                func: (m) => {
+                  El.Div({
+                    path: m,
+                    class: 'header flx ver',
+                    func: (h) => {
+                      El.Div({
+                        path: h,
+                        class: 'title',
+                        text: this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang].modal.search.title[this.lang.type(item, 0)]
+                      });
+                      
+                      El.Div({
+                        path: h,
+                        class: 'item flx',
+                        func: (h) => {
+                          El.Div({
+                            path: h,
+                            class: 'text',
+                            text: o.title
+                          });
+                          El.Button({
+                            path: h,
+                            text: this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang].modal.search.toDef[this.lang.type(item, 0)],
+                            onclick: () => {
+                              o.title = o.search.titleDef;
+                              m.remove();
+                              this.search(o, p, btnMode, item, string, line);
+                              // h.children[0].textContent = o.title;
+                            }
+                          });
+                        }
+                      });
+                    }
+                  });
+
+                  El.Div({
+                    path: m,
+                    class: 'list flx ver',
+                    func: (l) => {
+                      res.results.forEach(e => {
+                        El.Div({
+                          path: l,
+                          class: 'item flx',
+                          onclick: () => {
+                            console.log('CLICKED')
+                            m.remove();
+                            o.title = e.item.title;
+                            // o.search.titleUpd = e.item.title;
+                            o.search.malId = e.item.id;
+                            o.malId = e.item.id;
+                            o.s.mal.search = e.result.percents.diff;
+                            this.run(o);
+                          },
+                          func: (item) => {
+                            El.Div({
+                              path: item,
+                              text: e.item.title
+                            });
+
+                            El.Div({
+                              path: item,
+                              class: 'num',
+                              text: e.result.percents.diff+'%'
+                            });
+                          }
+                        })
+                      })
+                    }
+                  });
+                }
+              })
+            }
+          )
+        }
+      }
+    }
+  };
   run = (o) => {
     const runs = [];
     for(const e of o.cfg.api.list){
@@ -146,7 +271,16 @@ export class Def{
       switch(e.name){
         case 'mal': {
           runs.push(
-            new MalApi().fc.search.item.m({
+            (o.malId ? new MalApi().fc.search.item.byId({
+              type: o.type,
+              id: o.malId,
+              query: {
+                fields: ['id', 'title', 'media_type', 'rank', 'rating', 'popularity', 'score', 'mean', 'status', 'broadcast', 'statistics', 'start_date', 'my_list_status', 'num_episodes', 'num_volumes', 'num_chapters', 'recommendations', 'related_manga', 'related_anime', 'priority'].join(),
+                limit: 10
+              },
+              login: e.info.login,
+              secrets: e.secrets
+            }) : new MalApi().fc.search.item.m({
               type: o.type,
               title: o.title,
               query: {
@@ -155,7 +289,7 @@ export class Def{
               login: e.info.login,
               secrets: e.secrets,
               textMatch: o.cfg.textMatch
-            }).then(
+            })).then(
               res => {
                 if(!res) throw new Ut().MyError(['[MAL Load]', 'No data']);
                 if(e.main){
@@ -182,14 +316,22 @@ export class Def{
                   o.s.mal.volumes = res.num_volumes||0;
                   o.s.mal.chapters = res.num_chapters||0;
                 }
-                o.s.mal.status = res.status||'';
-                o.s.mal.broadcast = res.broadcast||'';
+                o.s.mal.status = {
+                  status: res.status,
+                  broadcast: res.broadcast
+                };
+                o.s.mal.broadcast = {
+                  status: res.status,
+                  broadcast: res.broadcast
+                };
+                // o.s.mal.broadcast = res.broadcast||'';
                 
                 if(res.my_list_status){
                   const my = res.my_list_status;
                   console.log('MAL SCORE', my);
                   o.s.save.statusItem = my.status||undefined;
                   o.s.save.myRating = my.score||0;
+                  o.s.mal.updatedAt = my.updated_at;
 
                   if(o.type === 'anime'){
                     o.s.save.watchedEps = my.num_episodes_watched||0;
@@ -210,7 +352,15 @@ export class Def{
             if(o.s.mal.id) console.log('IDDDDDD', o.s.mal.id);
           }
           runs.push(
-            new AniApi().fc.search.item.m({
+            (o.malId ? new AniApi().fc.search.item.byId({
+              type: o.type,
+              idMal: o.malId,
+              query: {
+                limit: 10
+              },
+              login: e.info.login,
+              secrets: e.secrets
+            }) : new AniApi().fc.search.item.m({
               type: o.type,
               title: o.title,
               query: {
@@ -219,7 +369,7 @@ export class Def{
               login: e.info.login,
               secrets: e.secrets,
               textMatch: o.cfg.textMatch
-            }).then(
+            })).then(
               res => {
                 console.log('ANI RES', res);
                 if(!res) throw new Ut().MyError(['[MAL Load]', 'No data']);
@@ -268,16 +418,19 @@ export class Def{
     )
   };
   save = (o, save) => {
+    const runs = [];
     for(const e of o.cfg.api.list){
       if(!e.save.active) continue;
+      if(!e.secrets.accToken) continue;
       switch(e.name){
         case 'mal': {
+          if(!o.s.mal.id) continue;
           const status = () => {
             if(o.s.mal.statusItem === 'repeating') return 'completed';
             else
             return o.s.mal.statusItem||(o.type === 'anime' ? 'watching':'reading')
           };
-          new MalApi().user.list.upd({
+          runs.push(new MalApi().user.list.upd({
             type: o.type,
             id: o.s.mal.id,
             secrets: e.secrets,
@@ -299,109 +452,192 @@ export class Def{
             sav => {
               console.log('[MAL Widget] UPDATE', sav);
               const time = El.getTime(sav?.updated_at, 'full');
-              save.target.textContent = 'Saved ✅';
-              // if(o.s.mal.statusItem !== sav.status) o.s.mal.statusMal = sav.status;
-              // time && (o.s.me.updatedAt = time.date+' '+time.time);
-              setTimeout(() => {
-                save.target.textContent = 'Save';
-              }, 5000);
+              time && (o.s.mal.updatedAt = time.date+' '+time.time);
             }
-          )
+          ))
         }
       }
     };
+    Promise.allSettled(runs).then(
+      results => {
+        console.log('[Animanga]:SAVE - saved!');
+        save.classList.add('saved');
+        // save.textContent = 'Saved ✅';
+        // if(o.s.mal.statusItem !== sav.status) o.s.mal.statusMal = sav.status;
+        // time && (o.s.me.updatedAt = time.date+' '+time.time);
+        setTimeout(() => {
+          save.classList.remove('saved');
+          // save.textContent = 'Save';
+        }, 5000);
+      }
+    )
   };
   build = (p, line, string, item, el, o) => {
-    switch(item.n){
-      case 'reload': El.Button({
-        path: p,
-        attrs: [item.align && ['i-align', item.align], item.style && ['i-style', item.style]],
+    const name = 'def';
+    const _this = this;
+    new (this.class(name, p, line, string, item, el, o, _this))().check()
+  };
+  class = (name, path, line, string, item, el, o, _this) => class {
+    title = () => {
+      El.Div({
+        path: path,
+        attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+        classes: ['i-mainTitle', '-item', 'flx'],
+        text: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['title'][_this.lang.type(item, 1)],
+        title: +_this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['title'][3],
+        func: (e) => {
+          el.def.title = e;
+        },
+        onclick: () => {
+          console.log('YO!', o);
+        }
+      });
+    };
+    reload = () => {
+      El.Button({
+        path: path,
+        attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
         class: ['reload', 'def', '-item', item.pos && ' -'+item.pos||'', 'flx'].join(' '),
-        text: this.lang[item.lang||string.lang||line.lang]['reload'][this.lang.type(item, 2)],
-        title: this.lang[item.lang||string.lang||line.lang]['reload'][3],
+        text: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['reload'][_this.lang.type(item, 2)],
+        title: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['reload'][3],
         func: (e) => {
           el.def.reload = e;
-          el.def.runner = () => this.run(o);
-          p.closest('#animanga-widget').addEventListener('rel', () => {
+          el.def.runner = () => _this.run(o);
+          path.closest('#animanga-widget').addEventListener('rel', () => {
             console.log('q', el.def.reload)
             // el.def.reload.focus();
-            this.run(o);
+            _this.run(o);
           });
         },
         onclick: () => {
           console.log('YO!', o);
-          this.run(o);
+          _this.search(o, path, '', item, string, line);
+          // this.run(o);
         }
       });
-      break;
-      case 'save': El.Div({
-        path: p,
-        attrs: [item.align && ['i-align', item.align], item.style && ['i-style', item.style]],
-        class: ['reload', 'def', '-item', item.pos && ' -'+item.pos||'', 'flx'].join(' '),
-        text: this.lang[item.lang||string.lang||line.lang]['save'][this.lang.type(item, 2)],
-        title: this.lang[item.lang||string.lang||line.lang]['save'][3],
-        func: (e) => el.def.save = e,
-        onclick: (btn) => {
-          this.save(o, el.def.save);
-        }
-      });
-      break;
-      case 'status': 
-        const _this = this;
-        
-        El.Div({
-          path: p,
-          classes: ['widgetStatus', 'def', '-item', item.pos && ' -'+item.pos||'', 'flx'],
-          text: this.lang[item.lang||string.lang||line.lang]['status'][this.lang.type(item, 2)],
-        title: this.lang[item.lang||string.lang||line.lang]['status'][3],
-          onclick: (e) => {
-            if(!e.target.className.match('-item')) return;
-            console.log('Lol', e.target)
-            if(!e.target.children.length) El.Dialog({
-              path: e.target,
-              class: 'mdl',
-              showM: true,
-              delOnclose: true,
-              func: (m) => {
-                const el = {
-                  mal: {},
-                  ani: {},
-                  shiki: {}
-                };
-                El.Div({
-                  path: m,
-                  class: 'mdl widgetStatus flx ver',
-                  func: (m) => {
-                    // console.log('API', api, classList[api]);
-                    new this.modal.Build({o:o}).main(m);
-                
-                    // window.addEventListener('message', (e) => {
-                    //   if(e.data.type && e.data.type === 'PREVIEW_INSTANTIATE_DIFF') return;
-                    //   console.log('Message from c!', e.data);
-                    //   // console.log('ELL', el)
-                    //   if(e.data.code){
-                    //     el.MSG.textContent = 'Код получен. Нажмите на кнопку выше для получения токенов';
-                    //     if(data) data.code = e.data.code;
-                
-                    //     el.w?.postMessage({MSG:'Код получен, данная вкладка будет закрыта через 5 секунд'}, '*');
-                    //     // el.btnLogin.disabled = true;
-                    //     // el.btnToken.disabled = false;
-                    //     setTimeout(() => {
-                    //       el.w && el.w?.postMessage({type:'close'}, '*');
-                    //     }, 5000);
-                    //   }
-                    // });
+    };
+    save = () => {
+      El.Div({
+        path: path,
+        classes: ['n-save-updated', '-itemMini', 'flx'],
+        attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+        func: (m) => {
+          El.Details({
+            path: m,
+            classes: ['n-updatedAt', '-itemMini', 'flx', 'ver'],
+            summary: true,
+            summaryT: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['saveData'][_this.lang.type(item, 1)],
+            title: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['saveData'][3],
+            func: (m) => {
+              El.Div({
+                path: m,
+                class: 'list flx ver',
+                func: (m) => {
+                  for(const i of o.cfg.api.list){
+                    if(i.save.active){
+                      El.Div({
+                        path: m,
+                        class: 'item flx',
+                        text: i.name.toUpperCase(),
+                        func: (m) => {
+                          El.Div({
+                            path: m,
+                            class: 'value',
+                            func: (e) => el[i.name].updatedAt = e
+                          });
+                        }
+                      });
+                    }
+                    // El.getTime(sav?.updated_at, 'full')
                   }
-                });
-              }
-            })
-            // e.target.children[0]?.showModal();
-          },
-          func: (s) => {
-          }
-        });
-      break;
-    }
+                }
+              });
+            }
+          });
+
+          El.Div({
+            path: m,
+            attrs: [['api', name]],
+            class: ['n-save', 'def', '-item', item.pos && ' -'+item.pos||'', 'flx'].join(' '),
+            text: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['save'][_this.lang.type(item, 2)],
+            title: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['save'][3],
+            func: (e) => el.def.save = e,
+            onclick: (btn) => {
+              _this.save(o, el.def.save);
+            }
+          });
+        }
+      });
+    };
+    status = () => {
+      El.Div({
+        path: path,
+        attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+        classes: ['widgetStatus', 'def', '-item', item.pos && ' -'+item.pos||'', 'flx'],
+        text: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['status'][_this.lang.type(item, 2)],
+        title: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['status'][3],
+        onclick: (e) => {
+          if(!e.target.className.match('-item')) return;
+          console.log('Lol', e.target)
+          if(!e.target.children.length) El.Dialog({
+            path: e.target,
+            class: 'mdl',
+            showM: true,
+            delOnclose: true,
+            func: (m) => {
+              const el = {
+                mal: {},
+                ani: {},
+                shiki: {}
+              };
+              El.Div({
+                path: m,
+                class: 'mdl widgetStatus flx ver',
+                func: (m) => {
+                  // console.log('API', api, classList[api]);
+                  new _this.modal.Build({o:o}).main(m);
+              
+                  // window.addEventListener('message', (e) => {
+                  //   if(e.data.type && e.data.type === 'PREVIEW_INSTANTIATE_DIFF') return;
+                  //   console.log('Message from c!', e.data);
+                  //   // console.log('ELL', el)
+                  //   if(e.data.code){
+                  //     el.MSG.textContent = 'Код получен. Нажмите на кнопку выше для получения токенов';
+                  //     if(data) data.code = e.data.code;
+              
+                  //     el.w?.postMessage({MSG:'Код получен, данная вкладка будет закрыта через 5 секунд'}, '*');
+                  //     // el.btnLogin.disabled = true;
+                  //     // el.btnToken.disabled = false;
+                  //     setTimeout(() => {
+                  //       el.w && el.w?.postMessage({type:'close'}, '*');
+                  //     }, 5000);
+                  //   }
+                  // });
+                }
+              });
+            }
+          })
+          // e.target.children[0]?.showModal();
+        },
+        func: (s) => {
+        }
+      });
+    };
+    check = () => {
+      const name = 'def';
+      switch(item.n){
+        case 'title': this.title();
+        break;
+        case 'reload': this.reload();
+        break;
+        case 'save': this.save();
+        break;
+        case 'status':
+          
+          this.status();
+        break;
+      }
+    };
   };
   connect = (type, el, o) => {
     function upd(key, v, e) {
