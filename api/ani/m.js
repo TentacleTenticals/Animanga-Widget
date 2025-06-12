@@ -246,7 +246,7 @@ export class AniApi{
         `;
         const variables = {
           type: o.type.toUpperCase(),
-          search: o.title.slice(0, 64),
+          search: o.title,
           perPage: o.limit
         };
         o.data = {
