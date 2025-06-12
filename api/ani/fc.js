@@ -75,6 +75,23 @@ export class AniFc extends AniApi{
             console.error('[Anilist FC]', err);
           }
         },
+        sort: {
+          byTitle: (o) => {
+            return this.fc.search.items.byTitle(o).then(
+              items => {
+                if(!items && !items.length) return;
+  
+                items.forEach(e => {
+                  e.iTitle = e.title;
+                });
+                const found = new Ut().textMatcher.m(items, o.title, {textMatch: o.textMatch});
+                if(!found) return;
+                // console.log('Founder', found);
+                return found;
+              }
+            );
+          }
+        },
         filter: {
           byTitle: (o) => {
             return this.fc.search.items.byTitle(o).then(
@@ -86,8 +103,8 @@ export class AniFc extends AniApi{
                 });
                 // console.log('LOLI', items)
                 const found = new Ut().textMatcher.m(items, o.title, {textMatch: o.textMatch});
-                if(found.ind === null) return;
-                return (items[found.ind]);
+                if(!found) return;
+                if(+found.sorted.result.percents.diff > +o.textMatch.percents) return items[found.sorted.item.ind];
               }
             );
           }
@@ -102,7 +119,7 @@ export class AniFc extends AniApi{
             console.log('[ANI byID]', res);
             if(!res) return;
             if(!res.data) return;
-            if(!res.data && !res.data.errors) throw new Ut().MyError(['[ANI byID]', 'Err', {type:'log'}], {errors:res.data.errors});
+            if(res?.errors) throw new Ut().MyError(['[ANI Search]:byId', 'Err', {type:'log'}], {errors:res.errors});
             if(!res.data.Media) return;
             // if(!res.data.Page.media) return;
             // console.log(ut.getType(res.data.Page.media));
@@ -113,7 +130,7 @@ export class AniFc extends AniApi{
       },
       items: {
         byTitle: (o) => {
-          console.log('T', o)
+          // console.log('T', o)
           return this.search.items.byTitle({
             type: o.type,
             title: o.title,
