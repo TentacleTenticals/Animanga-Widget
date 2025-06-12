@@ -1,7 +1,10 @@
 import {El} from '../../../base/classes/m.js';
+import {MalApi} from '../../../api/mal/m.js';
+import {Def} from '../def/m.js';
 
 export class Mal{
   gp = (t, path) => path.reduce((r, k) => k ? r[k] : r, t);
+  attrs = (o) => Object.entries(o).map(e => [e[0], e[1]]);
   lang = {
     type: (item, v) => {
       if(!item.title && !v) return 1;
@@ -24,21 +27,6 @@ export class Mal{
       if(item.title === 'sh') return 1;
     },
     en: {
-      id: ['ID', 'ID', '', 'MAL ID'],
-      status: ['Status', 'St', '⏳\ufe0e', 'Status'],
-      rating: ['Rating', 'Rt', '💣\ufe0e', 'Rating'],
-      popularity: ['Popularity', 'Pop-ty', '🔥\ufe0e'],
-      broadcast: ['Broadcast', 'Brod', '🗓️\ufe0e'],
-      link: ['Link', 'Link', '🔗', 'Link'],
-      title: ['', '', '', 'Title'],
-      watched: ['Watched:', 'Watch:', '📽️'],
-      watchedEps: ['Episodes', 'Eps', '🎞️', 'Watched episodes'],
-      episodes: ['', '', '', 'Episodes'],
-      readed: ['Readed:', 'Rdd:', '📖'],
-      readedVol: ['Volume', 'Vol'],
-      volumes: ['Volumes', 'Vol', '', 'Volumes'],
-      readedCh: ['Chapter', 'Ch'],
-      chapters: ['Chapters', 'Ch', ''],
       day: {
         monday: ['Monday', 'Mon', ''],
         tuesday: ['Tuesday', 'Tue', ''],
@@ -54,8 +42,16 @@ export class Mal{
         finished_airing: ['Вышло', 'Вы'],
         finished_publishing: ['Закончено', 'Зак']
       },
-      myRating: ['My rating', 'Myrat', '🔥\ufe0e', 'My rating'],
       anime: {
+        id: ['ID', 'ID', '', 'MAL ID'],
+        status: ['Status', 'St', '⏳\ufe0e', 'Status'],
+        rating: ['Rating', 'Rt', '💣\ufe0e', 'Rating'],
+        popularity: ['Popularity', 'Pop-ty', '🔥\ufe0e'],
+        broadcast: ['Broadcast', 'Brod', '🗓️\ufe0e'],
+        link: ['Link', 'Link', '🔗', 'Link'],
+        title: ['', '', '', 'Title'],
+        myRating: ['My rating', 'Myrat', '🔥\ufe0e', 'My rating'],
+      ['myRating-title']: ['My rating', 'Myrat', '🔥\ufe0e', 'My rating'],
         watched: ['Watched:', 'Watch:', '📽️'],
         watchedEps: ['Episodes', 'Eps', '🎞️', 'Watched episodes'],
         episodes: ['', '', '', 'Episodes'],
@@ -73,6 +69,13 @@ export class Mal{
         }
       },
       manga: {
+        id: ['ID', 'ID', '', 'MAL ID'],
+        status: ['Status', 'St', '⏳\ufe0e', 'Status'],
+        rating: ['Rating', 'Rt', '💣\ufe0e', 'Rating'],
+        popularity: ['Popularity', 'Pop-ty', '🔥\ufe0e'],
+        broadcast: ['Broadcast', 'Brod', '🗓️\ufe0e'],
+        link: ['Link', 'Link', '🔗', 'Link'],
+        title: ['', '', '', 'Title'],
         readed: ['Readed:', 'Rdd:', '📖'],
         readedVol: ['Volume', 'Vol'],
         volumes: ['Volumes', 'Vol', '', 'Volumes'],
@@ -100,14 +103,6 @@ export class Mal{
       broadcast: ['Выходит в', 'Вых в', '🗓️\ufe0e', 'Выходит в'],
       link: ['Ссылка', 'С-ка', '🔗', 'Ссылка'],
       title: ['', '', '', 'Название тайтла'],
-      watched: ['Смотрю:', 'Смт:', '📽️', 'Просмотрено'],
-      watchedEps: ['Эпизоды', 'Эп', '🎞️', 'Просмотреннные эпизоды'],
-      episodes: ['', '', '', 'Эпизоды'],
-      readed: ['Читаемое:', 'Чит:', '📖', 'Читаемое'],
-      readedVol: ['Volume', 'Vol', '', 'Прочитанные тома'],
-      volumes: ['Volumes', 'Vol', '', 'Тома'],
-      readedCh: ['Chapter', 'Ch', '', 'Прочитанные главы'],
-      chapters: ['Chapters', 'Ch', '', 'Главы'],
       day: {
         monday: ['Понедельник', 'Пн', ''],
         tuesday: ['Вторник', 'Вт', ''],
@@ -123,8 +118,18 @@ export class Mal{
         finished_airing: ['Вышло', 'Вы'],
         finished: ['Закончено', 'Зак']
       },
-      myRating: ['My rating', 'Myrat', '🔥\ufe0e', 'My rating'],
+      myRating: ['Мой рейтинг', 'МойРейт', '🔥\ufe0e', 'Мой рейтинг'],
+      ['myRating-title']: ['Мой рейтинг', 'МойРейт', '🔥\ufe0e', 'Мой рейтинг'],
       anime: {
+        id: ['ID', 'ID', '', 'MAL ID'],
+        status: ['Статус', 'Ст', '⏳\ufe0e', 'Статус'],
+        rating: ['Рейтинг', 'Рт', '💣\ufe0e', 'Рейтинг'],
+        popularity: ['Популярность', 'Попул', '🔥\ufe0e', 'Популярность'],
+        broadcast: ['Выходит в', 'Вых в', '🗓️\ufe0e', 'Выходит в'],
+        link: ['Ссылка', 'С-ка', '🔗', 'Ссылка'],
+        title: ['', '', '', 'Название тайтла'],
+        myRating: ['Мой рейтинг', 'МойРейт', '🔥\ufe0e', 'Мой рейтинг'],
+      ['myRating-title']: ['Мой рейтинг', 'МойРейт', '🔥\ufe0e', 'Мой рейтинг'],
         watched: ['Смотрю:', 'Смт:', '📽️', 'Просмотрено'],
         watchedEps: ['Эпизоды', 'Эп', '🎞️', 'Просмотреннные эпизоды'],
         episodes: ['', '', '', 'Эпизоды'],
@@ -167,18 +172,17 @@ export class Mal{
     const _this = this;
 
     class Gr{
-      item(path, item, obj){
+      itemCh(path, item, obj){
         El.Div({
           path: path,
           attrs: [
-            item.align && ['i-align', item.align],
-            item.gap && ['i-align', item.gap],
-            item.style && ['i-style', item.style],
+            ['api', name],
+            ...(item.cfg ? _this.attrs(item.cfg) : []),
             ...(obj && obj.attrs ? obj.attrs : [])
           ],
-          classes: [obj.key, item.tag && name, ...(obj && obj.class ? obj.class : []), 'flx'],
-          text: obj && obj.nottl ? '' : _this.gp(_this.lang, [item.lang||string.lang||line.lang, obj.type, obj.key, obj?.ttl||_this.lang.type(item)]),
-          title: _this.gp(_this.lang, [item.lang||string.lang||line.lang, obj.type, obj.key, 3]),
+          classes: ['n-'+obj.key, '-item', ...(obj && obj.classes ? obj.classes : []), 'flx'],
+          text: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, obj.key, _this.lang.type(item, 2)]),
+          title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, obj.key, 3]),
           func: (i) => {
             El.Div({
               path: i,
@@ -189,18 +193,67 @@ export class Mal{
           }
         });
       };
-      itemOne = (path, item, obj, text) => {
+      item = (path, item, obj, text) => {
         El.Div({
           path: path,
-          attrs: [item.align && ['i-align', item.align], item.style && ['i-style', item.style], ...(obj.attrs ? obj.attrs:[])],
-          classes: [obj.key, item.tag && name, ...(obj.class ? obj.class:[]), 'flx'],
-          text: _this.lang[item.lang||string.lang||line.lang][obj.key][text||_this.lang.type(item, obj.num)],
-          title: _this.lang[item.lang||string.lang||line.lang][obj.key][3],
+          attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : []), ...(obj.attrs ? obj.attrs:[])],
+          classes: ['n-'+obj.key, '-item', ...(obj.classes ? obj.classes:[]), 'flx'],
+          text: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, obj.key, _this.lang.type(item, 2)]),
+          title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, obj.key])[3],
+        });
+      };
+      itemMini = (path, item, obj, text) => {
+        El.Div({
+          path: path,
+          attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : []), ...(obj.attrs ? obj.attrs:[])],
+          classes: ['n-'+obj.key, '-itemMini', ...(obj.classes ? obj.classes:[]), 'flx'],
+          text: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, obj.key, _this.lang.type(item, 2)]),
+          title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, obj.key])[3],
+        });
+      };
+      itemMiniCh(path, item, obj){
+        El.Div({
+          path: path,
+          attrs: [
+            ['api', name],
+            ...(item.cfg ? _this.attrs(item.cfg) : []),
+            ...(obj && obj.attrs ? obj.attrs : [])
+          ],
+          classes: ['n-'+obj.key, '-itemMini', ...(obj && obj.classes ? obj.classes : []), 'flx'],
+          text: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, obj.key, _this.lang.type(item, 2)]),
+          title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, obj.key, 3]),
+          func: (i) => {
+            El.Div({
+              path: i,
+              class: 'value',
+              text: obj?.text,
+              func: (e) => el[name][obj.key] = e
+            });
+          }
+        });
+      };
+      inputNum = (path, item, obj) => {
+        El.Input({
+          path: path,
+          classes: ['n-'+obj.key, 'itemNum', 'val'],
+          type: 'number',
+          value: '0',
+          title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, obj.key, 3]),
+          oninput: (e) => {
+            if(e.target.value) e.target.style.width = +e.target.value.length*8+'px';
+            o.s.save[obj.key] = e.target.value;
+          },
+          func: (e) => {
+            el[name][obj.key] = e;
+            if(e.value) e.style.width = +e.value.length*8+'px';
+          }
         });
       }
       check = (i, it) => {
         switch(it.n){
-          case 'div': this.containers.div(i, it);
+          case 'div': console.log('III', it)
+          
+          this.containers.div(i, it);
           break;
           case 'label': this.containers.label(i, it);
           break;
@@ -209,10 +262,10 @@ export class Mal{
 
           case 'statusItem': this[o.type].inputs.statusItem(i, it);
           break;
-          case 'myRating': this.other.myRating(i, it);
+          case 'myRating': this.other.myRating(i, it, 'noType');
           break;
 
-          case 'myRatingTtl': this.other.title.myRating(i, it);
+          case 'myRating-title': this.other.title.myRating(i, it, 'noType');
           break;
 
           case 'titleWatched': this.anime.title.main(i, it);
@@ -261,7 +314,6 @@ export class Mal{
   
           case 'status': this.other.status(i, it);
           break;
-  
           case 'broadcast': this.other.broadcast(i, it);
           break;
   
@@ -274,53 +326,59 @@ export class Mal{
       };
       other = {
         id: (path, item) => {
-          this.item(path, item, {
-            key: 'id',
-            class: ['-item'],
+          El.Div({
+            path: path,
+            classes: ['n-'+'id', '-item', 'flx'],
+            attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+            text: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'id', _this.lang.type(item, 1)]),
+            title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'id', 3]),
+            func: (e) => {
+              // el[name].id = e;
+              El.A({
+                path: e,
+                classes: ['value', 'flx'],
+                func: (e) => el[name].id = e
+              })
+            }
           });
+          // this.itemCh(path, item, {
+          //   key: 'id',
+          //   class: ['-item'],
+          // });
         },
         rating: (path, item) => {
-          this.item(path, item, {
+          this.itemCh(path, item, {
             key: 'rating',
-            class: ['-item'],
+            classes: ['-item'],
             ttl: 2
           });
         },
         popularity: (path, item) => {
-          this.item(path, item, {
+          this.itemCh(path, item, {
             key: 'popularity',
-            class: ['-item'],
+            classes: ['-item'],
             ttl: 2
           });
         },
         status: (path, item) => {
-          this.item(path, item, {
+          this.itemCh(path, item, {
             key: 'status',
-            class: ['-item'],
-            attrs:[
-              ['lang', JSON.stringify([
-                (item.lang||string.lang||line.lang),
-                0]
-              )]
-            ],
-            ttl: 2
+            noType: true
+            // ttl: 2
           });
         },
         broadcast: (path, item) => {
           El.Div({
             path: path,
-            attrs: [item.align && ['i-align', item.align], item.style && ['i-style', item.style], item.showEnded && ['showEnded', item.showEnded], ['lang',
-            JSON.stringify([
-              (item.lang||string.lang||line.lang),
-              _this.lang.type(item)]
-              )]],
-            classes: ['broadcast', item.tag && name, '-item', '-hidden', 'flx'],
+            attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+            classes: ['n-'+'broadcast', '-item', 'flx'],
             func: (b) => {
               if(!el[name].broadcast) el[name].broadcast = {};
               El.Div({
                 path: b,
                 class: 'key',
-                text: _this.lang[item.lang||string.lang||line.lang]['broadcast'][_this.lang.type(item, 2)]
+                text: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'broadcast', _this.lang.type(item, 2)]),
+                title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'broadcast', 3])
               });
               El.Div({
                 path: b,
@@ -342,8 +400,9 @@ export class Mal{
         link: (path, item) => {
           El.A({
             path: path,
-            classes: ['link', item.tag && name, '-item', 'flx'],
-            text: _this.lang[item.lang||string.lang||line.lang]['link'][_this.lang.type(item, 2)],
+            classes: ['n-'+'link', '-item', 'flx'],
+            attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+            text: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'link', _this.lang.type(item, 2)]),
             func: (e) => {
               el[name].link = e;
             }
@@ -351,51 +410,66 @@ export class Mal{
         },
         title: {
           item: (path, item) => {
-            this.item(path, item, {
-              key: 'title',
-              class: ['-item']
-            });
+            El.Div({
+              path: path,
+              classes: ['n-title-search', '-item', 'flx'],
+              attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+              func: (m) => {
+                this.itemCh(m, item, {
+                  key: 'title',
+                  classes: ['-item']
+                });
+                El.Div({
+                  path: m,
+                  classes: ['n-search', 'flx'],
+                  func: (e) => el[name].search = e,
+                  onclick: () => {
+                    new Def().search(o, m, true, item, string, line);
+                  }
+                });
+              }
+            })
           },
           myRating: (path, item) => {
-            this.itemOne(path, item, {key:'myRating', class:['title', '-miniItem'], num:2});
+            this.itemMini(path, item, {key:'myRating-title', num:2});
           }
         },
         myRating: (path, item) => {
-          El.Input({
-            path: path,
-            classes: ['myRating', 'itemNum', 'val'],
-            type: 'number',
-            value: '0',
-            title: _this.gp(_this.lang, [item.lang||string.lang||line.lang, 'myRating', 3]),
-            oninput: (e) => {
-              if(e.target.value) e.target.style.width = +e.target.value.length*8+'px';
-            },
-            onchange: (e) => {
-              o.s.save.myRating = e.target.value;
-            },
-            func: (e) => {
-              el[name].myRating = e;
-              if(e.value) e.style.width = +e.value.length*8+'px';
-            }
-          });
+          this.inputNum(path, item, {key:'myRating', num:2});
+          // El.Input({
+          //   path: path,
+          //   classes: ['n-'+'myRating', 'itemNum', 'val'],
+          //   type: 'number',
+          //   value: '0',
+          //   title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, 'myRating', 3]),
+          //   oninput: (e) => {
+          //     if(e.target.value) e.target.style.width = +e.target.value.length*8+'px';
+          //     o.s.save.myRating = e.target.value;
+          //   },
+          //   func: (e) => {
+          //     el[name].myRating = e;
+          //     if(e.value) e.style.width = +e.value.length*8+'px';
+          //   }
+          // });
         }
       }
       anime = {
         title: {
           main: (path, item) => {
-            this.itemOne(path, item, {key:'watched', class:['title', '-miniItem'], num:2});
+            this.itemMini(path, item, {key:'watched', classes:['title', '-miniItem'], num:2});
           },
           eps: (path, item) => {
-            this.itemOne(path, item, {key:'watchedEps', class:['title', name], num:2});
+            this.item(path, item, {key:'watchedEps', num:2});
           }
         },
         inputs: {
           statusItem: (path, item) => {
             El.Select({
               path: path,
-              class: 'statusItem -item -flx',
-              options: _this.gp(_this.lang, [item.lang||string.lang||line.lang, o.type, 'statusItem', 'options']),
-              title: _this.gp(_this.lang, [item.lang||string.lang||line.lang, o.type, 'statusItem', 'text', 3]),
+              attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+              classes: ['n-'+'statusItem', '-item', '-flx'],
+              options: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'statusItem', 'options']),
+              title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'statusItem', 'text', 3]),
               func: (e) => {
                 el[name].statusItem = e;
               },
@@ -406,29 +480,16 @@ export class Mal{
           },
           episodes: {
             watched: (path, item) => {
-              El.Input({
-                path: path,
-                class: 'watchedEps itemNum val',
-                type: 'number',
-                value: '0',
-                title: _this.lang[item.lang||string.lang||line.lang]['watchedEps'][3],
-                oninput: (e) => {
-                  if(e.target.value) e.target.style.width = +e.target.value.length*8+'px';
-                  o.s.save.watchedEps = e.target.value;
-                },
-                func: (e) => {
-                  el[name].watchedEps = e;
-                  if(e.value) e.style.width = +e.value.length*8+'px';
-                }
-              });
+              this.inputNum(path, item, {key:'watchedEps', num:2});
             },
             max: (path, item) => {
-              this.item(path, item, {key:'episodes', class:['itemNum', 'len', 'flx'], attrs:[item.separator && ['i-sep', item.separator]], text:'0'});
+              this.itemMiniCh(path, item, {key:'episodes', classes:['itemNum', 'len', 'flx'], attrs:[...(item.cfg ? _this.attrs(item.cfg) : [])], text:'0'});
             },
             plus: (path, item) => {
               El.Button({
                 path: path,
-                classes: ['plusEps', 'numBtn', '-btn', item.type],
+                attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+                classes: ['n-'+'plusEps', 'numBtn', '-btn', item.type],
                 text: '+',
                 onclick: (l) => {
                   if(o.s.save.watchedEps === undefined) o.s.save.watchedEps = 0;
@@ -439,7 +500,8 @@ export class Mal{
             minus: (path, item) => {
               El.Button({
                 path: path,
-                classes: ['minusEps', 'numBtn', '-btn', item.type],
+                attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+                classes: ['n-'+'minusEps', 'numBtn', '-btn', item.type],
                 text: '-',
                 onclick: (l) => {
                   if(o.s.save.watchedEps === undefined) o.s.save.watchedEps = 0;
@@ -454,22 +516,22 @@ export class Mal{
       manga = {
         title: {
           main: (path, item) => {
-            this.itemOne(path, item, {key:'readed', class:['title', '-miniItem'], classq:[], num:2});
+            this.itemMini(path, item, {key:'readed', num:2});
           },
           vol: (path, item) => {
-            this.itemOne(path, item, {key:'readedVol', class:['title', '-miniItem'], classq:[], num:2});
+            this.itemMini(path, item, {key:'readedVol', num:2});
           },
           ch: (path, item) => {
-            this.itemOne(path, item, {key:'readedCh', class:['title', '-miniItem'], classq:[], num:2});
+            this.itemMini(path, item, {key:'readedCh', num:2});
           },
         },
         inputs: {
           statusItem: (path, item) => {
             El.Select({
               path: path,
-              class: 'statusItem -item -flx',
-              options: _this.gp(_this.lang, [item.lang||string.lang||line.lang, o.type, 'statusItem', 'options']),
-              title: _this.gp(_this.lang, [item.lang||string.lang||line.lang, o.type, 'statusItem', 'text', 3]),
+              classes: ['n-'+'statusItem', '-item', '-flx'],
+              options: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'statusItem', 'options']),
+              title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'statusItem', 'text', 3]),
               func: (e) => {
                 el[name].statusItem = e;
               }
@@ -477,28 +539,29 @@ export class Mal{
           },
           chapters: {
             readed: (path, item) => {
-              El.Input({
-                path: path,
-                class: 'readedCh itemNum val',
-                type: 'number',
-                value: '0',
-                title: _this.gp(_this.lang, [item.lang||string.lang||line.lang, o.type, 'readedCh', 3]),
-                oninput: (e) => {
-                  if(e.target.value) e.target.style.width = +e.target.value.length*8+'px';
-                  o.s.save.readedCh = e.target.value;
-                },
-                func: (e) => {
-                  el[name].readedCh = e;
-                  if(e.value) e.style.width = +e.value.length*8+'px';
-                }
-              });
+              this.inputNum(path, item, {key:'readedCh', num:2});
+              // El.Input({
+              //   path: path,
+              //   classes: ['n-'+'readedCh', 'itemNum', 'val'],
+              //   type: 'number',
+              //   value: '0',
+              //   title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'readedCh', 3]),
+              //   oninput: (e) => {
+              //     if(e.target.value) e.target.style.width = +e.target.value.length*8+'px';
+              //     o.s.save.readedCh = e.target.value;
+              //   },
+              //   func: (e) => {
+              //     el[name].readedCh = e;
+              //     if(e.value) e.style.width = +e.value.length*8+'px';
+              //   }
+              // });
             },
             max: (path, item) => {
-              this.item(path, item, {
+              this.itemCh(path, item, {
                 key: 'chapters',
                 type: o.type,
-                class: ['itemNum', 'len'],
-                attrs: [item.separator && ['i-sep', item.separator]],
+                classes: ['n-'+'itemNum', 'len'],
+                attrs: [...(item.cfg ? _this.attrs(item.cfg) : [])],
                 nottl: true,
                 text: '0'
               });
@@ -506,7 +569,7 @@ export class Mal{
             plus: (path, item) => {
               El.Button({
                 path: path,
-                class: ['plusCh', 'numBtn', '-btn', item.type].join(' '),
+                classes: ['n-'+'plusCh', 'numBtn', '-btn', item.type],
                 text: '+',
                 onclick: (l) => {
                   if(o.s.save.readedCh === undefined) o.s.save.readedCh = 0;
@@ -517,7 +580,7 @@ export class Mal{
             minus: (path, item) => {
               El.Button({
                 path: path,
-                class: ['minusCh', 'numBtn', '-btn', item.type].join(' '),
+                classes: ['n-'+'minusCh', 'numBtn', '-btn', item.type],
                 text: '-',
                 onclick: (l) => {
                   if(o.s.save.readedCh === undefined) o.s.save.readedCh = 0;
@@ -529,28 +592,14 @@ export class Mal{
           },
           volumes: {
             readed: (path, item) => {
-              El.Input({
-                path: path,
-                class: 'readedVol itemNum val',
-                type: 'number',
-                value: '0',
-                title: _this.gp(_this.lang, [item.lang||string.lang||line.lang, o.type, 'readedVol', 3]),
-                oninput: (e) => {
-                  if(e.target.value) e.target.style.width = +e.target.value.length*8+'px';
-                  o.s.save.readedVol = e.target.value;
-                },
-                func: (e) => {
-                  el[name].readedVol = e;
-                  if(e.value) e.style.width = +e.value.length*8+'px';
-                }
-              });
+              this.inputNum(path, item, {key:'readedVol', num:2});
             },
             max: (path, item) => {
-              this.item(path, item, {
+              this.itemCh(path, item, {
                 key: 'volumes',
                 type: o.type,
-                class: ['itemNum', 'len'],
-                attrs: [item.separator && ['i-sep', item.separator]],
+                classes: ['n-'+'itemNum', 'len'],
+                attrs: [...(item.cfg ? _this.attrs(item.cfg) : [])],
                 nottl: true,
                 text: '0'
               });
@@ -558,7 +607,7 @@ export class Mal{
             plus: (path, item) => {
               El.Button({
                 path: path,
-                class: ['plusVol', 'numBtn', '-btn', item.type].join(' '),
+                classes: ['n-'+'plusVol', 'numBtn', '-btn', item.type],
                 text: '+',
                 onclick: (l) => {
                   if(o.s.save.readedVol === undefined) o.s.save.readedVol = 0;
@@ -569,7 +618,7 @@ export class Mal{
             minus: (path, item) => {
               El.Button({
                 path: path,
-                class: ['minusVol', 'numBtn', '-btn', item.type].join(' '),
+                classes: ['n-'+'minusVol', 'numBtn', '-btn', item.type],
                 text: '-',
                 onclick: (l) => {
                   if(o.s.save.readedVol === undefined) o.s.save.readedVol = 0;
@@ -585,8 +634,8 @@ export class Mal{
         div: (path, item) => {
           El.Div({
             path: path,
-            attrs: [item.direction && ['i-dir', item.direction], item.gap && ['i-gap', item.gap]],
-            classes: ['container', item.tag && name, 'flx'],
+            attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+            classes: ['container', 'flx'],
             func: (i) => {
               item.items.forEach(it => {
                 this.check(i, it);
@@ -597,7 +646,8 @@ export class Mal{
         label: (path, items) => {
           El.Label({
             path: path,
-            classes: ['lab', item.tag && name, 'flx'],
+            classes: ['lab', 'flx'],
+            attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
             func: (i) => {
               items.items.forEach(it => {
                 this.check(i, it);
@@ -609,8 +659,8 @@ export class Mal{
           if(item.type !== o.type) return;
           El.Div({
             path: path,
-            classes: ['item-group', item.tag && name, 'flx'],
-            attrs: [item.direction && ['i-dir', item.direction], item.gap && ['i-gap', item.gap]],
+            classes: ['item-group', 'flx'],
+            attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
             func: (i) => {
               item.items.forEach(it => {
                 this.check(i, it);
@@ -640,6 +690,7 @@ export class Mal{
         break;
         case 'id':
           e.el[name].id.textContent = v;
+          e.el[name].id.href = new MalApi().link.item(o.type, v);
           return true;
         break;
         case 'link':
@@ -652,22 +703,22 @@ export class Mal{
         break;
         case 'status': {
           if(!v) return;
-          const l = e.el[name].status.parentNode.getAttribute('lang');
-          const arr = JSON.parse(l);
-          e.el[name].status.textContent = this.lang[arr[0]].statusVal[v][arr[1]];
+          const status = {
+            currently_airing: 'airpublish',
+            currently_publishing: 'airpublish',
+            finished_airing: 'finished',
+            finished: 'finished'
+          };
+          const l = {
+            lang: e.el[name].status.parentNode.getAttribute('lang'),
+            lvl: e.el[name].status.parentNode.getAttribute('langLvl')
+          };
 
+          e.el[name].status.textContent = this.lang[l.lang].statusVal[v.status][l.lvl];
           const st = e.el[name].status.parentNode;
-
-          switch(v){
-            case 'currently_airing': st.classList.add('airpublish');
-            break;
-            case 'currently_publishing': st.classList.add('airpublish');
-            break;
-            case 'finished_airing': st.classList.add('finished');
-            break;
-            case 'finished': st.classList.add('finished');
-            break;
-          }
+          st.classList.add(status[v.status]);
+          
+          // if(e.el[name].status) return;
         }
         break;
         case 'statusItem':
@@ -675,18 +726,30 @@ export class Mal{
         break;
         case 'broadcast': {
           if(!v) return;
-          console.log('Broad', o.s);
-          if(!e.el[name].broadcast.day.parentNode.getAttribute('showended') && o.s[name]?.status?.match(/finished_airing|finished/)) return e.el[name].broadcast.day.parentNode.classList.add('-hidden');
-          const l = e.el[name].broadcast.day.parentNode.getAttribute('lang');
-          const arr = JSON.parse(l);
-          // console.log('ARR', arr);
-          e.el[name].broadcast.day.textContent = this.lang[arr[0]].day[v.day_of_the_week][arr[1]];
-          e.el[name].broadcast.time.textContent = v.start_time;
-          e.el[name].broadcast.day.parentNode.classList.remove('-hidden');
+
+          const status = {
+            currently_airing: 'airpublish',
+            currently_publishing: 'airpublish',
+            finished_airing: 'finished',
+            finished: 'finished'
+          };
+          const l = {
+            lang: e.el[name].broadcast.day.parentNode.getAttribute('lang'),
+            lvl: e.el[name].broadcast.day.parentNode.getAttribute('langLvl')
+          };
+
+          e.el[name].broadcast.day.parentNode.setAttribute('status', status[v.status]);
+          e.el[name].broadcast.day.textContent = this.lang[l.lang].day[v.broadcast.day_of_the_week][l.lvl];
+          e.el[name].broadcast.time.textContent = v.broadcast.start_time;
         }
         break;
         case 'title':
           e.el[name].title.textContent = v;
+        break;
+        case 'search':
+          e.el[name].search.textContent = v+'%';
+          if(+o.cfg.textMatch.percents > +v) e.el[name].search.setAttribute('status', '-');
+          else e.el[name].search.setAttribute('status', '+');
         break;
         case 'watchedEps':
           // console.log('QQ', e.el[name].watchedEps)
@@ -707,6 +770,10 @@ export class Mal{
         break;
         case 'chapters':
           e.el[name].chapters.textContent = v;
+        break;
+        case 'updatedAt':
+          const d = El.getTime(v, 'full');
+          e.el[name].updatedAt.textContent = d.time+' '+d.date;
         break;
       }
       return true;
