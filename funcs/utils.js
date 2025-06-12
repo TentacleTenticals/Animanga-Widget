@@ -249,32 +249,35 @@ export class Ut{
     }
   };
   textMatcher = {
-    m(arr, title, o){
+    m(arr, title, o, full){
       // console.log('M', arr, title, o)
       // if(!arr && !o.matcher && !title) return;
-      const matching = {};
       const results = [];
       arr.forEach((e, ind) => {
         // result.ind = ind;
         results.push({
-          item: {title:e.iTitle, ind:ind},
-          result: this.search(e.iTitle, {ind:ind, text:title, textMatch: o.textMatch, matching})
+          item: {title:e.iTitle, id:e.id, ind:ind},
+          result: this[o.textMatch.matcher](e.iTitle, title)
         })
         // this.search(e.iTitle, results, {ind:ind, text:title, textMatch: o.textMatch, matching});
       });
       console.log('RESULTS', results);
-      const sort = results.reduce((a, b) => +a.result.percents.result > +b.result.percents.result ? a : b);
+      const sort = results.reduce((a, b) => +a.result.percents.diff > +b.result.percents.diff ? a : b);
       console.log('SORT', sort);
-      if(sort.result.percents.match) return sort.item;
+      
+      return {results:results, sorted:sort};
+      // else
+      // if(sort.result.percents.match) return sort.item;
+      // else if(o.textMatch.returnFalse) return sort.item;
     },
-    search(text, o){
+    search(text, text2, name){
       // console.log('SS', text, o);
       // if(!arr && !matcher) return;
       // const result = {};
-      const match = this[o.textMatch.matcher](text, o.text, o.textMatch);
-      if(match) return match.result;
+      const match = this[name](text, text2);
+      if(match) return match;
     },
-    lev(text, text2, o){
+    lev(text, text2){
       // console.log('LEV', arguments);
       function removeSym(text){
         const filter = /([\W]+)/gm;
@@ -305,10 +308,8 @@ export class Ut{
     
       const res = levenshtein(text, text2);
       const r = {
-        result: {
-          type: 'levenshtein',
-          percents: {result: res, match: res >= o.percents, check: o}
-        }
+        type: 'levenshtein',
+        percents: {diff: res}
       };
       // console.log('[TextMatcherLev]', r);
       return r;
