@@ -173,8 +173,8 @@ export class Ani{
             ...(obj && obj.attrs ? obj.attrs : [])
           ],
           classes: [obj.key, item.tag && name, ...(obj && obj.class ? obj.class : []), 'flx'],
-          text: obj && obj.nottl ? '' : _this.gp(_this.lang, [item.lang||string.lang||line.lang, obj.type, obj.key, obj?.ttl||_this.lang.type(item)]),
-          title: _this.gp(_this.lang, [item.lang||string.lang||line.lang, obj.type, obj.key, 3]),
+          text: obj && obj.nottl ? '' : _this.gp(_this.lang, [item.cfg.lang||string.cfg.lang||line.cfg.lang, obj.type, obj.key, obj?.ttl||_this.lang.type(item)]),
+          title: _this.gp(_this.lang, [item.cfg.lang||string.cfg.lang||line.cfg.lang, obj.type, obj.key, 3]),
           func: (i) => {
             El.Div({
               path: i,
@@ -190,8 +190,8 @@ export class Ani{
           path: path,
           attrs: [item.align && ['i-align', item.align], item.style && ['i-style', item.style], ...(obj.attrs ? obj.attrs:[])],
           classes: [obj.key, item.tag && name, ...(obj.class ? obj.class:[]), 'flx'],
-          text: _this.lang[item.lang||string.lang||line.lang][obj.key][text||_this.lang.type(item, obj.num)],
-          title: _this.lang[item.lang||string.lang||line.lang][obj.key][3],
+          text: _this.lang[item.cfg.lang||string.cfg.lang||line.cfg.lang][obj.key][text||_this.lang.type(item, obj.num)],
+          title: _this.lang[item.cfg.lang||string.cfg.lang||line.cfg.lang][obj.key][3],
         });
       }
       check = (i, it) => {
@@ -295,7 +295,7 @@ export class Ani{
             class: ['-item'],
             attrs:[
               ['lang', JSON.stringify([
-                (item.lang||string.lang||line.lang),
+                (item.cfg.lang||string.cfg.lang||line.cfg.lang),
                 0]
               )]
             ],
@@ -307,7 +307,7 @@ export class Ani{
             path: path,
             attrs: [item.align && ['i-align', item.align], item.style && ['i-style', item.style], item.showEnded && ['showEnded', item.showEnded], ['lang',
             JSON.stringify([
-              (item.lang||string.lang||line.lang),
+              (item.cfg.lang||string.cfg.lang||line.cfg.lang),
               _this.lang.type(item)]
               )]],
             classes: ['broadcast', item.tag && name, '-item', '-hidden', 'flx'],
@@ -316,7 +316,7 @@ export class Ani{
               El.Div({
                 path: b,
                 class: 'key',
-                text: _this.lang[item.lang||string.lang||line.lang]['broadcast'][_this.lang.type(item, 2)]
+                text: _this.lang[item.cfg.lang||string.cfg.lang||line.cfg.lang]['broadcast'][_this.lang.type(item, 2)]
               });
               El.Div({
                 path: b,
@@ -339,7 +339,7 @@ export class Ani{
           El.A({
             path: path,
             classes: ['link', item.tag && name, '-item', 'flx'],
-            text: _this.lang[item.lang||string.lang||line.lang]['link'][_this.lang.type(item, 2)],
+            text: _this.lang[item.cfg.lang||string.cfg.lang||line.cfg.lang]['link'][_this.lang.type(item, 2)],
             func: (e) => {
               el[name].link = e;
             }
@@ -362,7 +362,7 @@ export class Ani{
             classes: ['myRating', 'itemNum', 'val'],
             type: 'number',
             value: '0',
-            title: _this.gp(_this.lang, [item.lang||string.lang||line.lang, 'myRating', 3]),
+            title: _this.gp(_this.lang, [item.cfg.lang||string.cfg.lang||line.cfg.lang, 'myRating', 3]),
             oninput: (e) => {
               if(e.target.value) e.target.style.width = +e.target.value.length*8+'px';
             },
@@ -390,8 +390,8 @@ export class Ani{
             El.Select({
               path: path,
               class: 'statusItem -item -flx',
-              options: _this.gp(_this.lang, [item.lang||string.lang||line.lang, o.type, 'statusItem', 'options']),
-              title: _this.gp(_this.lang, [item.lang||string.lang||line.lang, o.type, 'statusItem', 'text', 3]),
+              options: _this.gp(_this.lang, [item.cfg.lang||string.cfg.lang||line.cfg.lang, o.type, 'statusItem', 'options']),
+              title: _this.gp(_this.lang, [item.cfg.lang||string.cfg.lang||line.cfg.lang, o.type, 'statusItem', 'text', 3]),
               func: (e) => {
                 el[name].statusItem = e;
               }
@@ -404,7 +404,7 @@ export class Ani{
                 class: 'watchedEps itemNum val',
                 type: 'number',
                 value: '0',
-                title: _this.lang[item.lang||string.lang||line.lang]['watchedEps'][3],
+                title: _this.lang[item.cfg.lang||string.cfg.lang||line.cfg.lang]['watchedEps'][3],
                 oninput: (e) => {
                   if(e.target.value) e.target.style.width = +e.target.value.length*8+'px';
                 },
@@ -460,8 +460,8 @@ export class Ani{
             El.Select({
               path: path,
               class: 'statusItem -item -flx',
-              options: _this.gp(_this.lang, [item.lang||string.lang||line.lang, o.type, 'statusItem', 'options']),
-              title: _this.gp(_this.lang, [item.lang||string.lang||line.lang, o.type, 'statusItem', 'text', 3]),
+              options: _this.gp(_this.lang, [item.cfg.lang||string.cfg.lang||line.cfg.lang, o.type, 'statusItem', 'options']),
+              title: _this.gp(_this.lang, [item.cfg.lang||string.cfg.lang||line.cfg.lang, o.type, 'statusItem', 'text', 3]),
               func: (e) => {
                 el[name].statusItem = e;
               }
@@ -474,7 +474,7 @@ export class Ani{
                 class: 'readedCh itemNum val',
                 type: 'number',
                 value: '0',
-                title: _this.gp(_this.lang, [item.lang||string.lang||line.lang, o.type, 'readedCh', 3]),
+                title: _this.gp(_this.lang, [item.cfg.lang||string.cfg.lang||line.cfg.lang, o.type, 'readedCh', 3]),
                 oninput: (e) => {
                   if(e.target.value) e.target.style.width = +e.target.value.length*8+'px';
                 },
@@ -528,7 +528,7 @@ export class Ani{
                 class: 'readedVol itemNum val',
                 type: 'number',
                 value: '0',
-                title: _this.gp(_this.lang, [item.lang||string.lang||line.lang, o.type, 'readedVol', 3]),
+                title: _this.gp(_this.lang, [item.cfg.lang||string.cfg.lang||line.cfg.lang, o.type, 'readedVol', 3]),
                 oninput: (e) => {
                   if(e.target.value) e.target.style.width = +e.target.value.length*8+'px';
                 },
