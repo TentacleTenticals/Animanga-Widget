@@ -1,6 +1,8 @@
-export default () => `
+export const baseCSS = () => `
 .flx {
   display: flex;
+  min-width: 0;
+  min-height: 0;
 
   &.hor {
     flex-direction: row;
