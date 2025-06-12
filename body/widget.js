@@ -10,6 +10,7 @@ export const widget = {
       ani: {},
       def: {}
     };
+    const attrs = (o) => Object.entries(o).map(e => [e[0], e[1]]);
 
     El.Div({
       path: o.path,
@@ -35,8 +36,7 @@ export const widget = {
           El.Div({
             path: m,
             attrs: [
-              line.direction && ['i-dir', line.direction],
-              line.gap && ['i-align', line.gap]
+              ...(line.cfg ? attrs(line.cfg) : [])
             ],
             class: ['line', 'lang-'+ o.cfg.lang, 'flx'].join(' '),
             func: (l) => {
@@ -44,19 +44,17 @@ export const widget = {
                 El.Div({
                   path: l,
                   attrs: [
-                    string.direction && ['i-dir', string.direction],
-                    string.align && ['i-align', string.align],
-                    string.gap && ['i-align', string.gap]
+                    ...(string.cfg ? attrs(string.cfg) : [])
                   ],
                   class: '-string flx',
                   func: (s) => {
                     string.items.forEach(item => {
                       switch(item.api){
-                        case 'mal': new Mal().build(s, {name:line.name, lang:line.lang}, {name:string.name, lang:string.lang}, item, el, o);
+                        case 'mal': new Mal().build(s, {name:line.name, cfg:line.cfg}, {name:string.name, cfg:string.cfg}, item, el, o);
                         break;
-                        case 'ani': new Ani().build(s, {name:line.name, lang:line.lang}, {name:string.name, lang:string.lang}, item, el, o);
+                        case 'ani': new Ani().build(s, {name:line.name, cfg:line.cfg}, {name:string.name, cfg:string.cfg}, item, el, o);
                         break;
-                        default: new Def().build(s, {name:line.name, lang:line.lang}, {name:string.name, lang:string.lang}, item, el, o);
+                        default: new Def().build(s, {name:line.name, cfg:line.cfg}, {name:string.name, cfg:string.cfg}, item, el, o);
                         break;
                       }
                     })
