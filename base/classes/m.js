@@ -125,7 +125,7 @@ export const El = {
     const main=document.createElement('details');
     if(o.summary) this.summary = this.Summary({
       path: main,
-      class: o.sClass,
+      class: o.summaryClass,
       text: o.summaryT
     });
     if(o.class) main.className = o.class;
@@ -200,6 +200,7 @@ export const El = {
     if(o.classes) main.className = o.classes.filter(e => e).join(' ');
     if(o.title) main.title=o.title;
     if(o.id) main.id = o.id;
+    if(o.attrs) o.attrs.forEach(e => e && e.length && main.setAttribute(e[0], e[1]));
     if(o.text) main.textContent = o.text;
     if(o.attr) main.setAttribute(o.attr[0], o.attr[1]);
     if(o.attrs) o.attrs.forEach(e => e && e.length && main.setAttribute(e[0], e[1]));
@@ -285,6 +286,7 @@ export const El = {
     const main=document.createElement('input');
     if(o.class) main.className=o.class;
     if(o.classes) main.className = o.classes.filter(e => e).join(' ');
+    if(o.attrs) o.attrs.forEach(e => e && e.length && main.setAttribute(e[0], e[1]));
     if(o.text) main.textContent=o.text;
     if(o.name) main.name=o.name;
     if(o.type) main.type=o.type;
@@ -337,6 +339,7 @@ export const El = {
     if(o.class) main.className = o.class;
     if(o.classes) main.className = o.classes.filter(e => e).join(' ');
     if(o.id) main.id=o.id;
+    if(o.attrs) o.attrs.forEach(e => e && e.length && main.setAttribute(e[0], e[1]));
     if(o.title) main.title = o.title;
     if(o.name) main.name=o.name;
     if(o.onchange) main.onchange=o.onchange;
