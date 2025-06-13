@@ -467,7 +467,7 @@ export class Mal{
             El.Select({
               path: path,
               attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
-              classes: ['n-'+'statusItem', '-item', '-flx'],
+              classes: ['n-'+'statusItem', '-itemSel', '-flx'],
               options: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'statusItem', 'options']),
               title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'statusItem', 'text', 3]),
               func: (e) => {
@@ -483,7 +483,7 @@ export class Mal{
               this.inputNum(path, item, {key:'watchedEps', num:2});
             },
             max: (path, item) => {
-              this.itemMiniCh(path, item, {key:'episodes', classes:['itemNum', 'len', 'flx'], attrs:[...(item.cfg ? _this.attrs(item.cfg) : [])], text:'0'});
+              this.itemMiniCh(path, item, {key:'episodes', classes:['itemNum', 'len', 'flx'], attrs:[...(item.cfg ? _this.attrs(item.cfg) : [])], text:'?'});
             },
             plus: (path, item) => {
               El.Button({
@@ -529,7 +529,7 @@ export class Mal{
           statusItem: (path, item) => {
             El.Select({
               path: path,
-              classes: ['n-'+'statusItem', '-item', '-flx'],
+              classes: ['n-'+'statusItem', '-itemSel', '-flx'],
               options: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'statusItem', 'options']),
               title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'statusItem', 'text', 3]),
               func: (e) => {
@@ -563,7 +563,7 @@ export class Mal{
                 classes: ['n-'+'itemNum', 'len'],
                 attrs: [...(item.cfg ? _this.attrs(item.cfg) : [])],
                 nottl: true,
-                text: '0'
+                text: '?'
               });
             },
             plus: (path, item) => {
@@ -601,7 +601,7 @@ export class Mal{
                 classes: ['n-'+'itemNum', 'len'],
                 attrs: [...(item.cfg ? _this.attrs(item.cfg) : [])],
                 nottl: true,
-                text: '0'
+                text: '?'
               });
             },
             plus: (path, item) => {
@@ -703,6 +703,7 @@ export class Mal{
         break;
         case 'status': {
           if(!v) return;
+          if(!v.status) return;
           const status = {
             currently_airing: 'airpublish',
             currently_publishing: 'airpublish',
@@ -726,6 +727,7 @@ export class Mal{
         break;
         case 'broadcast': {
           if(!v) return;
+          if(!v.broadcast) return;
 
           const status = {
             currently_airing: 'airpublish',
@@ -771,9 +773,11 @@ export class Mal{
         case 'chapters':
           e.el[name].chapters.textContent = v;
         break;
-        case 'updatedAt':
+        case 'updatedAt': {
+          if(!v) return e.el[name].updatedAt.textContent = '';
           const d = El.getTime(v, 'full');
           e.el[name].updatedAt.textContent = d.time+' '+d.date;
+        }
         break;
       }
       return true;
