@@ -71,26 +71,6 @@ export default () => `
   --header-item: "Amarante", serif;
   --select: "Inter", sans-serif;
 }
-.lang-ru {
-  --header-item: "Overpass", sans-serif;
-  --qheader-item: "Amarante", serif;
-  --select: "Inter", sans-serif;
-}
-[lang='ru'] {
-  --header-item: "Amarante", serif;
-  --title: "Overpass", sans-serif;
-  --key: "Inter", sans-serif;
-
-  .n-title {
-    .value:empty {
-      font-family: var(--title);
-    }
-  }
-
-  .key {
-    font-family: var(--key);
-  }
-}
 *:lang(ru) {
   --header-item: "Amarante", serif;
   --title: "Overpass", sans-serif;
@@ -145,10 +125,15 @@ export default () => `
     }
   }
 
+  [i-align] {
+    &[i-align='end'] {
+      margin-left: auto;
+    }
+  }
+
   .-item {
     gap: 0 3px;
     align-items: center;
-    -align-items: end;
     position: relative;
     min-width: 0;
     padding: 3px 5px 3px 5px;
@@ -223,9 +208,6 @@ export default () => `
       &[align='end'] {
         margin-left: auto;
       }
-    }
-    &:not([align]) {
-      -align-self: normal;
     }
 
     &.n-reload {
@@ -442,12 +424,6 @@ export default () => `
     }
   }
 
-  [i-align] {
-    &[i-align='end'] {
-      margin-left: auto;
-    }
-  }
-
   .lab {
     align-items: center;
     min-width: 0;
@@ -485,7 +461,6 @@ export default () => `
       color: var(--col);
 
       &[separator] {
-        -gap: attr(gap type(*));
   
         &[separator='before'] {
           &::before {
@@ -508,7 +483,6 @@ export default () => `
     min-width: 0;
 
     &[direction] {
-      -flex-direction: attr(i-dir type(<custom-ident>));
 
       &[direction='column'] {
         flex-direction: column;
@@ -527,18 +501,8 @@ export default () => `
     .-string {
       flex-wrap: wrap;
       flex-grow: 1;
-      -align-items: center;
       gap: 5px 7px;
       min-width: 0;
-
-      &[i-align] {
-        &[i-align='normal'] {
-          -align-self: normal;
-        }
-      }
-      &:not([i-align]) {
-        -align-self: normal;
-      }
 
       .-itemMini {
         min-width: 0;
