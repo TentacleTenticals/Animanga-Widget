@@ -32,7 +32,7 @@ export class Def{
       status: ['Status', 'St', '📶', 'Status'],
       reload: ['Reload', 'Rl', '🔃', 'Reload'],
       save: ['Save', 'Sav', '💾', 'Save'],
-      saveData: ['Last saves', 'LS', '', 'Last saves'],
+      saveData: ['Last saves', 'LS', '📚', 'Last saves'],
       modal: {
         search: {
           title: ['Search', 'Sr', '', 'Search'],
@@ -45,7 +45,7 @@ export class Def{
       status: ['Статус', 'Ст', '📶', 'Статус'],
       reload: ['Reload', 'Rl', '🔃', 'Reload'],
       save: ['Сохранить', 'Сохр', '💾', 'Сохранить'],
-      saveData: ['Последние сохранения', 'ПС', '', 'Последние сохранения'],
+      saveData: ['Последние сохранения', 'ПС', '📚', 'Последние сохранения'],
       modal: {
         search: {
           title: ['Поиск', 'Пск', '', 'Поиск'],
@@ -169,9 +169,9 @@ export class Def{
             textMatch: o.cfg.textMatch
           }).then(
             res => {
-              res.results.sort((a,b) => (a.result.percents.diff > b.result.percents.diff) ? -1 : ((b.result.percents.diff > a.result.percents.diff) ? 1 : 0))
+              // res.results.toSorted((a,b) => (a.result.percents.diff > b.result.percents.diff) ? -1 : ((b.result.percents.diff > a.result.percents.diff) ? 1 : 0))
               if(!btnMode && o.search.start.mode === 'bestMatch'){
-                const item = res.sorted.item;
+                const item = res.items[res.sorted.item.ind];
                 console.log('ITEMMMMMM', item)
                 // o.title = item.title;
                 // o.search.titleUpd = e.item.title;
@@ -226,17 +226,19 @@ export class Def{
                     path: m,
                     class: 'list flx ver',
                     func: (l) => {
-                      res.results.forEach(e => {
+                      const sort = res.results.toSorted((a,b) => (+a.result.percents.diff > +b.result.percents.diff) ? -1 : ((+b.result.percents.diff > +a.result.percents.diff) ? 1 : 0));
+                      sort.forEach(e => {
                         El.Div({
                           path: l,
                           class: 'item flx',
                           onclick: () => {
                             console.log('CLICKED')
                             m.remove();
-                            o.title = e.item.title;
+                            const item = res.items[e.item.ind];
+                            o.title = item.title;
                             // o.search.titleUpd = e.item.title;
-                            o.search.malId = e.item.id;
-                            o.malId = e.item.id;
+                            o.search.malId = item.id;
+                            o.malId = item.id;
                             o.s.mal.search = e.result.percents.diff;
                             this.run(o);
                           },
@@ -292,16 +294,16 @@ export class Def{
             })).then(
               res => {
                 if(!res) throw new Ut().MyError(['[MAL Load]', 'No data']);
-                if(e.main){
-                  console.log('MAL is main');
-                  o.s.save.myRating = res.my_list_status?.score||0;
-                  if(o.type === 'anime'){
-                    o.s.save.watchedEps = res.my_list_status?.num_episodes_watched||0;
-                  }else{
-                    o.s.save.readedVol = res.my_list_status?.num_volumes_read||0;
-                    o.s.save.readedCh = res.my_list_status?.num_chapters_read||0;
-                  }
-                };
+                // if(e.main){
+                //   console.log('MAL is main');
+                //   o.s.save.myRating = res.my_list_status?.score||0;
+                //   if(o.type === 'anime'){
+                //     o.s.save.watchedEps = res.my_list_status?.num_episodes_watched||0;
+                //   }else{
+                //     o.s.save.readedVol = res.my_list_status?.num_volumes_read||0;
+                //     o.s.save.readedCh = res.my_list_status?.num_chapters_read||0;
+                //   }
+                // };
 
                 console.log('MAL RESULT', res);
                 o.s.mal.id = res.id;
@@ -311,10 +313,10 @@ export class Def{
                 o.s.mal.title = res.title;
 
                 if(o.type === 'anime'){
-                  o.s.mal.episodes = res.num_episodes||0;
+                  o.s.mal.episodes = res.num_episodes||'?';
                 }else{
-                  o.s.mal.volumes = res.num_volumes||0;
-                  o.s.mal.chapters = res.num_chapters||0;
+                  o.s.mal.volumes = res.num_volumes||'?';
+                  o.s.mal.chapters = res.num_chapters||'?';
                 }
                 o.s.mal.status = {
                   status: res.status,
@@ -325,22 +327,51 @@ export class Def{
                   broadcast: res.broadcast
                 };
                 // o.s.mal.broadcast = res.broadcast||'';
-                
-                if(res.my_list_status){
-                  const my = res.my_list_status;
-                  console.log('MAL SCORE', my);
-                  o.s.save.statusItem = my.status||undefined;
-                  o.s.save.myRating = my.score||0;
-                  o.s.mal.updatedAt = my.updated_at;
 
-                  if(o.type === 'anime'){
-                    o.s.save.watchedEps = my.num_episodes_watched||0;
-                  }else{
-                    o.s.save.readedVol = my.num_volumes_read||0;
-                    o.s.save.readedCh = my.num_chapters_read||0;
-                  }
+                const my = res.my_list_status;
+                // console.log('MAL SCORE', my);
+                o.s.save.statusItem = my?.status||'';
+                o.s.save.myRating = my?.score||0;
+                o.s.mal.updatedAt = my?.updated_at||'';
+
+                console.log('TYPE TYPE TYPE TYPE TYPE TPYE', o);
+
+                if(o.type === 'anime'){
+                  // console.log('TYPE TYPE TYPE TYPE TYPE TPYE')
+                  o.s.save.watchedEps = my?.num_episodes_watched||0;
+                }else{
+                  o.s.save.readedVol = my?.num_volumes_read||0;
+                  o.s.save.readedCh = my?.num_chapters_read||0;
                 }
-                console.log('RRRRRRRR', o.s);
+
+                // return success('ok');
+                
+                // if(res.my_list_status){
+                //   const my = res.my_list_status;
+                //   console.log('MAL SCORE', my);
+                //   o.s.save.statusItem = my.status||'';
+                //   o.s.save.myRating = my.score||0;
+                //   o.s.mal.updatedAt = my.updated_at||'';
+
+                //   if(o.type === 'anime'){
+                //     o.s.save.watchedEps = my.num_episodes_watched||0;
+                //   }else{
+                //     o.s.save.readedVol = my.num_volumes_read||0;
+                //     o.s.save.readedCh = my.num_chapters_read||0;
+                //   }
+                // }else{
+                //   o.s.save.statusItem = undefined;
+                //   o.s.save.myRating = 0;
+                //   o.s.mal.updatedAt = '';
+
+                //   if(o.type === 'anime'){
+                //     o.s.save.watchedEps = 0;
+                //   }else{
+                //     o.s.save.readedVol = 0;
+                //     o.s.save.readedCh = 0;
+                //   }
+                // }
+                console.log('COMPLETED!!!!!!!!!');
               }
             )
           )
@@ -482,7 +513,7 @@ export class Def{
       El.Div({
         path: path,
         attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
-        classes: ['i-mainTitle', '-item', 'flx'],
+        classes: ['i-mainTitle', '-item', '-btn', 'flx'],
         text: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['title'][_this.lang.type(item, 1)],
         title: +_this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['title'][3],
         func: (e) => {
@@ -497,7 +528,7 @@ export class Def{
       El.Button({
         path: path,
         attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
-        class: ['reload', 'def', '-item', item.pos && ' -'+item.pos||'', 'flx'].join(' '),
+        class: ['reload', 'def', '-item', '-btn', item.pos && ' -'+item.pos||'', 'flx'].join(' '),
         text: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['reload'][_this.lang.type(item, 2)],
         title: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['reload'][3],
         func: (e) => {
@@ -526,7 +557,8 @@ export class Def{
             path: m,
             classes: ['n-updatedAt', '-itemMini', 'flx', 'ver'],
             summary: true,
-            summaryT: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['saveData'][_this.lang.type(item, 1)],
+            summaryClass: 'key',
+            summaryT: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['saveData'][_this.lang.type(item, 2)],
             title: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['saveData'][3],
             func: (m) => {
               El.Div({
@@ -555,10 +587,10 @@ export class Def{
             }
           });
 
-          El.Div({
+          El.Button({
             path: m,
             attrs: [['api', name]],
-            class: ['n-save', 'def', '-item', item.pos && ' -'+item.pos||'', 'flx'].join(' '),
+            class: ['n-save', 'def', '-item', '-btn', item.pos && ' -'+item.pos||'', 'flx'].join(' '),
             text: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['save'][_this.lang.type(item, 2)],
             title: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['save'][3],
             func: (e) => el.def.save = e,
@@ -570,17 +602,17 @@ export class Def{
       });
     };
     status = () => {
-      El.Div({
+      El.Button({
         path: path,
         attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
-        classes: ['widgetStatus', 'def', '-item', item.pos && ' -'+item.pos||'', 'flx'],
+        classes: ['widgetStatus', 'def', '-item', '-btn', item.pos && ' -'+item.pos||'', 'flx'],
         text: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['status'][_this.lang.type(item, 2)],
         title: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['status'][3],
         onclick: (e) => {
           if(!e.target.className.match('-item')) return;
           console.log('Lol', e.target)
           if(!e.target.children.length) El.Dialog({
-            path: e.target,
+            path: path,
             class: 'mdl',
             showM: true,
             delOnclose: true,
