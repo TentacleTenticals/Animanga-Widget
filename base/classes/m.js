@@ -899,6 +899,7 @@ export const El = {
   Css: function(name, css, path, check) {
     if(check && this.styleChecker(name)) return;
     const main= document.createElement('style');
+    main.type = 'text/css';
     main.textContent = css;
     if(name) main.setAttribute('stylename', name);
     (path||document.body).appendChild(main);
