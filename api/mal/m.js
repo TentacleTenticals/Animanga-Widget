@@ -50,7 +50,7 @@ export class MalApi{
       byId: (o) => {
         o.secrets?.url && (o.url = o.secrets.url);
         const query = {
-          q: o.title,
+          // q: o.title,
           ...o.query
         };
         o.headers = {
@@ -68,7 +68,7 @@ export class MalApi{
         o.secrets?.url && (o.url = o.secrets.url);
         const query = {
           q: o.title.slice(0, 64),
-          query: o.query
+          ...o.query
         };
         o.headers = {
           // 'Content-Type': 'application/json',
