@@ -65,7 +65,10 @@ export class MalFc extends MalApi{
           return this.search.items.byTitle({
             type: o.type,
             title: o.title,
-            query: o.query,
+            query: {
+              ...o.query,
+              nsfw: true
+            },
             secrets: o.secrets
           });
         }
@@ -94,7 +97,10 @@ export class MalFc extends MalApi{
         byId: (o) => this.search.item.byId({
           type: o.type,
           id: o.id,
-          query: o.query,
+          query: {
+            ...o.query,
+            nsfw: true
+          },
           login: o.login,
           secrets: o.secrets
         }).then(
@@ -118,6 +124,7 @@ export class MalFc extends MalApi{
               });
               const found = new Ut().textMatcher.m(items, o.title, {textMatch: o.textMatch});
               if(!found) new Ut().MyError(['[MAL Sort]:ByTitle', 'Item not sorted!', {type:'log'}], {o:o});
+              found.items = items;
               // console.log('Founder', found);
               return found;
             }
