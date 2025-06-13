@@ -76,6 +76,21 @@ export default () => `
   --qheader-item: "Amarante", serif;
   --select: "Inter", sans-serif;
 }
+[lang='ru'] {
+  --header-item: "Amarante", serif;
+  --title: "Overpass", sans-serif;
+  --key: "Inter", sans-serif;
+
+  .n-title {
+    .value:empty {
+      font-family: var(--title);
+    }
+  }
+
+  .key {
+    font-family: var(--key);
+  }
+}
 *:lang(ru) {
   --header-item: "Amarante", serif;
   --title: "Overpass", sans-serif;
