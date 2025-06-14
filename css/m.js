@@ -71,7 +71,7 @@ export default () => `
   --header-item: "Amarante", serif;
   --select: "Inter", sans-serif;
 }
-*:lang(ru) {
+[lang='ru'] {
   --header-item: "Amarante", serif;
   --title: "Overpass", sans-serif;
   --key: "Inter", sans-serif;
@@ -558,6 +558,61 @@ export default () => `
 
       &::after {
         content: '❌';
+      }
+    }
+  }
+}
+
+.mdl {
+  width: 80%;
+
+  .m-header {
+    text-align: center;
+  }
+
+  .m-list {
+    gap: 5px 5px;
+  }
+
+  &::backdrop {
+    background-color: rgb(0 0 0 / 0.8);
+  }
+}
+
+.search-modal {
+  gap: 7px 0;
+  background-color: var(--bck-c);
+
+  .header {
+    gap: 5px 0;
+
+    .title {
+      text-align: center;
+      color: var(--col);
+    }
+
+    .item {
+      gap: 0 5px;
+
+      .text {
+        color: var(--col);
+      }
+    }
+  }
+
+  .list {
+    gap: 5px 0;
+
+    .item {
+      justify-content: space-between;
+      gap: 0 5px;
+      color: var(--col);
+
+      .num {
+        padding: 0 2px 0 2px;
+        font-size: smaller;
+        border: 1px solid var(--bor-c);
+        border-radius: 2px;
       }
     }
   }
