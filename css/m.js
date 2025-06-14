@@ -67,24 +67,17 @@ export default () => `
   --font-mini: "Amarante", serif;
 }
 
-.lang-en {
-  --header-item: "Amarante", serif;
-  --select: "Inter", sans-serif;
-}
-[lang='ru'] {
+:lang(en) {
   --header-item: "Amarante", serif;
   --title: "Overpass", sans-serif;
+  --select: "Inter", sans-serif;
   --key: "Inter", sans-serif;
-
-  .n-title {
-    .value:empty {
-      font-family: var(--title);
-    }
-  }
-
-  .key {
-    font-family: var(--key);
-  }
+}
+:lang(ru) {
+  --header-item: "Amarante", serif;
+  --title: "Overpass", sans-serif;
+  --select: "Inter", sans-serif;
+  --key: "Inter", sans-serif;
 }
 .-right {
   margin-left: auto;
