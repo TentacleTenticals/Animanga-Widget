@@ -125,8 +125,8 @@ export default () => `
     }
   }
 
-  [i-align] {
-    &[i-align='end'] {
+  [align] {
+    &[align='end'] {
       margin-left: auto;
     }
   }
@@ -134,6 +134,7 @@ export default () => `
   .-item {
     gap: 0 3px;
     align-items: center;
+    -align-items: end;
     position: relative;
     min-width: 0;
     padding: 3px 5px 3px 5px;
@@ -202,12 +203,6 @@ export default () => `
 
     &.n-link {
       text-decoration: none;
-    }
-
-    &[align] {
-      &[align='end'] {
-        margin-left: auto;
-      }
     }
 
     &.n-reload {
@@ -336,12 +331,6 @@ export default () => `
     }
   }
 
-  *[align] {
-    &[align='end'] {
-      margin-left: auto;
-    }
-  }
-
   .numBtn {
     color: var(--col);
     background-color: var(--bck-c);
@@ -362,7 +351,6 @@ export default () => `
   }
 
   .container {
-    -align-items: center;
     min-width: 0;
     position: relative;
     
@@ -443,7 +431,6 @@ export default () => `
       text-align: center;
       min-width: 8px;
       width: 0;
-      -width: attr(value px, 20px);
       appearance: none;
       -moz-appearance: textfield;
       color: var(--col);
@@ -461,6 +448,7 @@ export default () => `
       color: var(--col);
 
       &[separator] {
+        -gap: attr(gap type(*));
   
         &[separator='before'] {
           &::before {
@@ -478,7 +466,6 @@ export default () => `
 
   .line {
     flex-grow: 1;
-    -align-items: center;
     gap: 7px 7px;
     min-width: 0;
 
@@ -491,11 +478,9 @@ export default () => `
 
     &[i-align] {
       &[i-align='normal'] {
-        -align-self: normal;
       }
     }
     &:not([i-align]) {
-      -align-self: normal;
     }
     
     .-string {
@@ -530,7 +515,6 @@ export default () => `
   .-itemTitle {
     padding: 0 0 3px 0;
     color: var(--col);
-    /* font-family: 'Parkinsans', sans-serif; */
     font-family: 'Faculty Glyphic', sans-serif;
     border: solid var(--bor-c);
     border-width: 0 0 2px 0;
@@ -540,9 +524,6 @@ export default () => `
 .widgetStatus {
   .gap-5 {
     gap: 5px 5px;
-  }
-
-  .list {
   }
 
   .pad-list {
@@ -628,7 +609,6 @@ export default () => `
       color: var(--col);
 
       .num {
-        -align-self: center;
         padding: 0 2px 0 2px;
         font-size: smaller;
         border: 1px solid var(--bor-c);
