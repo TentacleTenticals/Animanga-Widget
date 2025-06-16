@@ -82,6 +82,17 @@ export const El = {
       }
     }
   },
+  Link: function(o){
+    const main=document.createElement('link'); 
+    if(o.type) switch(o.type){
+      case 'css': 
+        main.type="text/css";
+        main.rel = "stylesheet";
+      break;
+    }
+    if(o.url) main.href = o.url;
+    o.insert ? o.path.insertAdjacentElement(o.insert, main) : o.path.appendChild(main);
+  },
   Div: function(o){
     const main=document.createElement('div');
     if(o.class) main.className = o.class;
@@ -899,7 +910,6 @@ export const El = {
   Css: function(name, css, path, check) {
     if(check && this.styleChecker(name)) return;
     const main= document.createElement('style');
-    main.type = 'text/css';
     main.textContent = css;
     if(name) main.setAttribute('stylename', name);
     (path||document.body).appendChild(main);
