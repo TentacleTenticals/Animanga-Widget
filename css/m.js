@@ -1,14 +1,4 @@
 export default () => `
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Parkinsans:wght@300..800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Faculty+Glyphic&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Amarante&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap');
-
-@import url('https://fonts.googleapis.com/css2?family=Dosis:wght@200..800&display=swap');
-
-@import url('https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,100..900;1,100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
 .dark-theme {
   --col: rgb(255 255 255);
@@ -44,6 +34,9 @@ export default () => `
 
   --mal-tag-c: rgb(215 215 255);
   --status-open: rgb(100, 200, 200);
+
+  --logo-c: rgb(119 199 155);
+  --logo-c-sub: rgb(199 99 155);
 }
 .light-theme {
   --col: rgb(0 0 0);
@@ -78,7 +71,39 @@ export default () => `
   --title: "Overpass", sans-serif;
   --select: "Inter", sans-serif;
   --key: "Inter", sans-serif;
+
+  --key-value: "Inter", sans-serif;
 }
+
+[lang0='en'], [lang1='en'], [lang2='en'] {
+
+  &[lang0='en'] {
+    --key: "Amarante", serif;
+
+    &.itemInpNum {
+      font-size: 15px;
+    }
+  }
+  &[lang1='en'] {
+    --value: "Amarante", serif;
+
+    &.itemInpNum {
+      font-size: 15px;
+    }
+  }
+}
+
+[lang0='ru'], [lang1='ru'], [lang2='ru'] {
+
+  &[lang0='ru'] {
+    --key: "Inter", sans-serif;
+  }
+  &[lang1='ru'] {
+    --value: "Inter", sans-serif;
+    --select: "Inter", sans-serif;
+  }
+}
+
 .-right {
   margin-left: auto;
 }
@@ -94,8 +119,109 @@ export default () => `
   background-color: var(--bck-c);
   margin-top: 10px;
 
+  .n-logo {
+    color: var(--logo-c);
+    position: relative;
+
+    &::after {
+      padding: 0 1px 0 1px;
+      vertical-align: super;
+      content: 'W';
+      font-size: x-small;
+      position: absolute;
+      top: 50%;
+      left: 60%;
+      background-color: var(--bck-c);
+      color: var(--logo-c-sub);
+    }
+  }
+
   .-hidden {
     display: none;
+  }
+
+  .key-value {
+    font-family: var(--key-value);
+  }
+  .key {
+    font-family: var(--key);
+  }
+  .value {
+    font-family: var(--value);
+  }
+
+  [separator] {
+    &[separator='before'] {
+      ::before {
+        content: '/';
+      }
+    }
+    &[separator='after'] {
+      ::after {
+        content: '/';
+      }
+    }
+  }
+
+  .-item, .itemMini {
+    align-items: normal;
+  }
+  .-string {
+    align-items: center;
+  }
+
+  .itemPart {
+    gap: 0 3px;
+    position: relative;
+    min-width: 0;
+    padding: 3px 0px 3px 0px;
+    color: var(--col);
+
+    .value {
+      &:is(:empty) {
+        display: none;
+      }
+    }
+    &:has(.value:empty) {
+      &:not(:has(.key)) {
+        display: none;
+      }
+      .value {
+        display: none;
+      }
+    }
+
+    &.airpublish {
+      background-color: var(--bck-c-green);
+    }
+    &.finished {
+      background-color: var(--bck-c-red);
+    }
+  }
+
+  .itemInpNum {
+    min-width: 0;
+    -font-size: 16px;
+    font-family: var(--value);
+    min-width: 8px;
+    width: 0;
+
+    &.val {
+      padding: 1px 0px 1px 2px;
+      text-align: center;
+      min-width: 8px;
+      width: 0;
+      appearance: none;
+      -moz-appearance: textfield;
+      color: var(--col);
+      background-color: unset;
+      border: none;
+      outline: none;
+
+      &::-webkit-inner-spin-button {
+        display: none;
+      }
+    }
   }
 
   .-btn {
@@ -111,6 +237,7 @@ export default () => `
   }
 
   .-btn {
+    padding: 3px;
     cursor: pointer;
     
     &:hover {
@@ -118,21 +245,103 @@ export default () => `
     }
   }
 
+  .n-plusEps, .n-minusEps {
+    font-size: x-small;
+  }
+
   [align] {
     &[align='end'] {
       margin-left: auto;
     }
   }
+  [grow] {
+    &[grow='1'] {
+      flex-grow: 1;
+    }
+  }
+
+  .n-updatedAt {
+    flex-grow: 1;
+    min-width: 0;
+    position: relative;
+
+    summary {
+      padding: 0 3px 0 3px;
+
+      &:hover {
+        background-color: var(--bck-hover-c);
+      }
+    }
+
+    &[align='end'] {
+      summary {
+        margin-left: auto;
+      }
+    }
+
+    summary {
+      cursor: pointer;
+    }
+
+    &[open] summary {
+      list-style-type: '';
+      background-color: var(--status-open);
+    }
+    &:not([open]) summary {
+      list-style-type: '';
+    }
+
+    .list {
+      gap: 0 5px;
+      padding: 0 3px 0 3px;
+      position: absolute;
+      right: 0;
+      width: calc(100% - 3px - 3px);
+      background-color: var(--bck-c);
+      border-radius: 0 0 3px 3px;
+      border: 1px solid var(--bor-c);
+      box-shadow: 0 0 3px 1px rgb(0, 0, 0);
+
+      .item {
+        gap: 0 5px;
+        white-space: nowrap;
+      }
+    }
+  }
+  .n-save {
+    flex-grow: 0;
+
+    &.saved {
+      &::after {
+        content: '✅';
+      }
+    }
+  }
+
+  .n-save-updated {
+    gap: 0 10px;
+    flex-grow: 1;
+    align-self: auto;
+
+    &[align='end'] {
+      justify-content: end;
+
+      summary {
+        align-self: end;
+      }
+    }
+  }
 
   .-item {
-    gap: 0 3px;
     align-items: center;
-    -align-items: end;
+    gap: 0 3px;
     position: relative;
     min-width: 0;
-    padding: 3px 5px 3px 5px;
-    font-family: var(--header-item);
-    color: var(--col);
+    padding: 3px 3px 3px 3px;
+
+    &:not(.n-logo) {
+      color: var(--col);
+    }
 
     &.n-title-search {
       &:has(.n-title .value:empty) {
@@ -151,6 +360,7 @@ export default () => `
     }
 
     .n-search {
+      align-items: center;
       padding: 0 3px 0 3px;
       font-size: smaller;
       font-weight: 600;
@@ -228,65 +438,6 @@ export default () => `
     }
   }
 
-  .n-save-updated {
-    gap: 0 10px;
-    flex-grow: 1;
-    align-self: auto;
-
-    &[align='end'] {
-      justify-content: end;
-
-      summary {
-        align-self: end;
-      }
-    }
-    
-    .n-updatedAt {
-      flex-grow: 1;
-      min-width: 0;
-      position: relative;
-
-      summary {
-        cursor: pointer;
-      }
-
-      &[open] summary {
-        list-style-type: '';
-        background-color: var(--status-open);
-      }
-      &:not([open]) summary {
-        list-style-type: '';
-      }
-  
-      .list {
-        gap: 0 5px;
-        padding: 0 3px 0 3px;
-        position: absolute;
-        right: 0;
-        width: calc(100% - 3px - 3px);
-        background-color: var(--bck-c);
-        border-radius: 0 0 3px 3px;
-        border: 1px solid var(--bor-c);
-        box-shadow: 0 0 3px 1px rgb(0, 0, 0);
-
-        .item {
-          gap: 0 5px;
-          white-space: nowrap;
-        }
-      }
-    }
-
-    .n-save {
-      flex-grow: 0;
-
-      &.saved {
-        &::after {
-          content: '✅';
-        }
-      }
-    }
-  }
-
   *[api] {
     &[api='mal'] {
       &[tag] {
@@ -299,7 +450,7 @@ export default () => `
           content: 'ML';
           font-family: var(--font-mini);
           font-weight: 400;
-          background-color: var(--bck-c-sec);
+          background-color: var(--bck-c);
         }
 
         &[tag='2'] {
@@ -346,6 +497,27 @@ export default () => `
   .container {
     min-width: 0;
     position: relative;
+
+    :nth-child(1 of .itemPart) {
+      padding: 3px 5px 3px 5px;
+    }
+    :nth-child(2 of .itemPart) {
+
+      &:not(:nth-last-child(1)) {
+              
+        &:not(:has(.value:empty)) {
+          padding: 3px 0px 3px 0;
+        }
+      }
+
+      &:not(:nth-last-child(1 of .itemPart)) {
+        -padding: 3px 0px 3px 0px;
+      }
+    }
+
+    :nth-last-child(1 of .itemPart) {
+      padding: 3px 5px 3px 0px;
+    }
     
     &:not([gap]) {
       gap: 0 5px;
@@ -406,7 +578,6 @@ export default () => `
   }
 
   .lab {
-    align-items: center;
     min-width: 0;
 
     &:not([gap]) {
@@ -417,7 +588,6 @@ export default () => `
   .itemNum {
     min-width: 0;
     font-size: 14px;
-    font-family: "Amarante", serif;
 
     &.val {
       padding: 1px 0px 1px 2px;
@@ -468,13 +638,6 @@ export default () => `
         flex-direction: column;
       }
     }
-
-    &[i-align] {
-      &[i-align='normal'] {
-      }
-    }
-    &:not([i-align]) {
-    }
     
     .-string {
       flex-wrap: wrap;
@@ -484,9 +647,7 @@ export default () => `
 
       .-itemMini {
         min-width: 0;
-        align-items: center;
         position: relative;
-        font-family: var(--header-item);
         color: var(--col);
 
         &.reload {
