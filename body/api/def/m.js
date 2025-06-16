@@ -5,7 +5,18 @@ import {Modal} from './modal.js';
 import {Ut} from '../../../funcs/utils.js';
 
 export class Def{
-  attrs = (o) => Object.entries(o).map(e => [e[0], e[1]]);
+  splitter = (o) => {
+    const t = o.split('/');
+    if(!t.length > 1) return [['lang', t[0]]];
+    else
+    return [['lang0', t[0]], ['lang1', t[1]], ['lang2', t[2]]];
+  };
+  attrs = (o) => Object.entries(o).map(e => e[0] === 'lang' ? this.splitter(e[1]) : [[e[0], e[1]]]).flat().filter(e => e[1]);
+  lng = (o, n) => {
+    const l = o.split('/');
+    if(!l.length > 1||!n) return l[0];
+    else return l[n] ? l[n] : l[0];
+  };
   lang = {
     type: (item, v) => {
       if(!item.title && !v) return 1;
@@ -29,10 +40,10 @@ export class Def{
     },
     en: {
       title: ['Animanga Widget', 'AW', '', 'Animaga Widget'],
-      status: ['Status', 'St', '📶', 'Status'],
-      reload: ['Reload', 'Rl', '🔃', 'Reload'],
-      save: ['Save', 'Sav', '💾', 'Save'],
-      saveData: ['Last saves', 'LS', '📚', 'Last saves'],
+      status: ['Status', 'St', '📶\ufe0e', 'Status'],
+      reload: ['Reload', 'Rl', '🔃\ufe0e', 'Reload'],
+      save: ['Save', 'Sav', '💾\ufe0e', 'Save'],
+      saveData: ['Last saves', 'LS', '📚\ufe0e', 'Last saves'],
       modal: {
         search: {
           title: ['Search', 'Sr', '', 'Search'],
@@ -42,10 +53,10 @@ export class Def{
     },
     ru: {
       title: ['Animanga Widget', 'AW', '', 'Animaga Widget'],
-      status: ['Статус', 'Ст', '📶', 'Статус'],
-      reload: ['Reload', 'Rl', '🔃', 'Reload'],
-      save: ['Сохранить', 'Сохр', '💾', 'Сохранить'],
-      saveData: ['Последние сохранения', 'ПС', '📚', 'Последние сохранения'],
+      status: ['Статус', 'Ст', '📶\ufe0e', 'Статус'],
+      reload: ['Reload', 'Rl', '🔃\ufe0e', 'Reload'],
+      save: ['Сохранить', 'Сохр', '💾\ufe0e', 'Сохранить'],
+      saveData: ['Последние сохранения', 'ПС', '📚\ufe0e', 'Последние сохранения'],
       modal: {
         search: {
           title: ['Поиск', 'Пск', '', 'Поиск'],
@@ -172,7 +183,7 @@ export class Def{
               // res.results.toSorted((a,b) => (a.result.percents.diff > b.result.percents.diff) ? -1 : ((b.result.percents.diff > a.result.percents.diff) ? 1 : 0))
               if(!btnMode && o.search.start.mode === 'bestMatch'){
                 const item = res.items[res.sorted.item.ind];
-                console.log('ITEMMMMMM', item)
+                // console.log('ITEMMMMMM', item)
                 // o.title = item.title;
                 // o.search.titleUpd = e.item.title;
                 o.search.malId = item.id;
@@ -195,7 +206,7 @@ export class Def{
                       El.Div({
                         path: h,
                         class: 'title',
-                        text: this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang].modal.search.title[this.lang.type(item, 0)]
+                        text: this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang)].modal.search.title[this.lang.type(item, 0)]
                       });
                       
                       El.Div({
@@ -209,7 +220,7 @@ export class Def{
                           });
                           El.Button({
                             path: h,
-                            text: this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang].modal.search.toDef[this.lang.type(item, 0)],
+                            text: this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang)].modal.search.toDef[this.lang.type(item, 0)],
                             onclick: () => {
                               o.title = o.search.titleDef;
                               m.remove();
@@ -232,7 +243,6 @@ export class Def{
                           path: l,
                           class: 'item flx',
                           onclick: () => {
-                            console.log('CLICKED')
                             m.remove();
                             const item = res.items[e.item.ind];
                             o.title = item.title;
@@ -326,51 +336,24 @@ export class Def{
                   status: res.status,
                   broadcast: res.broadcast
                 };
+                o.s.mal.broadcastTime = {
+                  status: res.status,
+                  broadcast: res.broadcast
+                };
                 // o.s.mal.broadcast = res.broadcast||'';
 
                 const my = res.my_list_status;
-                // console.log('MAL SCORE', my);
                 o.s.save.statusItem = my?.status||'';
                 o.s.save.myRating = my?.score||0;
                 o.s.mal.updatedAt = my?.updated_at||'';
 
-                console.log('TYPE TYPE TYPE TYPE TYPE TPYE', o);
-
                 if(o.type === 'anime'){
-                  // console.log('TYPE TYPE TYPE TYPE TYPE TPYE')
                   o.s.save.watchedEps = my?.num_episodes_watched||0;
                 }else{
                   o.s.save.readedVol = my?.num_volumes_read||0;
                   o.s.save.readedCh = my?.num_chapters_read||0;
                 }
 
-                // return success('ok');
-                
-                // if(res.my_list_status){
-                //   const my = res.my_list_status;
-                //   console.log('MAL SCORE', my);
-                //   o.s.save.statusItem = my.status||'';
-                //   o.s.save.myRating = my.score||0;
-                //   o.s.mal.updatedAt = my.updated_at||'';
-
-                //   if(o.type === 'anime'){
-                //     o.s.save.watchedEps = my.num_episodes_watched||0;
-                //   }else{
-                //     o.s.save.readedVol = my.num_volumes_read||0;
-                //     o.s.save.readedCh = my.num_chapters_read||0;
-                //   }
-                // }else{
-                //   o.s.save.statusItem = undefined;
-                //   o.s.save.myRating = 0;
-                //   o.s.mal.updatedAt = '';
-
-                //   if(o.type === 'anime'){
-                //     o.s.save.watchedEps = 0;
-                //   }else{
-                //     o.s.save.readedVol = 0;
-                //     o.s.save.readedCh = 0;
-                //   }
-                // }
                 console.log('COMPLETED!!!!!!!!!');
               }
             )
@@ -378,10 +361,6 @@ export class Def{
         }
         break;
         case 'ani': {
-          if(o.s.mal){
-            console.log('OS', o.s.mal);
-            if(o.s.mal.id) console.log('IDDDDDD', o.s.mal.id);
-          }
           runs.push(
             (o.malId ? new AniApi().fc.search.item.byId({
               type: o.type,
@@ -405,10 +384,6 @@ export class Def{
                 console.log('ANI RES', res);
                 if(!res) throw new Ut().MyError(['[MAL Load]', 'No data']);
                 if(e.main){
-                  const round10 = (num) => num && Math.round(num / 10) * 10;
-                  const full = (num) => num | 0;
-                  // full(15 / 10);
-                  console.log('ANI is main');
                   o.s.save.myRating = res.mediaListEntry?.score;
                   if(o.type === 'anime'){
                     o.s.save.watchedEps = res.mediaListEntry?.progress||0;
@@ -421,21 +396,6 @@ export class Def{
                 o.s.ani.id = res.id;
                 o.s.ani.rating = res.meanScore;
                 o.s.ani.link = new AniApi().link.item(o.type, res.id);
-                // o.s.ani.popularity = res.popularity;
-                // o.s.ani.title = res.title;
-                // if(o.type === 'anime'){
-                //   o.s.ani.watchedEps = res.my_list_status?.num_episodes_watched||0;
-                //   o.s.ani.episodes = res.num_episodes||0;
-                // }else{
-                //   o.s.ani.readedVol = res.my_list_status?.num_volumes_read||0;
-                //   o.s.ani.readedCh = res.my_list_status?.num_chapters_read||0;
-                //   o.s.ani.volumes = res.num_volumes||0;
-                //   o.s.ani.chapters = res.num_chapters||0;
-                // }
-                // o.s.ani.status = res.status||'';
-                // o.s.ani.broadcast = res.broadcast||'';
-                // o.s.ani.statusItem = res.my_list_status?.status||undefined;
-                // o.s.ani.myRating = res.my_list_status?.score||0;
               }
             )
           )
@@ -506,16 +466,17 @@ export class Def{
   build = (p, line, string, item, el, o) => {
     const name = 'def';
     const _this = this;
-    new (this.class(name, p, line, string, item, el, o, _this))().check()
+    el.run = (o) => this.search(o, p, '', item, string, line);
+    new (this.class(name, p, line, string, item, el, o, _this))().check(p, item)
   };
   class = (name, path, line, string, item, el, o, _this) => class {
-    title = () => {
+    logo = (path, item) => {
       El.Div({
         path: path,
         attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
-        classes: ['i-mainTitle', '-item', '-btn', 'flx'],
-        text: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['title'][_this.lang.type(item, 1)],
-        title: +_this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['title'][3],
+        classes: ['n-logo', '-item', '-btn', 'flx'],
+        text: _this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang)]['title'][_this.lang.type(item, 1)],
+        title: +_this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, 2)]['title'][3],
         func: (e) => {
           el.def.title = e;
         },
@@ -524,13 +485,13 @@ export class Def{
         }
       });
     };
-    reload = () => {
+    reload = (path, item) => {
       El.Button({
         path: path,
         attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
         class: ['reload', 'def', '-item', '-btn', item.pos && ' -'+item.pos||'', 'flx'].join(' '),
-        text: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['reload'][_this.lang.type(item, 2)],
-        title: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['reload'][3],
+        text: _this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang)]['reload'][_this.lang.type(item, 2)],
+        title: _this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, 2)]['reload'][3],
         func: (e) => {
           el.def.reload = e;
           el.def.runner = () => _this.run(o);
@@ -547,70 +508,64 @@ export class Def{
         }
       });
     };
-    save = () => {
-      El.Div({
+    save = (path, item) => {
+      El.Button({
         path: path,
-        classes: ['n-save-updated', '-itemMini', 'flx'],
         attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+        class: ['n-save', 'def', '-item', '-btn', item.pos && ' -'+item.pos||'', 'flx'].join(' '),
+        text: _this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang)]['save'][_this.lang.type(item, 2)],
+        title: _this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, 2)]['save'][3],
+        func: (e) => el.def.save = e,
+        onclick: (btn) => {
+          _this.save(o, el.def.save);
+        }
+      });
+    };
+    saveDetails = (path, item) => {
+      El.Details({
+        path: path,
+        classes: ['n-updatedAt', '-itemMini', 'flx', 'ver'],
+        attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+        summary: true,
+        summaryClass: 'key',
+        summaryT: _this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang)]['saveData'][_this.lang.type(item, 2)],
+        title: _this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, 2)]['saveData'][3],
         func: (m) => {
-          El.Details({
+          El.Div({
             path: m,
-            classes: ['n-updatedAt', '-itemMini', 'flx', 'ver'],
-            summary: true,
-            summaryClass: 'key',
-            summaryT: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['saveData'][_this.lang.type(item, 2)],
-            title: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['saveData'][3],
+            class: 'list flx ver',
             func: (m) => {
-              El.Div({
-                path: m,
-                class: 'list flx ver',
-                func: (m) => {
-                  for(const i of o.cfg.api.list){
-                    if(i.save.active){
+              for(const i of o.cfg.api.list){
+                if(i.save.active){
+                  El.Div({
+                    path: m,
+                    class: 'item flx',
+                    text: i.name.toUpperCase(),
+                    func: (m) => {
                       El.Div({
                         path: m,
-                        class: 'item flx',
-                        text: i.name.toUpperCase(),
-                        func: (m) => {
-                          El.Div({
-                            path: m,
-                            class: 'value',
-                            func: (e) => el[i.name].updatedAt = e
-                          });
-                        }
+                        class: 'value',
+                        func: (e) => el[i.name].updatedAt = e
                       });
                     }
-                    // El.getTime(sav?.updated_at, 'full')
-                  }
+                  });
                 }
-              });
-            }
-          });
-
-          El.Button({
-            path: m,
-            attrs: [['api', name]],
-            class: ['n-save', 'def', '-item', '-btn', item.pos && ' -'+item.pos||'', 'flx'].join(' '),
-            text: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['save'][_this.lang.type(item, 2)],
-            title: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['save'][3],
-            func: (e) => el.def.save = e,
-            onclick: (btn) => {
-              _this.save(o, el.def.save);
+                // El.getTime(sav?.updated_at, 'full')
+              }
             }
           });
         }
       });
     };
-    status = () => {
+    status = (path, item) => {
       El.Button({
         path: path,
         attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
         classes: ['widgetStatus', 'def', '-item', '-btn', item.pos && ' -'+item.pos||'', 'flx'],
-        text: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['status'][_this.lang.type(item, 2)],
-        title: _this.lang[item.cfg?.lang||string.cfg?.lang||line.cfg?.lang]['status'][3],
+        text: _this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang)]['status'][_this.lang.type(item, 2)],
+        title: _this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, 2)]['status'][3],
         onclick: (e) => {
           if(!e.target.className.match('-item')) return;
-          console.log('Lol', e.target)
           if(!e.target.children.length) El.Dialog({
             path: path,
             class: 'mdl',
@@ -655,18 +610,61 @@ export class Def{
         }
       });
     };
-    check = () => {
+    containers = {
+      div: (path, item) => {
+        El.Div({
+          path: path,
+          attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+          classes: ['container', 'flx'],
+          func: (i) => {
+            item.items.forEach(it => {
+              this.check(i, it);
+            });
+          }
+        });
+      },
+      label: (path, item) => {
+        El.Label({
+          path: path,
+          classes: ['lab', 'flx'],
+          attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+          func: (i) => {
+            item.items.forEach(it => {
+              this.check(i, it);
+            });
+          }
+        })
+      },
+      itemGroup: (path, item) => {
+        if(item.type !== o.type) return;
+        El.Div({
+          path: path,
+          classes: ['item-group', 'flx'],
+          attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+          func: (i) => {
+            item.items.forEach(it => {
+              this.check(i, it);
+            })
+          }
+        });
+      }
+    };
+    check = (i, it) => {
       const name = 'def';
-      switch(item.n){
-        case 'title': this.title();
+      switch(it.n){
+        case 'div': this.containers.div(i, it);
         break;
-        case 'reload': this.reload();
+        case 'logo': this.logo(i, it);
         break;
-        case 'save': this.save();
+        case 'reload': this.reload(i, it);
+        break;
+        case 'save': this.save(i, it);
+        break;
+        case 'saveDetails': this.saveDetails(i, it);
         break;
         case 'status':
           
-          this.status();
+          this.status(i, it);
         break;
       }
     };
