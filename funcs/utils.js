@@ -256,7 +256,7 @@ export class Ut{
       arr.forEach((e, ind) => {
         // result.ind = ind;
         results.push({
-          item: {title:e.iTitle, id:e.id, ind:ind},
+          item: {title:e.iTitle, ind:ind},
           result: this[o.textMatch.matcher](e.iTitle, title)
         })
         // this.search(e.iTitle, results, {ind:ind, text:title, textMatch: o.textMatch, matching});
