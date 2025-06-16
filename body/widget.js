@@ -23,9 +23,10 @@ export const widget = {
           if(!e.detail) return;
           switch(e.detail.type){
             case 'reload': 
-            console.log('R', el.def.reload);
+            console.log('R', el.run);
+            // el.run(o)
             // el.def.reload.click();
-            const ev = new Event('mousedown', { view: window, bubbles: true, cancelable: true });
+            const ev = new MouseEvent('mousedown', { view: window, bubbles: true, cancelable: true });
             el.def.reload.dispatchEvent(ev);
             break;
           }
@@ -210,7 +211,7 @@ export const widget = {
 
     function updater(o){
       function upd(key, val, tar){
-        console.log('UUUPD', key, val);
+        // console.log('UUUPD', key, val);
         switch(key){
           case 'myRating':
             o.s.mal && (o.s.mal.myRating = val);
@@ -272,19 +273,14 @@ export const widget = {
     new Mal().connect(el, o);
     new Ani().connect(el, o);
     updater(o);
-    // document.addEventListener('rel', () => {
-    //   console.log('q', el.def.reload)
-    //   // el.def.reload.focus();
-    //   el.def.reload.mousedown();
-    // });
-    // const r = new CustomEvent("rel", {
+
+    // const eventAwesome = new CustomEvent('status', {
     //   bubbles: true,
-    //   detail: { text: () => textarea.value },
+    //   detail: {
+    //     type: 'reload'
+    //   }
     // });
-    // document.dispatchEvent(r);
-    // o.s.mal.myRating = 0;
-    // if(o.type === 'anime'){
-    //   o.s.mal.watchedEps = 0;
-    // }
+
+    // o.path.children[2].dispatchEvent(eventAwesome);
   }
 }
