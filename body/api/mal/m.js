@@ -4,7 +4,18 @@ import {Def} from '../def/m.js';
 
 export class Mal{
   gp = (t, path) => path.reduce((r, k) => k ? r[k] : r, t);
-  attrs = (o) => Object.entries(o).map(e => [e[0], e[1]]);
+  lng = (o, n) => {
+    const l = o.split('/');
+    if(!l.length > 1||!n) return l[0];
+    else return l[n] ? l[n] : l[0];
+  };
+  splitter = (o) => {
+    const t = o.split('/');
+    if(!t.length > 1) return [['lang', t[0]]];
+    else
+    return [['lang0', t[0]], ['lang1', t[1]], ['lang2', t[2]]];
+  };
+  attrs = (o) => Object.entries(o).map(e => e[0] === 'lang' ? this.splitter(e[1]) : [[e[0], e[1]]]).flat().filter(e => e[1]);
   lang = {
     type: (item, v) => {
       if(!item.title && !v) return 1;
@@ -37,17 +48,18 @@ export class Mal{
         sunday: ['Sunday', 'Sun', '']
       },
       statusVal: {
-        currently_airing: ['Выходит', 'Вых'],
-        currently_publishing: ['Публикуется', 'Пуб'],
-        finished_airing: ['Вышло', 'Вы'],
-        finished_publishing: ['Закончено', 'Зак']
+        currently_airing: ['Airing', 'Air'],
+        currently_publishing: ['Publishing', 'Pub'],
+        finished_airing: ['Finished', 'Fin'],
+        finished_publishing: ['Finished', 'Fin']
       },
       anime: {
-        id: ['ID', 'ID', '', 'MAL ID'],
+        id: ['ID', 'ID', '🆔\ufe0e', 'MAL ID'],
         status: ['Status', 'St', '⏳\ufe0e', 'Status'],
         rating: ['Rating', 'Rt', '💣\ufe0e', 'Rating'],
         popularity: ['Popularity', 'Pop-ty', '🔥\ufe0e'],
         broadcast: ['Broadcast', 'Brod', '🗓️\ufe0e'],
+        broadcastTime: [],
         link: ['Link', 'Link', '🔗', 'Link'],
         title: ['', '', '', 'Title'],
         myRating: ['My rating', 'Myrat', '🔥\ufe0e', 'My rating'],
@@ -69,11 +81,12 @@ export class Mal{
         }
       },
       manga: {
-        id: ['ID', 'ID', '', 'MAL ID'],
+        id: ['ID', 'ID', '🆔\ufe0e', 'MAL ID'],
         status: ['Status', 'St', '⏳\ufe0e', 'Status'],
         rating: ['Rating', 'Rt', '💣\ufe0e', 'Rating'],
         popularity: ['Popularity', 'Pop-ty', '🔥\ufe0e'],
         broadcast: ['Broadcast', 'Brod', '🗓️\ufe0e'],
+        broadcastTime: [],
         link: ['Link', 'Link', '🔗', 'Link'],
         title: ['', '', '', 'Title'],
         readed: ['Readed:', 'Rdd:', '📖'],
@@ -96,11 +109,12 @@ export class Mal{
       }
     },
     ru: {
-      id: ['ID', 'ID', '', 'MAL ID'],
+      id: ['ID', 'ID', '🆔\ufe0e', 'MAL ID'],
       status: ['Статус', 'Ст', '⏳\ufe0e', 'Статус'],
       rating: ['Рейтинг', 'Рт', '💣\ufe0e', 'Рейтинг'],
       popularity: ['Популярность', 'Попул', '🔥\ufe0e', 'Популярность'],
       broadcast: ['Выходит в', 'Вых в', '🗓️\ufe0e', 'Выходит в'],
+      broadcastTime: [],
       link: ['Ссылка', 'С-ка', '🔗', 'Ссылка'],
       title: ['', '', '', 'Название тайтла'],
       day: {
@@ -121,11 +135,12 @@ export class Mal{
       myRating: ['Мой рейтинг', 'МойРейт', '🔥\ufe0e', 'Мой рейтинг'],
       ['myRating-title']: ['Мой рейтинг', 'МойРейт', '🔥\ufe0e', 'Мой рейтинг'],
       anime: {
-        id: ['ID', 'ID', '', 'MAL ID'],
+        id: ['ID', 'ID', '🆔\ufe0e', 'MAL ID'],
         status: ['Статус', 'Ст', '⏳\ufe0e', 'Статус'],
         rating: ['Рейтинг', 'Рт', '💣\ufe0e', 'Рейтинг'],
         popularity: ['Популярность', 'Попул', '🔥\ufe0e', 'Популярность'],
         broadcast: ['Выходит в', 'Вых в', '🗓️\ufe0e', 'Выходит в'],
+        broadcastTime: [],
         link: ['Ссылка', 'С-ка', '🔗', 'Ссылка'],
         title: ['', '', '', 'Название тайтла'],
         myRating: ['Мой рейтинг', 'МойРейт', '🔥\ufe0e', 'Мой рейтинг'],
@@ -172,6 +187,130 @@ export class Mal{
     const _this = this;
 
     class Gr{
+      lng = {
+        text: (item, string, line, obj, o) => _this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||
+          line.cfg?.lang), o.type, obj.key])[_this.lang.type(item, 2)]||_this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang), o.type, obj.key])[1],
+        title: (item, string, line, obj, o) => _this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang), o.type, obj.key])[3]
+      };
+      items = {
+        type: (o) => {
+          switch(o.type){
+            case 'part': return 'itemPart'
+            break;
+            case 'mini': return 'itemMini'
+            break;
+            case 'part': return 'itemPart'
+            break;
+            default: return '-item';
+          }
+        },
+        item: (path, item, obj, text) => {
+          El.Div({
+            path: path,
+            attrs: [
+              ['api', name],
+              ...(item.cfg ? _this.attrs(item.cfg) : []),
+              ...(obj && obj.attrs ? obj.attrs : [])
+            ],
+            classes: ['n-'+obj.key, this.items.type(obj), 'flx'],
+            title: this.lng.title(item, string, line, obj, o),
+            func: (i) => {
+              El.Div({
+                path: i,
+                class: 'key',
+                text: this.lng.text(item, string, line, obj, o),
+                func: (e) => obj.key && (el[name][obj.key] = e)
+              });
+  
+              if(obj.func) obj.func(i);
+            }
+          });
+        },
+        val: (path, item, obj) => {
+          El.Div({
+            path: path,
+            attrs: [
+              ['api', name],
+              ...(item.cfg ? _this.attrs(item.cfg) : []),
+              ...(obj && obj.attrs ? obj.attrs : [])
+            ],
+            classes: ['n-'+obj.key, this.items.type(obj), 'flx'],
+            title: this.lng.title(item, string, line, obj, o),
+            func: (i) => {
+              El.Div({
+                path: i,
+                class: 'value',
+                text: obj?.text,
+                func: (e) => el[name][obj.key] = e
+              });
+            }
+          });
+        },
+        keyVal: (path, item, obj) => {
+          El.Div({
+            path: path,
+            attrs: [
+              ['api', name],
+              ...(item.cfg ? _this.attrs(item.cfg) : []),
+              ...(obj && obj.attrs ? obj.attrs : [])
+            ],
+            classes: ['n-'+obj.key, this.items.type(obj), 'flx'],
+            title: this.lng.title(item, string, line, obj, o),
+            func: (i) => {
+              El.Div({
+                path: i,
+                class: 'key',
+                text: this.lng.text(item, string, line, obj, o)
+              });
+  
+              El.Div({
+                path: i,
+                class: 'value',
+                text: obj?.text,
+                func: (e) => el[name][obj.key] = e
+              });
+            }
+          });
+        },
+        num: (path, item, obj, text) => {
+          El.Div({
+            path: path,
+            attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : []), ...(obj.attrs ? obj.attrs:[])],
+            classes: ['n-'+obj.key, '-itemMini', ...(obj.classes ? obj.classes:[]), '-itemNum', 'flx'],
+            title: this.lng.title(item, string, line, obj, o),
+            func: (i) => {
+              El.Div({
+                path: i,
+                class: 'value num',
+                text: obj.text,
+                func: (e) => el[name][obj.key] = e
+              });
+            }
+          });
+        },
+        inputNum: (path, item, obj) => {
+          El.Input({
+            path: path,
+            classes: ['n-'+obj.key, '-itemMini', 'itemInpNum', 'val'],
+            attrs: [
+              ['api', name],
+              ...(item.cfg ? _this.attrs(item.cfg) : []),
+              ...(obj && obj.attrs ? obj.attrs : [])
+            ],
+            type: 'number',
+            value: '0',
+            title: this.lng.title(item, string, line, obj, o),
+            oninput: (e) => {
+              if(e.target.value) e.target.style.width = +e.target.value.length*8+'px';
+              o.s.save[obj.key] = e.target.value;
+            },
+            func: (e) => {
+              el[name][obj.key] = e;
+              if(e.value) e.style.width = +e.value.length*8+'px';
+            }
+          });
+        }
+      };
       itemCh(path, item, obj){
         El.Div({
           path: path,
@@ -180,10 +319,15 @@ export class Mal{
             ...(item.cfg ? _this.attrs(item.cfg) : []),
             ...(obj && obj.attrs ? obj.attrs : [])
           ],
-          classes: ['n-'+obj.key, '-item', ...(obj && obj.classes ? obj.classes : []), 'flx'],
-          text: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, obj.key, _this.lang.type(item, 2)]),
-          title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, obj.key, 3]),
+          classes: ['n-'+obj.key, this.items.type(obj), 'flx'],
+          title: this.lng.title(item, string, line, obj, o),
           func: (i) => {
+            El.Div({
+              path: i,
+              class: 'key',
+              text: this.lng.text(item, string, line, obj, o)
+            });
+
             El.Div({
               path: i,
               class: 'value',
@@ -198,8 +342,14 @@ export class Mal{
           path: path,
           attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : []), ...(obj.attrs ? obj.attrs:[])],
           classes: ['n-'+obj.key, '-item', ...(obj.classes ? obj.classes:[]), 'flx'],
-          text: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, obj.key, _this.lang.type(item, 2)]),
-          title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, obj.key])[3],
+          title: this.lng.title(item, string, line, obj, o),
+          func: (i) => {
+            El.Div({
+              path: i,
+              class: 'value',
+              text: this.lng.text(item, string, line, obj, o)
+            });
+          }
         });
       };
       itemMini = (path, item, obj, text) => {
@@ -207,8 +357,29 @@ export class Mal{
           path: path,
           attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : []), ...(obj.attrs ? obj.attrs:[])],
           classes: ['n-'+obj.key, '-itemMini', ...(obj.classes ? obj.classes:[]), 'flx'],
-          text: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, obj.key, _this.lang.type(item, 2)]),
-          title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, obj.key])[3],
+          title: this.lng.title(item, string, line, obj, o),
+          func: (i) => {
+            El.Div({
+              path: i,
+              class: 'value',
+              text: this.lng.text(item, string, line, obj, o)
+            });
+          }
+        });
+      };
+      itemMiniNum = (path, item, obj, text) => {
+        El.Div({
+          path: path,
+          attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : []), ...(obj.attrs ? obj.attrs:[])],
+          classes: ['n-'+obj.key, '-itemMini', ...(obj.classes ? obj.classes:[]), '-itemNum', 'flx'],
+          title: this.lng.title(item, string, line, obj, o),
+          func: (i) => {
+            El.Div({
+              path: i,
+              class: 'value num',
+              func: (e) => el[name][obj.key] = e
+            });
+          }
         });
       };
       itemMiniCh(path, item, obj){
@@ -220,9 +391,13 @@ export class Mal{
             ...(obj && obj.attrs ? obj.attrs : [])
           ],
           classes: ['n-'+obj.key, '-itemMini', ...(obj && obj.classes ? obj.classes : []), 'flx'],
-          text: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, obj.key, _this.lang.type(item, 2)]),
-          title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, obj.key, 3]),
+          title: this.lng.title(item, string, line, obj, o),
           func: (i) => {
+            El.Div({
+              path: i,
+              class: 'key',
+              text: this.lng.text(item, string, line, obj, o)
+            });
             El.Div({
               path: i,
               class: 'value',
@@ -236,9 +411,14 @@ export class Mal{
         El.Input({
           path: path,
           classes: ['n-'+obj.key, 'itemNum', 'val'],
+          attrs: [
+            ['api', name],
+            ...(item.cfg ? _this.attrs(item.cfg) : []),
+            ...(obj && obj.attrs ? obj.attrs : [])
+          ],
           type: 'number',
           value: '0',
-          title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, obj.key, 3]),
+          title: this.lng.title(item, string, line, obj, o),
           oninput: (e) => {
             if(e.target.value) e.target.style.width = +e.target.value.length*8+'px';
             o.s.save[obj.key] = e.target.value;
@@ -251,9 +431,7 @@ export class Mal{
       }
       check = (i, it) => {
         switch(it.n){
-          case 'div': console.log('III', it)
-          
-          this.containers.div(i, it);
+          case 'div': this.containers.div(i, it);
           break;
           case 'label': this.containers.label(i, it);
           break;
@@ -316,6 +494,8 @@ export class Mal{
           break;
           case 'broadcast': this.other.broadcast(i, it);
           break;
+          case 'broadcastTime': this.other.broadcastTime(i, it);
+          break;
   
           case 'link': this.other.link(i, it);
           break;
@@ -326,21 +506,32 @@ export class Mal{
       };
       other = {
         id: (path, item) => {
-          El.Div({
-            path: path,
-            classes: ['n-'+'id', '-item', 'flx'],
-            attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
-            text: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'id', _this.lang.type(item, 1)]),
-            title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'id', 3]),
-            func: (e) => {
-              // el[name].id = e;
-              El.A({
-                path: e,
-                classes: ['value', 'flx'],
-                func: (e) => el[name].id = e
-              })
-            }
-          });
+          this.items.item(path, item, {key: 'id', func: (e) => {
+            El.A({
+              path: e,
+              classes: ['value', 'flx'],
+              func: (e) => el[name].id = e
+            })
+          }})
+          // El.Div({
+          //   path: path,
+          //   classes: ['n-'+'id', '-item', 'flx'],
+          //   attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+          //   title: _this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, 2), o.type, 'id', 3]),
+          //   func: (e) => {
+          //     // el[name].id = e;
+          //     El.Div({
+          //       path: e,
+          //       class: 'key',
+          //       text: _this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang), o.type, 'id', _this.lang.type(item, 1)]),
+          //     });
+          //     El.A({
+          //       path: e,
+          //       classes: ['value', 'flx'],
+          //       func: (e) => el[name].id = e
+          //     })
+          //   }
+          // });
           // this.itemCh(path, item, {
           //   key: 'id',
           //   class: ['-item'],
@@ -361,40 +552,51 @@ export class Mal{
           });
         },
         status: (path, item) => {
-          this.itemCh(path, item, {
+          this.items.keyVal(path, item, {
             key: 'status',
-            noType: true
+            type: 'part'
             // ttl: 2
           });
         },
         broadcast: (path, item) => {
-          El.Div({
-            path: path,
-            attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
-            classes: ['n-'+'broadcast', '-item', 'flx'],
-            func: (b) => {
-              if(!el[name].broadcast) el[name].broadcast = {};
-              El.Div({
-                path: b,
-                class: 'key',
-                text: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'broadcast', _this.lang.type(item, 2)]),
-                title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'broadcast', 3])
-              });
-              El.Div({
-                path: b,
-                class: 'day value',
-                func: (e) => {
-                  el[name].broadcast.day = e;
-                }
-              });
-              El.Div({
-                path: b,
-                class: 'time value',
-                func: (e) => {
-                  el[name].broadcast.time = e;
-                }
-              });
-            }
+          this.items.keyVal(path, item, {
+            key: 'broadcast',
+            type: 'part'
+          });
+
+          // El.Div({
+          //   path: path,
+          //   attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+          //   classes: ['n-'+'broadcast', '-item', 'flx'],
+          //   func: (b) => {
+          //     if(!el[name].broadcast) el[name].broadcast = {};
+          //     El.Div({
+          //       path: b,
+          //       class: 'key',
+          //       text: _this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang), o.type, 'broadcast', _this.lang.type(item, 2)]),
+          //       title: _this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, 2), o.type, 'broadcast', 3])
+          //     });
+          //     El.Div({
+          //       path: b,
+          //       class: 'day key-value',
+          //       func: (e) => {
+          //         el[name].broadcast.day = e;
+          //       }
+          //     });
+          //     El.Div({
+          //       path: b,
+          //       class: 'time key-value',
+          //       func: (e) => {
+          //         el[name].broadcast.time = e;
+          //       }
+          //     });
+          //   }
+          // });
+        },
+        broadcastTime: (path, item) => {
+          this.items.val(path, item, {
+            key: 'broadcastTime',
+            type: 'part'
           });
         },
         link: (path, item) => {
@@ -402,7 +604,7 @@ export class Mal{
             path: path,
             classes: ['n-'+'link', '-item', 'flx'],
             attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
-            text: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'link', _this.lang.type(item, 2)]),
+            text: _this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang), o.type, 'link', _this.lang.type(item, 2)]),
             func: (e) => {
               el[name].link = e;
             }
@@ -435,7 +637,7 @@ export class Mal{
           }
         },
         myRating: (path, item) => {
-          this.inputNum(path, item, {key:'myRating', num:2});
+          this.items.inputNum(path, item, {key:'myRating', num:2});
           // El.Input({
           //   path: path,
           //   classes: ['n-'+'myRating', 'itemNum', 'val'],
@@ -468,8 +670,8 @@ export class Mal{
               path: path,
               attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
               classes: ['n-'+'statusItem', '-itemSel', '-flx'],
-              options: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'statusItem', 'options']),
-              title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'statusItem', 'text', 3]),
+              options: _this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang), o.type, 'statusItem', 'options']),
+              title: _this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, 2), o.type, 'statusItem', 'text', 3]),
               func: (e) => {
                 el[name].statusItem = e;
               },
@@ -480,17 +682,17 @@ export class Mal{
           },
           episodes: {
             watched: (path, item) => {
-              this.inputNum(path, item, {key:'watchedEps', num:2});
+              this.items.inputNum(path, item, {key:'watchedEps', num:2});
             },
             max: (path, item) => {
-              this.itemMiniCh(path, item, {key:'episodes', classes:['itemNum', 'len', 'flx'], attrs:[...(item.cfg ? _this.attrs(item.cfg) : [])], text:'?'});
+              this.items.num(path, item, {key:'episodes', text:'?'});
             },
             plus: (path, item) => {
               El.Button({
                 path: path,
                 attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
                 classes: ['n-'+'plusEps', 'numBtn', '-btn', item.type],
-                text: '+',
+                text: '➕\ufe0e',
                 onclick: (l) => {
                   if(o.s.save.watchedEps === undefined) o.s.save.watchedEps = 0;
                   o.s.save.watchedEps++;
@@ -502,7 +704,7 @@ export class Mal{
                 path: path,
                 attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
                 classes: ['n-'+'minusEps', 'numBtn', '-btn', item.type],
-                text: '-',
+                text: '➖\ufe0e',
                 onclick: (l) => {
                   if(o.s.save.watchedEps === undefined) o.s.save.watchedEps = 0;
                   if(o.s.save.watchedEps === 0) return;
@@ -530,8 +732,8 @@ export class Mal{
             El.Select({
               path: path,
               classes: ['n-'+'statusItem', '-itemSel', '-flx'],
-              options: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'statusItem', 'options']),
-              title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'statusItem', 'text', 3]),
+              options: _this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang), o.type, 'statusItem', 'options']),
+              title: _this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, 2), o.type, 'statusItem', 'text', 3]),
               func: (e) => {
                 el[name].statusItem = e;
               }
@@ -557,12 +759,9 @@ export class Mal{
               // });
             },
             max: (path, item) => {
-              this.itemCh(path, item, {
+              this.itemMiniNum(path, item, {
                 key: 'chapters',
                 type: o.type,
-                classes: ['n-'+'itemNum', 'len'],
-                attrs: [...(item.cfg ? _this.attrs(item.cfg) : [])],
-                nottl: true,
                 text: '?'
               });
             },
@@ -595,12 +794,9 @@ export class Mal{
               this.inputNum(path, item, {key:'readedVol', num:2});
             },
             max: (path, item) => {
-              this.itemCh(path, item, {
+              this.itemMiniNum(path, item, {
                 key: 'volumes',
                 type: o.type,
-                classes: ['n-'+'itemNum', 'len'],
-                attrs: [...(item.cfg ? _this.attrs(item.cfg) : [])],
-                nottl: true,
                 text: '?'
               });
             },
@@ -681,25 +877,21 @@ export class Mal{
     //   o.s[name].watchedEps = 0;
     // }
     const upd = (key, v, e) => {
-      console.log('UPD ' + name, key, v, e);
+      // console.log('UPD ' + name, key, v, e);
       if(!e.el[name][key]) return;
       switch (key) {
         case 'rating':
           e.el[name].rating.textContent = v;
-          return true;
         break;
         case 'id':
           e.el[name].id.textContent = v;
           e.el[name].id.href = new MalApi().link.item(o.type, v);
-          return true;
         break;
         case 'link':
           e.el[name].link.href = v;
-          return true;
         break;
         case 'popularity':
           e.el[name].popularity.textContent = v;
-          return true;
         break;
         case 'status': {
           if(!v) return;
@@ -711,8 +903,8 @@ export class Mal{
             finished: 'finished'
           };
           const l = {
-            lang: e.el[name].status.parentNode.getAttribute('lang'),
-            lvl: e.el[name].status.parentNode.getAttribute('langLvl')
+            lang: e.el[name].status.parentNode.getAttribute('lang1')||e.el[name].status.parentNode.getAttribute('lang0'),
+            lvl: e.el[name].status.parentNode.getAttribute('langLvl')||0
           };
 
           e.el[name].status.textContent = this.lang[l.lang].statusVal[v.status][l.lvl];
@@ -736,13 +928,32 @@ export class Mal{
             finished: 'finished'
           };
           const l = {
-            lang: e.el[name].broadcast.day.parentNode.getAttribute('lang'),
-            lvl: e.el[name].broadcast.day.parentNode.getAttribute('langLvl')
+            lang: e.el[name].broadcast.parentNode.getAttribute('lang1')||e.el[name].broadcast.parentNode.getAttribute('lang0'),
+            lvl: e.el[name].broadcast.parentNode.getAttribute('langLvl')||0
           };
 
-          e.el[name].broadcast.day.parentNode.setAttribute('status', status[v.status]);
-          e.el[name].broadcast.day.textContent = this.lang[l.lang].day[v.broadcast.day_of_the_week][l.lvl];
-          e.el[name].broadcast.time.textContent = v.broadcast.start_time;
+          e.el[name].broadcast.parentNode.setAttribute('status', status[v.status]);
+          e.el[name].broadcast.textContent = this.lang[l.lang].day[v.broadcast.day_of_the_week][l.lvl];
+          // e.el[name].broadcast.time.textContent = v.broadcast.start_time;
+        }
+        break;
+        case 'broadcastTime': {
+          if(!v) return;
+          if(!v.broadcast) return;
+
+          const status = {
+            currently_airing: 'airpublish',
+            currently_publishing: 'airpublish',
+            finished_airing: 'finished',
+            finished: 'finished'
+          };
+          const l = {
+            lang: e.el[name].broadcastTime.parentNode.getAttribute('lang1')||e.el[name].broadcastTime.parentNode.getAttribute('lang0'),
+            lvl: e.el[name].broadcastTime.parentNode.getAttribute('langLvl')||0
+          };
+
+          e.el[name].broadcastTime.parentNode.setAttribute('status', status[v.status]);
+          e.el[name].broadcastTime.textContent = v.broadcast.start_time;
         }
         break;
         case 'title':
@@ -759,10 +970,8 @@ export class Mal{
           e.el[name].watchedEps.style.width = +e.el[name].watchedEps.value.length*8+'px';
         break;
         case 'myRating':
-          console.log('VVVVV', v);
           e.el[name].myRating.value = v;
           e.el[name].myRating.style.width = +e.el[name].myRating.value.length*8+'px';
-          return true;
         break;
         case 'episodes':
           e.el[name].episodes.textContent = v;
