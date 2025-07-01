@@ -1,75 +1,64 @@
 import {El} from '../../../base/classes/m.js';
 import {MalApi} from '../../../api/mal/m.js';
 import {Def} from '../def/m.js';
+import {default as Base} from '../class.js';
+import {default as Func} from '../utilsClass.js';
 
-export class Mal{
-  gp = (t, path) => path.reduce((r, k) => k ? r[k] : r, t);
-  lng = (o, n) => {
-    const l = o.split('/');
-    if(!l.length > 1||!n) return l[0];
-    else return l[n] ? l[n] : l[0];
-  };
-  splitter = (o) => {
-    const t = o.split('/');
-    if(!t.length > 1) return [['lang', t[0]]];
-    else
-    return [['lang0', t[0]], ['lang1', t[1]], ['lang2', t[2]]];
-  };
-  attrs = (o) => Object.entries(o).map(e => e[0] === 'lang' ? this.splitter(e[1]) : [[e[0], e[1]]]).flat().filter(e => e[1]);
+export class Mal extends Func(){
   lang = {
-    type: (item, v) => {
-      if(!item.title && !v) return 1;
-      else
-      if(!item.title && v) return v;
-      else
-      if(item.title && v){
-        switch(item.title){
-          case '0':
-          case 'lg': return 0;
-          case '1':
-          case 'sh': return 1;
-          case '2':
-          case 'ico': return 2;
-          // default: return item.title;
-        }
-      }else
-      if(item.title === 'lg') return 0;
-      else
-      if(item.title === 'sh') return 1;
-    },
     en: {
-      day: {
-        monday: ['Monday', 'Mon', ''],
-        tuesday: ['Tuesday', 'Tue', ''],
-        wednesday: ['Wednesday', 'Wed', ''],
-        thursday: ['Thursday', '', 'Thu'],
-        friday: ['Friday', 'Fri', ''],
-        saturday: ['Saturday', 'Sat', ''],
-        sunday: ['Sunday', 'Sun', '']
+      id: ['ID', 'ID', '🆔\ufe0e', 'MAL ID'],
+      status: {
+        title: ['Status', 'St', '⏳\ufe0e', 'Status'],
+        value: {
+          currently_airing: ['Airing', 'Air'],
+          currently_publishing: ['Publishing', 'Pub'],
+          finished_airing: ['Finished', 'Fin'],
+          finished_publishing: ['Finished', 'Fin']
+        }
       },
-      statusVal: {
-        currently_airing: ['Airing', 'Air'],
-        currently_publishing: ['Publishing', 'Pub'],
-        finished_airing: ['Finished', 'Fin'],
-        finished_publishing: ['Finished', 'Fin']
+      myRating: ['My rating', 'Myrat', '🔥\ufe0e', 'My rating'],
+      rating: {
+        title: ['Rating', 'Rt', '💣\ufe0e', 'Rating'],
+        my: ['My rating', 'Myrat', '🔥\ufe0e', 'My rating'],
+      },
+      popularity: ['Popularity', 'Pop-ty', '🔥\ufe0e'],
+      air: {
+        title: ['Broadcast', 'Brod', '🗓️\ufe0e', 'Air date'],
+        day: {
+          monday: ['Monday', 'Mon', ''],
+          tuesday: ['Tuesday', 'Tue', ''],
+          wednesday: ['Wednesday', 'Wed', ''],
+          thursday: ['Thursday', '', 'Thu'],
+          friday: ['Friday', 'Fri', ''],
+          saturday: ['Saturday', 'Sat', ''],
+          sunday: ['Sunday', 'Sun', '']
+        },
+        time: []
+      },
+      advices: ['Рекомендации', 'Рек', '-', 'Рекомендации'],
+      link: ['Link', 'Link', '🔗', 'Link'],
+      item: {
+        title: ['', '', '', 'Title'],
+        search: ['', '', '', 'Search']
+      },
+      statusItem: {
+        value: {
+          currently_airing: ['Airing', 'Air'],
+          currently_publishing: ['Publishing', 'Pub'],
+          finished_airing: ['Finished', 'Fin'],
+          finished_publishing: ['Finished', 'Fin']
+        }
       },
       anime: {
-        id: ['ID', 'ID', '🆔\ufe0e', 'MAL ID'],
-        status: ['Status', 'St', '⏳\ufe0e', 'Status'],
-        rating: ['Rating', 'Rt', '💣\ufe0e', 'Rating'],
-        popularity: ['Popularity', 'Pop-ty', '🔥\ufe0e'],
-        broadcast: ['Broadcast', 'Brod', '🗓️\ufe0e'],
-        broadcastTime: [],
-        link: ['Link', 'Link', '🔗', 'Link'],
-        title: ['', '', '', 'Title'],
-        myRating: ['My rating', 'Myrat', '🔥\ufe0e', 'My rating'],
-      ['myRating-title']: ['My rating', 'Myrat', '🔥\ufe0e', 'My rating'],
-        watched: ['Watched:', 'Watch:', '📽️'],
-        watchedEps: ['Episodes', 'Eps', '🎞️', 'Watched episodes'],
-        episodes: ['', '', '', 'Episodes'],
-        statusItem: {
-          text: ['Status', '', '', 'Watching status'],
-          options: [
+        plusEps: ['', '', '', ''],
+        status: {
+          title: ['Status', 'St', '⏳\ufe0e', 'Status'],
+          value: {
+            currently_airing: ['Airing', 'Air'],
+            finished_airing: ['Finished', 'Fin']
+          },
+          my: [
             ['-', undefined],
             ['Watching', 'watching'],
             ['Completed', 'completed'],
@@ -78,24 +67,21 @@ export class Mal{
             ['Plan to watch', 'plan_to_watch'],
             ['Repeating', 'repeating']
           ]
+        },
+        title: ['Watched:', 'Watch:', '📽️'],
+        episodes: {
+          my: ['Episodes', 'Eps', '🎞️', 'Watched episodes'],
+          num: ['', '', '', 'Episodes'],
         }
       },
       manga: {
-        id: ['ID', 'ID', '🆔\ufe0e', 'MAL ID'],
-        status: ['Status', 'St', '⏳\ufe0e', 'Status'],
-        rating: ['Rating', 'Rt', '💣\ufe0e', 'Rating'],
-        popularity: ['Popularity', 'Pop-ty', '🔥\ufe0e'],
-        broadcast: ['Broadcast', 'Brod', '🗓️\ufe0e'],
-        broadcastTime: [],
-        link: ['Link', 'Link', '🔗', 'Link'],
-        title: ['', '', '', 'Title'],
-        readed: ['Readed:', 'Rdd:', '📖'],
+        readed: ['Readed:', 'Rdd:', '📖', 'Readed'],
         readedVol: ['Volume', 'Vol'],
         volumes: ['Volumes', 'Vol', '', 'Volumes'],
         readedCh: ['Chapter', 'Ch'],
         chapters: ['Chapters', 'Ch', ''],
         statusItem: {
-          text: ['Статус', '', '', 'Статус чтения'],
+          title: ['Статус', '', '', 'Статус чтения'],
           options: [
             ['-', undefined],
             ['Reading', 'reading'],
@@ -111,46 +97,38 @@ export class Mal{
     ru: {
       id: ['ID', 'ID', '🆔\ufe0e', 'MAL ID'],
       status: ['Статус', 'Ст', '⏳\ufe0e', 'Статус'],
-      rating: ['Рейтинг', 'Рт', '💣\ufe0e', 'Рейтинг'],
-      popularity: ['Популярность', 'Попул', '🔥\ufe0e', 'Популярность'],
-      broadcast: ['Выходит в', 'Вых в', '🗓️\ufe0e', 'Выходит в'],
-      broadcastTime: [],
-      link: ['Ссылка', 'С-ка', '🔗', 'Ссылка'],
-      title: ['', '', '', 'Название тайтла'],
-      day: {
-        monday: ['Понедельник', 'Пн', ''],
-        tuesday: ['Вторник', 'Вт', ''],
-        wednesday: ['Среда', 'Ср', ''],
-        thursday: ['Четверг', 'Чт', ''],
-        friday: ['Пятница', 'Пт', ''],
-        saturday: ['Суббота', 'Сб', ''],
-        sunday: ['Воскресенье', 'Вс', '']
+      rating: {
+        title: ['Рейтинг', 'Рт', '💣\ufe0e', 'Рейтинг'],
+        my: ['Мой рейтинг', 'МойРт', '🔥\ufe0e', 'Мой рейтинг'],
       },
-      statusVal: {
-        currently_airing: ['Выходит', 'Вых'],
-        currently_publishing: ['Публикуется', 'Пуб'],
-        finished_airing: ['Вышло', 'Вы'],
-        finished: ['Закончено', 'Зак']
+      popularity: ['Популярность', 'Поп-ть', '🔥\ufe0e'],
+      air: {
+        title: ['Дата выхода', 'ДатаВых', '🗓️\ufe0e', 'Дата выхода'],
+        day: {
+          monday: ['Понедельник', 'Пн', ''],
+          tuesday: ['Вторник', 'Вт', ''],
+          wednesday: ['Среда', 'Ср', ''],
+          thursday: ['Четверг', 'Чт', ''],
+          friday: ['Пятница', 'Пт', ''],
+          saturday: ['Суббота', 'Сб', ''],
+          sunday: ['Воскресенье', 'Вс', '']
+        },
+        time: []
       },
-      myRating: ['Мой рейтинг', 'МойРейт', '🔥\ufe0e', 'Мой рейтинг'],
-      ['myRating-title']: ['Мой рейтинг', 'МойРейт', '🔥\ufe0e', 'Мой рейтинг'],
-      anime: {
-        id: ['ID', 'ID', '🆔\ufe0e', 'MAL ID'],
-        status: ['Статус', 'Ст', '⏳\ufe0e', 'Статус'],
-        rating: ['Рейтинг', 'Рт', '💣\ufe0e', 'Рейтинг'],
-        popularity: ['Популярность', 'Попул', '🔥\ufe0e', 'Популярность'],
-        broadcast: ['Выходит в', 'Вых в', '🗓️\ufe0e', 'Выходит в'],
-        broadcastTime: [],
-        link: ['Ссылка', 'С-ка', '🔗', 'Ссылка'],
+      advices: ['Рекомендации', 'Рек', '🗳️\ufe0e', 'Рекомендации'],
+      link: ['Ссылка', 'Слк', '🔗', 'Ссылка'],
+      item: {
         title: ['', '', '', 'Название тайтла'],
-        myRating: ['Мой рейтинг', 'МойРейт', '🔥\ufe0e', 'Мой рейтинг'],
-      ['myRating-title']: ['Мой рейтинг', 'МойРейт', '🔥\ufe0e', 'Мой рейтинг'],
-        watched: ['Смотрю:', 'Смт:', '📽️', 'Просмотрено'],
-        watchedEps: ['Эпизоды', 'Эп', '🎞️', 'Просмотреннные эпизоды'],
-        episodes: ['', '', '', 'Эпизоды'],
-        statusItem: {
-          text: ['Статус', '', '', 'Статус просмотра'],
-          options: [
+        search: ['', '', '', 'Процент совпадения названия']
+      },
+      anime: {
+        title: ['Просмотрено:', 'Watch:', '📽️', 'Просмотрено'],
+        status: {
+          value: {
+            currently_airing: ['Выходит', 'Вых'],
+            finished_airing: ['Закончено', 'Зак']
+          },
+          my: [
             ['-', undefined],
             ['Смотрю', 'watching'],
             ['Просмотрено', 'completed'],
@@ -159,17 +137,22 @@ export class Mal{
             ['Планирую посмотреть', 'plan_to_watch'],
             ['Повтор', 'repeating']
           ]
+        },
+        episodes: {
+          my: ['Просмотрено эпизодов', 'ПрЭп', '🎞️', 'Просмотрено эпизодов'],
+          num: ['Всего эпизодов', 'Кол-во эп', '', 'Всего эпизодов'],
+          plus: ['+ эп', 'Ув', '➕\ufe0e', '+ эпизод'],
+          minus: ['- эп', 'Ум', '➖\ufe0e', '- эпизод']
         }
       },
       manga: {
-        readed: ['Читаемое:', 'Чит:', '📖', 'Читаемое'],
-        readedVol: ['Volume', 'Vol', '', 'Прочитанные тома'],
-        volumes: ['Volumes', 'Vol', '', 'Тома'],
-        readedCh: ['Chapter', 'Ch', '', 'Прочитанные главы'],
-        chapters: ['Chapters', 'Ch', '', 'Главы'],
-        statusItem: {
-          text: ['Статус', '', '', 'Статус чтения'],
-          options: [
+        title: ['Прочтено:', 'Прчт:', '📖', 'Статус прочтения манги'],
+        status: {
+          value: {
+            currently_publishing: ['Публикуется', 'Пуб'],
+            finished: ['Закончено', 'Зак']
+          },
+          my: [
             ['-', undefined],
             ['Читаю', 'reading'],
             ['Прочитано', 'completed'],
@@ -178,403 +161,163 @@ export class Mal{
             ['Планирую прочитать', 'plan_to_read'],
             ['Повтор', 'repeating']
           ]
+        },
+        chapters: {
+          title: ['Главы', 'Главы', 'Г', 'Главы'],
+          plus: ['+ том', 'Ув', '➕\ufe0e', '+ том'],
+          minus: ['- том', 'Ум', '➖\ufe0e', '- том'],
+          my: ['Глава', 'Глв', '', 'Прочитанные главы'],
+          num: ['Всего глав', 'Кол-во гл', '', 'Всего глав']
+        },
+        volumes: {
+          title: ['Тома', 'Тома', 'Т', 'Тома'],
+          my: ['Volume', 'Vol', '', 'Прочитанные тома'],
+          num: ['Всего томов', 'Кол-во тм', '', 'Всего томов'],
+          plus: ['+ глава', '+ гл', '➕\ufe0e', '+ глава'],
+          minus: ['- глава', '- гл', '➖\ufe0e', '- глава']
         }
       }
     }
   };
-  build = (p, line, string, item, el, o) => {
-    const name = 'mal';
-    const _this = this;
+  class = (path, name, line, subLine, item, el, o, _this) => class extends Base(path, name, line, subLine, item, el, o, this) {
+    check = (path, item) => {
+      switch(item.n){
+        case 'div': this.containers.div(path, item);
+        break;
+        case 'label': this.containers.label(path, item);
+        break;
+        case 'itemGroup': this.containers.itemGroup(path, item);
+        break;
 
-    class Gr{
-      lng = {
-        text: (item, string, line, obj, o) => _this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||
-          line.cfg?.lang), o.type, obj.key])[_this.lang.type(item, 2)]||_this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang), o.type, obj.key])[1],
-        title: (item, string, line, obj, o) => _this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang), o.type, obj.key])[3]
-      };
-      items = {
-        type: (o) => {
-          switch(o.type){
-            case 'part': return 'itemPart'
-            break;
-            case 'mini': return 'itemMini'
-            break;
-            case 'part': return 'itemPart'
-            break;
-            default: return '-item';
-          }
-        },
-        item: (path, item, obj, text) => {
-          El.Div({
-            path: path,
-            attrs: [
-              ['api', name],
-              ...(item.cfg ? _this.attrs(item.cfg) : []),
-              ...(obj && obj.attrs ? obj.attrs : [])
-            ],
-            classes: ['n-'+obj.key, this.items.type(obj), 'flx'],
-            title: this.lng.title(item, string, line, obj, o),
-            func: (i) => {
-              El.Div({
-                path: i,
-                class: 'key',
-                text: this.lng.text(item, string, line, obj, o),
-                func: (e) => obj.key && (el[name][obj.key] = e)
-              });
-  
-              if(obj.func) obj.func(i);
-            }
-          });
-        },
-        val: (path, item, obj) => {
-          El.Div({
-            path: path,
-            attrs: [
-              ['api', name],
-              ...(item.cfg ? _this.attrs(item.cfg) : []),
-              ...(obj && obj.attrs ? obj.attrs : [])
-            ],
-            classes: ['n-'+obj.key, this.items.type(obj), 'flx'],
-            title: this.lng.title(item, string, line, obj, o),
-            func: (i) => {
-              El.Div({
-                path: i,
-                class: 'value',
-                text: obj?.text,
-                func: (e) => el[name][obj.key] = e
-              });
-            }
-          });
-        },
-        keyVal: (path, item, obj) => {
-          El.Div({
-            path: path,
-            attrs: [
-              ['api', name],
-              ...(item.cfg ? _this.attrs(item.cfg) : []),
-              ...(obj && obj.attrs ? obj.attrs : [])
-            ],
-            classes: ['n-'+obj.key, this.items.type(obj), 'flx'],
-            title: this.lng.title(item, string, line, obj, o),
-            func: (i) => {
-              El.Div({
-                path: i,
-                class: 'key',
-                text: this.lng.text(item, string, line, obj, o)
-              });
-  
-              El.Div({
-                path: i,
-                class: 'value',
-                text: obj?.text,
-                func: (e) => el[name][obj.key] = e
-              });
-            }
-          });
-        },
-        num: (path, item, obj, text) => {
-          El.Div({
-            path: path,
-            attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : []), ...(obj.attrs ? obj.attrs:[])],
-            classes: ['n-'+obj.key, '-itemMini', ...(obj.classes ? obj.classes:[]), '-itemNum', 'flx'],
-            title: this.lng.title(item, string, line, obj, o),
-            func: (i) => {
-              El.Div({
-                path: i,
-                class: 'value num',
-                text: obj.text,
-                func: (e) => el[name][obj.key] = e
-              });
-            }
-          });
-        },
-        inputNum: (path, item, obj) => {
-          El.Input({
-            path: path,
-            classes: ['n-'+obj.key, '-itemMini', 'itemInpNum', 'val'],
-            attrs: [
-              ['api', name],
-              ...(item.cfg ? _this.attrs(item.cfg) : []),
-              ...(obj && obj.attrs ? obj.attrs : [])
-            ],
-            type: 'number',
-            value: '0',
-            title: this.lng.title(item, string, line, obj, o),
-            oninput: (e) => {
-              if(e.target.value) e.target.style.width = +e.target.value.length*8+'px';
-              o.s.save[obj.key] = e.target.value;
-            },
-            func: (e) => {
-              el[name][obj.key] = e;
-              if(e.value) e.style.width = +e.value.length*8+'px';
-            }
-          });
-        }
-      };
-      itemCh(path, item, obj){
-        El.Div({
-          path: path,
-          attrs: [
-            ['api', name],
-            ...(item.cfg ? _this.attrs(item.cfg) : []),
-            ...(obj && obj.attrs ? obj.attrs : [])
-          ],
-          classes: ['n-'+obj.key, this.items.type(obj), 'flx'],
-          title: this.lng.title(item, string, line, obj, o),
-          func: (i) => {
-            El.Div({
-              path: i,
-              class: 'key',
-              text: this.lng.text(item, string, line, obj, o)
-            });
+        case 'advices': this.other.advices(path, item);
+        break;
 
-            El.Div({
-              path: i,
-              class: 'value',
-              text: obj?.text,
-              func: (e) => el[name][obj.key] = e
-            });
-          }
-        });
-      };
-      item = (path, item, obj, text) => {
-        El.Div({
-          path: path,
-          attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : []), ...(obj.attrs ? obj.attrs:[])],
-          classes: ['n-'+obj.key, '-item', ...(obj.classes ? obj.classes:[]), 'flx'],
-          title: this.lng.title(item, string, line, obj, o),
-          func: (i) => {
-            El.Div({
-              path: i,
-              class: 'value',
-              text: this.lng.text(item, string, line, obj, o)
-            });
-          }
-        });
-      };
-      itemMini = (path, item, obj, text) => {
-        El.Div({
-          path: path,
-          attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : []), ...(obj.attrs ? obj.attrs:[])],
-          classes: ['n-'+obj.key, '-itemMini', ...(obj.classes ? obj.classes:[]), 'flx'],
-          title: this.lng.title(item, string, line, obj, o),
-          func: (i) => {
-            El.Div({
-              path: i,
-              class: 'value',
-              text: this.lng.text(item, string, line, obj, o)
-            });
-          }
-        });
-      };
-      itemMiniNum = (path, item, obj, text) => {
-        El.Div({
-          path: path,
-          attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : []), ...(obj.attrs ? obj.attrs:[])],
-          classes: ['n-'+obj.key, '-itemMini', ...(obj.classes ? obj.classes:[]), '-itemNum', 'flx'],
-          title: this.lng.title(item, string, line, obj, o),
-          func: (i) => {
-            El.Div({
-              path: i,
-              class: 'value num',
-              func: (e) => el[name][obj.key] = e
-            });
-          }
-        });
-      };
-      itemMiniCh(path, item, obj){
-        El.Div({
-          path: path,
-          attrs: [
-            ['api', name],
-            ...(item.cfg ? _this.attrs(item.cfg) : []),
-            ...(obj && obj.attrs ? obj.attrs : [])
-          ],
-          classes: ['n-'+obj.key, '-itemMini', ...(obj && obj.classes ? obj.classes : []), 'flx'],
-          title: this.lng.title(item, string, line, obj, o),
-          func: (i) => {
-            El.Div({
-              path: i,
-              class: 'key',
-              text: this.lng.text(item, string, line, obj, o)
-            });
-            El.Div({
-              path: i,
-              class: 'value',
-              text: obj?.text,
-              func: (e) => el[name][obj.key] = e
-            });
-          }
-        });
-      };
-      inputNum = (path, item, obj) => {
-        El.Input({
-          path: path,
-          classes: ['n-'+obj.key, 'itemNum', 'val'],
-          attrs: [
-            ['api', name],
-            ...(item.cfg ? _this.attrs(item.cfg) : []),
-            ...(obj && obj.attrs ? obj.attrs : [])
-          ],
-          type: 'number',
-          value: '0',
-          title: this.lng.title(item, string, line, obj, o),
-          oninput: (e) => {
-            if(e.target.value) e.target.style.width = +e.target.value.length*8+'px';
-            o.s.save[obj.key] = e.target.value;
-          },
-          func: (e) => {
-            el[name][obj.key] = e;
-            if(e.value) e.style.width = +e.value.length*8+'px';
-          }
-        });
+        case 'status.my': this[o.type].inputs.myStatus(path, item);
+        break;
+        case 'rating.my': this.other.myRating(path, item);
+        break;
+
+        case 'rating.my.title': this.other.title.myRating(path, item);
+        break;
+
+        case 'anime.titleWatched': this.anime.title.main(path, item);
+        break;
+        case 'anime.titleEps': this.anime.title.eps(path, item);
+        break;
+        case 'anime.episodes.my': this.anime.inputs.episodes.watched(path, item);
+        break;
+        case 'anime.episodes.num': this.anime.inputs.episodes.max(path, item);
+        break;
+        case 'anime.episodes.plus': this.anime.inputs.episodes.plus(path, item);
+        break;
+        case 'anime.episodes.minus': this.anime.inputs.episodes.minus(path, item);
+        break;
+
+        case 'manga.title': this.manga.title.main(path, item);
+        break;
+        case 'manga.volumes.title': this.manga.title.vol(path, item);
+        break;
+        case 'manga.volumes.my': this.manga.inputs.volumes.readed(path, item);
+        break;
+        case 'manga.volumes.num': this.manga.inputs.volumes.max(path, item);
+        break;
+        case 'manga.volumes.plus': this.manga.inputs.volumes.plus(path, item);
+        break;
+        case 'manga.volumes.minus': this.manga.inputs.volumes.minus(path, item);
+        break;
+
+        case 'manga.chapters.title': this.manga.title.ch(path, item);
+        break;
+        case 'manga.chapters.my': this.manga.inputs.chapters.readed(path, item);
+        break;
+        case 'manga.chapters.num': this.manga.inputs.chapters.max(path, item);
+        break;
+        case 'manga.chapters.plus': this.manga.inputs.chapters.plus(path, item);
+        break;
+        case 'manga.chapters.minus': this.manga.inputs.chapters.minus(path, item);
+        break;
+
+        case 'id': this.other.id(path, item);
+        break;
+        case 'rating': this.other.rating(path, item);
+        break;
+        case 'popularity': this.other.popularity(path, item);
+        break;
+
+        case 'status': this.other.status(path, item);
+        break;
+        case 'air.title': this.other.air.title(path, item);
+        break;
+        case 'air.day': this.other.air.day(path, item);
+        break;
+        case 'air.time': this.other.air.time(path, item);
+        break;
+
+        case 'link': this.other.link(path, item);
+        break;
+
+        case 'item.title': this.other.title.item(path, item);
+        break;
+        case 'item.search': this.other.title.search(path, item);
+        break;
       }
-      check = (i, it) => {
-        switch(it.n){
-          case 'div': this.containers.div(i, it);
-          break;
-          case 'label': this.containers.label(i, it);
-          break;
-          case 'itemGroup': this.containers.itemGroup(i, it);
-          break;
-
-          case 'statusItem': this[o.type].inputs.statusItem(i, it);
-          break;
-          case 'myRating': this.other.myRating(i, it, 'noType');
-          break;
-
-          case 'myRating-title': this.other.title.myRating(i, it, 'noType');
-          break;
-
-          case 'titleWatched': this.anime.title.main(i, it);
-          break;
-          case 'titleEps': this.anime.title.eps(i, it);
-          break;
-          case 'watchedEps': this.anime.inputs.episodes.watched(i, it);
-          break;
-          case 'episodes': this.anime.inputs.episodes.max(i, it);
-          break;
-          case 'plusEps': this.anime.inputs.episodes.plus(i, it);
-          break;
-          case 'minusEps': this.anime.inputs.episodes.minus(i, it);
-          break;
-
-          case 'titleReaded': this.manga.title.main(i, it);
-          break;
-          case 'titleVol': this.manga.title.vol(i, it);
-          break;
-          case 'readedVol': this.manga.inputs.volumes.readed(i, it);
-          break;
-          case 'volumes': this.manga.inputs.volumes.max(i, it);
-          break;
-          case 'plusVol': this.manga.inputs.volumes.plus(i, it);
-          break;
-          case 'minusVol': this.manga.inputs.volumes.minus(i, it);
-          break;
-
-          case 'titleCh': this.manga.title.ch(i, it);
-          break;
-          case 'readedCh': this.manga.inputs.chapters.readed(i, it);
-          break;
-          case 'chapters': this.manga.inputs.chapters.max(i, it);
-          break;
-          case 'plusCh': this.manga.inputs.chapters.plus(i, it);
-          break;
-          case 'minusCh': this.manga.inputs.chapters.minus(i, it);
-          break;
-
-          case 'id': this.other.id(i, it);
-          break;
-          case 'rating': this.other.rating(i, it);
-          break;
-          case 'popularity': this.other.popularity(i, it);
-          break;
-  
-          case 'status': this.other.status(i, it);
-          break;
-          case 'broadcast': this.other.broadcast(i, it);
-          break;
-          case 'broadcastTime': this.other.broadcastTime(i, it);
-          break;
-  
-          case 'link': this.other.link(i, it);
-          break;
-  
-          case 'title': this.other.title.item(i, it);
-          break;
-        }
-      };
-      other = {
-        id: (path, item) => {
-          this.items.item(path, item, {key: 'id', func: (e) => {
+    };
+    other = {
+      id: (path, item) => {
+        this.items.btn(path, item, {
+          key: ['id', 'id'],
+          func: (e) => {
             El.A({
               path: e,
               classes: ['value', 'flx'],
               func: (e) => el[name].id = e
             })
-          }})
-          // El.Div({
-          //   path: path,
-          //   classes: ['n-'+'id', '-item', 'flx'],
-          //   attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
-          //   title: _this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, 2), o.type, 'id', 3]),
-          //   func: (e) => {
-          //     // el[name].id = e;
-          //     El.Div({
-          //       path: e,
-          //       class: 'key',
-          //       text: _this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang), o.type, 'id', _this.lang.type(item, 1)]),
-          //     });
-          //     El.A({
-          //       path: e,
-          //       classes: ['value', 'flx'],
-          //       func: (e) => el[name].id = e
-          //     })
-          //   }
-          // });
-          // this.itemCh(path, item, {
-          //   key: 'id',
-          //   class: ['-item'],
-          // });
-        },
-        rating: (path, item) => {
-          this.itemCh(path, item, {
-            key: 'rating',
-            classes: ['-item'],
-            ttl: 2
-          });
-        },
-        popularity: (path, item) => {
-          this.itemCh(path, item, {
-            key: 'popularity',
-            classes: ['-item'],
-            ttl: 2
-          });
-        },
-        status: (path, item) => {
-          this.items.keyVal(path, item, {
-            key: 'status',
+          },
+          onclick: (e) => e.target.children[0]?.click()
+        });
+      },
+      rating: (path, item) => {
+        this.items.keyVal(path, item, {
+          key: ['rating.title', 'rating'],
+          ttl: 2
+        });
+      },
+      popularity: (path, item) => {
+        this.items.keyVal(path, item, {
+          key: ['popularity', 'popularity'],
+          ttl: 2
+        });
+      },
+      status: (path, item) => {
+        this.items.val(path, item, {
+          key: ['status', 'status'],
+          type: 'part'
+        });
+      },
+      air: {
+        title: (path, item) => {
+          this.items.item(path, item, {
+            key: ['air.title', ''],
             type: 'part'
-            // ttl: 2
           });
         },
-        broadcast: (path, item) => {
-          this.items.keyVal(path, item, {
-            key: 'broadcast',
+        day: (path, item) => {
+          this.items.val(path, item, {
+            key: ['air.day', 'airDay'],
             type: 'part'
           });
 
           // El.Div({
           //   path: path,
-          //   attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+          //   attrs: [['api', name], ...(item.cfg ? this.attrs(item.cfg) : [])],
           //   classes: ['n-'+'broadcast', '-item', 'flx'],
           //   func: (b) => {
           //     if(!el[name].broadcast) el[name].broadcast = {};
           //     El.Div({
           //       path: b,
           //       class: 'key',
-          //       text: _this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang), o.type, 'broadcast', _this.lang.type(item, 2)]),
-          //       title: _this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, 2), o.type, 'broadcast', 3])
+          //       text: this.gp(_this.lang, [_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang), o.type, 'broadcast', _this.lang.type(item, 2)]),
+          //       title: this.gp(_this.lang, [_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang, 2), o.type, 'broadcast', 3])
           //     });
           //     El.Div({
           //       path: b,
@@ -593,291 +336,315 @@ export class Mal{
           //   }
           // });
         },
-        broadcastTime: (path, item) => {
+        time: (path, item) => {
           this.items.val(path, item, {
-            key: 'broadcastTime',
+            key: ['air.time', 'airTime'],
             type: 'part'
           });
         },
-        link: (path, item) => {
-          El.A({
-            path: path,
-            classes: ['n-'+'link', '-item', 'flx'],
-            attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
-            text: _this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang), o.type, 'link', _this.lang.type(item, 2)]),
-            func: (e) => {
-              el[name].link = e;
-            }
-          });
-        },
-        title: {
-          item: (path, item) => {
+      },
+      advices: (path, item) => {
+        this.items.btn(path, item, {
+          key: ['advices', 'advices'],
+          func: (e) => {
             El.Div({
-              path: path,
-              classes: ['n-title-search', '-item', 'flx'],
-              attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
-              func: (m) => {
-                this.itemCh(m, item, {
-                  key: 'title',
-                  classes: ['-item']
-                });
-                El.Div({
-                  path: m,
-                  classes: ['n-search', 'flx'],
-                  func: (e) => el[name].search = e,
-                  onclick: () => {
-                    new Def().search(o, m, true, item, string, line);
-                  }
-                });
-              }
+              path: e,
+              class: 'num',
+              func: (e) => el[name].advices = e
             })
           },
-          myRating: (path, item) => {
-            this.itemMini(path, item, {key:'myRating-title', num:2});
+          onclick: (e) => {
+            El.Dialog({
+              path: path,
+              class: 'n-advices modal flx ver',
+              showM: true,
+              delOnclose: true,
+              func: (e) => {
+                El.Div({
+                  path: e,
+                  class: 'header',
+                  text: [this.lng.text(item, subLine, line, {key:['advices'], num:3}, o), ' ', o.s.mal.advices.length].join('')
+                });
+                El.Div({
+                  path: e,
+                  class: 'list flx ver',
+                  func: (list) => {
+                    if(!o.s.mal.advices) return;
+                    const url = new MalApi().title;
+                    o.s.mal.advices.forEach(e => {
+                      El.Div({
+                        path: list,
+                        class: 'item flx ver',
+                        func: (item) => {
+                          El.A({
+                            path: item,
+                            class: 'title',
+                            text: e.node.title,
+                            url: url+o.type+'/'+e.node.id
+                          });
+                          El.Div({
+                            path: item,
+                            func: (mask) => {
+                              El.Image({
+                                path: mask,
+                                url: e.node.main_picture.medium
+                              });
+                            }
+                          });
+                        }
+                      });
+                    })
+                  }
+                })
+              }
+            })
           }
+        })
+      },
+      link: (path, item) => {
+        // El.A({
+        //   path: path,
+        //   classes: ['n-'+'link', '-item', 'flx'],
+        //   attrs: [['api', name], ...(item.cfg ? this.attrs(item.cfg) : [])],
+        //   text: this.gp(_this.lang, [_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang), o.type, 'link', _this.lang.type(item, 2)]),
+        //   func: (e) => {
+        //     el[name].link = e;
+        //   }
+        // });
+      },
+      title: {
+        item: (path, item) => {
+          this.items.keyVal(path, item, {
+            key: ['item.title', 'title']
+          });
+          // El.Div({
+          //   path: path,
+          //   classes: ['n-title-search', '-item', 'flx'],
+          //   attrs: [['api', name], ...(item.cfg ? this.attrs(item.cfg) : [])],
+          //   func: (m) => {
+          //     this.itemCh(m, item, {
+          //       key: 'title',
+          //       classes: ['-item']
+          //     });
+          //     // El.Div({
+          //     //   path: m,
+          //     //   classes: ['n-search', 'flx'],
+          //     //   func: (e) => el[name].search = e,
+          //     //   onclick: () => {
+          //     //     new Def().search(o, m, true, item, subLine, line);
+          //     //   }
+          //     // });
+          //   }
+          // })
+        },
+        search: (path, item, obj) => {
+          this.items.btn(path, item, {
+            key: ['item.search', 'search'],
+            func: (e) => el[name].search = e,
+            onclick: () => {
+              new Def().search(o, path, true, item, subLine, line);
+            }
+          });
         },
         myRating: (path, item) => {
-          this.items.inputNum(path, item, {key:'myRating', num:2});
-          // El.Input({
-          //   path: path,
-          //   classes: ['n-'+'myRating', 'itemNum', 'val'],
-          //   type: 'number',
-          //   value: '0',
-          //   title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, 'myRating', 3]),
-          //   oninput: (e) => {
-          //     if(e.target.value) e.target.style.width = +e.target.value.length*8+'px';
-          //     o.s.save.myRating = e.target.value;
-          //   },
-          //   func: (e) => {
-          //     el[name].myRating = e;
-          //     if(e.value) e.style.width = +e.value.length*8+'px';
-          //   }
-          // });
+          // console.log(this.gp(_this.lang, ['ru', 'myRating']))
+          this.items.item(path, item, {
+            key: ['rating.my', ''],
+            num: 2
+          });
+        }
+      },
+      myRating: (path, item) => {
+        this.items.inputNum(path, item, {
+          key: ['rating.my', 'myRating'],
+          num: 2
+        });
+      }
+    }
+    anime = {
+      title: {
+        main: (path, item) => {
+          this.items.val(path, item, {
+            key: ['anime.title', 'watched'],
+            classes: ['title', '-miniItem'],
+            type: 'mini',
+            num: 2
+          });
+        },
+        eps: (path, item) => {
+          this.items.val(path, item, {
+            key: ['anime.episodes.num', 'watchedEps'],
+            type: 'num',
+            num: 2
+          });
+        }
+      },
+      inputs: {
+        myStatus: (path, item) => {
+          this.items.inputs.select(path, item, {
+            key: ['anime.status.my', 'myStatus'],
+            num: 2,
+            type: 'mini'
+          });
+        },
+        episodes: {
+          watched: (path, item) => {
+            this.items.inputNum(path, item, {
+              key: ['anime.episodes.my', 'watchedEps'],
+              num: 2,
+              type: 'mini'
+            });
+          },
+          max: (path, item) => {
+            this.items.val(path, item, {
+              key: ['anime.episodes.num', 'episodes'],
+              text: '?',
+              type: 'mini'
+            });
+          },
+          plus: (path, item) => {
+            this.items.btn(path, item, {
+              key: ['anime.episodes.plus', ''],
+              classes: ['numBtn', '-btn'],
+              type: 'mini',
+              onclick: () => {
+                if(o.s.save.watchedEps === undefined) o.s.save.watchedEps = 0;
+                o.s.save.watchedEps++;
+              }
+            });
+          },
+          minus: (path, item) => {
+            this.items.btn(path, item, {
+              key: ['anime.episodes.minus', ''],
+              classes: ['numBtn', '-btn'],
+              type: 'mini',
+              onclick: () => {
+                if(o.s.save.watchedEps === undefined) o.s.save.watchedEps = 0;
+                if(o.s.save.watchedEps === 0) return;
+                o.s.save.watchedEps--;
+              }
+            });
+          }
         }
       }
-      anime = {
-        title: {
-          main: (path, item) => {
-            this.itemMini(path, item, {key:'watched', classes:['title', '-miniItem'], num:2});
-          },
-          eps: (path, item) => {
-            this.item(path, item, {key:'watchedEps', num:2});
-          }
-        },
-        inputs: {
-          statusItem: (path, item) => {
-            El.Select({
-              path: path,
-              attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
-              classes: ['n-'+'statusItem', '-itemSel', '-flx'],
-              options: _this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang), o.type, 'statusItem', 'options']),
-              title: _this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, 2), o.type, 'statusItem', 'text', 3]),
-              func: (e) => {
-                el[name].statusItem = e;
-              },
-              onchange: (e) => {
-                o.s.save.statusItem = e.target.value;
-              }
-            });
-          },
-          episodes: {
-            watched: (path, item) => {
-              this.items.inputNum(path, item, {key:'watchedEps', num:2});
-            },
-            max: (path, item) => {
-              this.items.num(path, item, {key:'episodes', text:'?'});
-            },
-            plus: (path, item) => {
-              El.Button({
-                path: path,
-                attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
-                classes: ['n-'+'plusEps', 'numBtn', '-btn', item.type],
-                text: '➕\ufe0e',
-                onclick: (l) => {
-                  if(o.s.save.watchedEps === undefined) o.s.save.watchedEps = 0;
-                  o.s.save.watchedEps++;
-                }
-              });
-            },
-            minus: (path, item) => {
-              El.Button({
-                path: path,
-                attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
-                classes: ['n-'+'minusEps', 'numBtn', '-btn', item.type],
-                text: '➖\ufe0e',
-                onclick: (l) => {
-                  if(o.s.save.watchedEps === undefined) o.s.save.watchedEps = 0;
-                  if(o.s.save.watchedEps === 0) return;
-                  o.s.save.watchedEps--;
-                }
-              });
-            }
-          }
-        }
-      };
-      manga = {
-        title: {
-          main: (path, item) => {
-            this.itemMini(path, item, {key:'readed', num:2});
-          },
-          vol: (path, item) => {
-            this.itemMini(path, item, {key:'readedVol', num:2});
-          },
-          ch: (path, item) => {
-            this.itemMini(path, item, {key:'readedCh', num:2});
-          },
-        },
-        inputs: {
-          statusItem: (path, item) => {
-            El.Select({
-              path: path,
-              classes: ['n-'+'statusItem', '-itemSel', '-flx'],
-              options: _this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang), o.type, 'statusItem', 'options']),
-              title: _this.gp(_this.lang, [_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, 2), o.type, 'statusItem', 'text', 3]),
-              func: (e) => {
-                el[name].statusItem = e;
-              }
-            });
-          },
-          chapters: {
-            readed: (path, item) => {
-              this.inputNum(path, item, {key:'readedCh', num:2});
-              // El.Input({
-              //   path: path,
-              //   classes: ['n-'+'readedCh', 'itemNum', 'val'],
-              //   type: 'number',
-              //   value: '0',
-              //   title: _this.gp(_this.lang, [item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, o.type, 'readedCh', 3]),
-              //   oninput: (e) => {
-              //     if(e.target.value) e.target.style.width = +e.target.value.length*8+'px';
-              //     o.s.save.readedCh = e.target.value;
-              //   },
-              //   func: (e) => {
-              //     el[name].readedCh = e;
-              //     if(e.value) e.style.width = +e.value.length*8+'px';
-              //   }
-              // });
-            },
-            max: (path, item) => {
-              this.itemMiniNum(path, item, {
-                key: 'chapters',
-                type: o.type,
-                text: '?'
-              });
-            },
-            plus: (path, item) => {
-              El.Button({
-                path: path,
-                classes: ['n-'+'plusCh', 'numBtn', '-btn', item.type],
-                text: '+',
-                onclick: (l) => {
-                  if(o.s.save.readedCh === undefined) o.s.save.readedCh = 0;
-                  o.s.save.readedCh++;
-                }
-              });
-            },
-            minus: (path, item) => {
-              El.Button({
-                path: path,
-                classes: ['n-'+'minusCh', 'numBtn', '-btn', item.type],
-                text: '-',
-                onclick: (l) => {
-                  if(o.s.save.readedCh === undefined) o.s.save.readedCh = 0;
-                  if(o.s.save.readedCh === 0) return;
-                  o.s.save.readedCh--;
-                }
-              });
-            },
-          },
-          volumes: {
-            readed: (path, item) => {
-              this.inputNum(path, item, {key:'readedVol', num:2});
-            },
-            max: (path, item) => {
-              this.itemMiniNum(path, item, {
-                key: 'volumes',
-                type: o.type,
-                text: '?'
-              });
-            },
-            plus: (path, item) => {
-              El.Button({
-                path: path,
-                classes: ['n-'+'plusVol', 'numBtn', '-btn', item.type],
-                text: '+',
-                onclick: (l) => {
-                  if(o.s.save.readedVol === undefined) o.s.save.readedVol = 0;
-                  o.s.save.readedVol++;
-                }
-              });
-            },
-            minus: (path, item) => {
-              El.Button({
-                path: path,
-                classes: ['n-'+'minusVol', 'numBtn', '-btn', item.type],
-                text: '-',
-                onclick: (l) => {
-                  if(o.s.save.readedVol === undefined) o.s.save.readedVol = 0;
-                  if(o.s.save.readedVol === 0) return;
-                  o.s.save.readedVol--;
-                }
-              });
-            },
-          },
-        },
-      };
-      containers = {
-        div: (path, item) => {
-          El.Div({
-            path: path,
-            attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
-            classes: ['container', 'flx'],
-            func: (i) => {
-              item.items.forEach(it => {
-                this.check(i, it);
-              });
-            }
-          });
-        },
-        label: (path, items) => {
-          El.Label({
-            path: path,
-            classes: ['lab', 'flx'],
-            attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
-            func: (i) => {
-              items.items.forEach(it => {
-                this.check(i, it);
-              });
-            }
-          })
-        },
-        itemGroup: (path, item) => {
-          if(item.type !== o.type) return;
-          El.Div({
-            path: path,
-            classes: ['item-group', 'flx'],
-            attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
-            func: (i) => {
-              item.items.forEach(it => {
-                this.check(i, it);
-              })
-            }
-          });
-        }
-      };
     };
+    manga = {
+      title: {
+        main: (path, item) => {
+          this.items.item(path, item, {
+            key: ['manga.title', ''],
+            num: 2
+          });
+        },
+        vol: (path, item) => {
+          this.items.item(path, item, {
+            key: ['manga.volumes.title', ''],
+            num: 2
+          });
+        },
+        ch: (path, item) => {
+          this.items.item(path, item, {
+            key: ['manga.chapters.title', ''],
+            num: 2
+          });
+        },
+      },
+      inputs: {
+        myStatus: (path, item) => {
+          this.items.inputs.select(path, item, {
+            key: ['manga.status.my', 'myStatus'],
+            num: 2,
+            type: 'mini'
+          });
+        },
+        chapters: {
+          readed: (path, item) => {
+            this.items.inputNum(path, item, {
+              key: ['manga.chapters.my', 'readedCh'],
+              num: 2,
+              type: 'mini'
+            });
+          },
+          max: (path, item) => {
+            this.items.val(path, item, {
+              key: ['manga.chapters.num', 'chapters'],
+              type: 'mini',
+              text: '?'
+            });
+          },
+          plus: (path, item) => {
+            this.items.btn(path, item, {
+              key: ['manga.chapters.plus', ''],
+              type: 'mini incdecBtn',
+              onclick: () => {
+                if(o.s.save.readedCh === undefined) o.s.save.readedCh = 0;
+                o.s.save.readedCh++;
+              }
+            });
+          },
+          minus: (path, item) => {
+            this.items.btn(path, item, {
+              key: ['manga.chapters.minus', ''],
+              type: 'mini incdecBtn',
+              onclick: () => {
+                if(o.s.save.readedCh === undefined) o.s.save.readedCh = 0;
+                if(o.s.save.readedCh === 0) return;
+                o.s.save.readedCh--;
+              }
+            });
+          },
+        },
+        volumes: {
+          readed: (path, item) => {
+            this.items.inputNum(path, item, {
+              key: ['manga.volumes.my', 'readedVol'],
+              type: 'mini',
+              num: 2
+            });
+          },
+          max: (path, item) => {
+            this.items.val(path, item, {
+              key: ['manga.volumes.num', 'volumes'],
+              type: 'mini',
+              text: '?'
+            });
+          },
+          plus: (path, item) => {
+            this.items.btn(path, item, {
+              key: ['manga.volumes.plus', ''],
+              type: 'mini incdecBtn',
+              onclick: () => {
+                if(o.s.save.readedVol === undefined) o.s.save.readedVol = 0;
+                o.s.save.readedVol++;
+              }
+            });
+          },
+          minus: (path, item) => {
+            this.items.btn(path, item, {
+              key: ['manga.volumes.minus', ''],
+              type: 'mini incdecBtn',
+              onclick: () => {
+                if(o.s.save.readedVol === undefined) o.s.save.readedVol = 0;
+                if(o.s.save.readedVol === 0) return;
+                o.s.save.readedVol--;
+              }
+            });
+          },
+        },
+      },
+    };
+  };
+  build = (p, line, subLine, item, el, o) => {
+    const name = 'mal';
+    const _this = this;
 
-    new Gr().check(p, item);
+    new (this.class(p, name, line, subLine, item, el, o, _this))().check(p, item);
 
   };
   connect = (el, o) => {
     const name = 'mal';
-    // o.s[name].myRating = 0;
-    // if(o.type === 'anime'){
-    //   o.s[name].watchedEps = 0;
-    // }
     const upd = (key, v, e) => {
-      // console.log('UPD ' + name, key, v, e);
+      console.log('UPD ' + name, key, v, e);
       if(!e.el[name][key]) return;
       switch (key) {
         case 'rating':
@@ -907,17 +674,17 @@ export class Mal{
             lvl: e.el[name].status.parentNode.getAttribute('langLvl')||0
           };
 
-          e.el[name].status.textContent = this.lang[l.lang].statusVal[v.status][l.lvl];
+          e.el[name].status.textContent = this.lang[l.lang].status.value[v.status][l.lvl];
           const st = e.el[name].status.parentNode;
           st.classList.add(status[v.status]);
           
           // if(e.el[name].status) return;
         }
         break;
-        case 'statusItem':
+        case 'myStatus':
           e.el[name].statusItem.value = v;
         break;
-        case 'broadcast': {
+        case 'airDay': {
           if(!v) return;
           if(!v.broadcast) return;
 
@@ -928,16 +695,18 @@ export class Mal{
             finished: 'finished'
           };
           const l = {
-            lang: e.el[name].broadcast.parentNode.getAttribute('lang1')||e.el[name].broadcast.parentNode.getAttribute('lang0'),
-            lvl: e.el[name].broadcast.parentNode.getAttribute('langLvl')||0
+            lang: e.el[name].airDay.parentNode.getAttribute('lang1')||e.el[name].airDay.parentNode.getAttribute('lang0'),
+            lvl: e.el[name].airDay.parentNode.getAttribute('langLvl')||0
           };
 
-          e.el[name].broadcast.parentNode.setAttribute('status', status[v.status]);
-          e.el[name].broadcast.textContent = this.lang[l.lang].day[v.broadcast.day_of_the_week][l.lvl];
+          console.log('LANG', l);
+
+          e.el[name].airDay.parentNode.setAttribute('status', status[v.status]);
+          e.el[name].airDay.textContent = this.lang[l.lang].air.day[v.broadcast.day_of_the_week][l.lvl];
           // e.el[name].broadcast.time.textContent = v.broadcast.start_time;
         }
         break;
-        case 'broadcastTime': {
+        case 'airTime': {
           if(!v) return;
           if(!v.broadcast) return;
 
@@ -948,13 +717,17 @@ export class Mal{
             finished: 'finished'
           };
           const l = {
-            lang: e.el[name].broadcastTime.parentNode.getAttribute('lang1')||e.el[name].broadcastTime.parentNode.getAttribute('lang0'),
-            lvl: e.el[name].broadcastTime.parentNode.getAttribute('langLvl')||0
+            lang: e.el[name].airTime.parentNode.getAttribute('lang1')||e.el[name].airTime.parentNode.getAttribute('lang0'),
+            lvl: e.el[name].airTime.parentNode.getAttribute('langLvl')||0
           };
 
-          e.el[name].broadcastTime.parentNode.setAttribute('status', status[v.status]);
-          e.el[name].broadcastTime.textContent = v.broadcast.start_time;
+          e.el[name].airTime.parentNode.setAttribute('status', status[v.status]);
+          e.el[name].airTime.textContent = v.broadcast.start_time;
         }
+        break;
+        case 'advices':
+          console.log('advices', v.length)
+          e.el[name].advices.textContent = v.length;
         break;
         case 'title':
           e.el[name].title.textContent = v;
@@ -967,17 +740,25 @@ export class Mal{
         case 'watchedEps':
           // console.log('QQ', e.el[name].watchedEps)
           e.el[name].watchedEps.value = v;
-          e.el[name].watchedEps.style.width = +e.el[name].watchedEps.value.length*8+'px';
+          e.el[name].watchedEps.style.width = this.len(v, o.cfg.css.fontSize)
         break;
         case 'myRating':
           e.el[name].myRating.value = v;
-          e.el[name].myRating.style.width = +e.el[name].myRating.value.length*8+'px';
+          e.el[name].myRating.style.width = this.len(v, o.cfg.css.fontSize)
         break;
         case 'episodes':
           e.el[name].episodes.textContent = v;
         break;
+        case 'readedVol':
+          e.el[name].readedVol.value = v;
+          e.el[name].readedVol.style.width = this.len(v, o.cfg.css.fontSize)
+        break;
         case 'volumes':
           e.el[name].volumes.textContent = v;
+        break;
+        case 'readedCh':
+          e.el[name].readedCh.value = v;
+          e.el[name].readedCh.style.width = this.len(v, o.cfg.css.fontSize)
         break;
         case 'chapters':
           e.el[name].chapters.textContent = v;
