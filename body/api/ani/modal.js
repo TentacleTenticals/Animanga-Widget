@@ -98,6 +98,7 @@ export const AniModal = () => class extends Modal{
         const o = this.o;
         El.Button({
           path: path,
+          class: '-btn',
           text: this._lang[o.cfg.helper.lang].helper['tokens api']['functions'].login[0],
           func: (e) => this.el[api.name].btnLogin = e,
           onclick: () => {
