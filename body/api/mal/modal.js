@@ -96,6 +96,7 @@ export const MalModal = () => class extends Modal{
         console.log('SUPER',  super.message);
         El.Button({
           path: path,
+          class: '-btn',
           text: this._lang[o.cfg.helper.lang].helper['tokens api']['functions'].login[0],
           func: (e) => this.el[api.name].btnLogin = e,
           onclick: () => {
@@ -111,6 +112,7 @@ export const MalModal = () => class extends Modal{
         });
         if(api.secrets.refToken) El.Button({
           path: path,
+          class: '-btn',
           text: this._lang[o.cfg.helper.lang].helper['tokens api']['functions'].update[0],
           func: (e) => this.el[api.name].btnUpdate = e,
           onclick: () => {
