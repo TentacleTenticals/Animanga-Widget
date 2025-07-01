@@ -235,7 +235,7 @@ export const widget = {
             o.s.mal && (o.s.mal.readedCh = val);
             o.s.ani && (o.s.ani.readedCh = val);
           break;
-          case 'statusItem': {
+          case 'myStatus': {
             const s = {
               mal: {
                 watching: 'watching',
@@ -261,13 +261,13 @@ export const widget = {
             if(o.s.mal){
               if(val === 'repeating'){
                 o.s.mal.repeating = true;
-                o.s.mal.statusItem = 'repeating';
+                o.s.mal.myStatus = 'repeating';
               }else{
                 o.s.mal.repeating = false;
-                o.s.mal.statusItem = s.mal[val];
+                o.s.mal.myStatus = s.mal[val];
               }
             };
-            o.s.ani && (o.s.ani.statusItem = s.ani[val]);
+            o.s.ani && (o.s.ani.myStatus = s.ani[val]);
           }
         }
         return true;
