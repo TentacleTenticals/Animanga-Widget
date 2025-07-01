@@ -6,8 +6,14 @@ import {Ani} from './api/ani/m.js';
 export const widget = {
   build: (o) => {
     const el = {
-      mal: {},
-      ani: {},
+      mal: {
+        anime: {},
+        my: {}
+      },
+      ani: {
+        anime: {},
+        my: {}
+      },
       def: {}
     };
     const attrs = (o) => Object.entries(o).map(e => [e[0], e[1]]);
@@ -41,21 +47,21 @@ export const widget = {
             ],
             class: ['line', 'lang-'+ o.cfg.lang, 'flx'].join(' '),
             func: (l) => {
-              line.items.forEach(string => {
+              line.items.forEach(subLine => {
                 El.Div({
                   path: l,
                   attrs: [
-                    ...(string.cfg ? attrs(string.cfg) : [])
+                    ...(subLine.cfg ? attrs(subLine.cfg) : [])
                   ],
-                  class: '-string flx',
+                  class: '-subLine flx',
                   func: (s) => {
-                    string.items.forEach(item => {
+                    subLine.items.forEach(item => {
                       switch(item.api){
-                        case 'mal': new Mal().build(s, {name:line.name, cfg:line.cfg}, {name:string.name, cfg:string.cfg}, item, el, o);
+                        case 'mal': o.cfg.api.body.mal && new Mal().build(s, {name:line.name, cfg:line.cfg}, {name:subLine.name, cfg:subLine.cfg}, item, el, o);
                         break;
-                        case 'ani': new Ani().build(s, {name:line.name, cfg:line.cfg}, {name:string.name, cfg:string.cfg}, item, el, o);
+                        case 'ani': o.cfg.api.body.ani && new Ani().build(s, {name:line.name, cfg:line.cfg}, {name:subLine.name, cfg:subLine.cfg}, item, el, o);
                         break;
-                        default: new Def().build(s, {name:line.name, cfg:line.cfg}, {name:string.name, cfg:string.cfg}, item, el, o);
+                        default: new Def().build(s, {name:line.name, cfg:line.cfg}, {name:subLine.name, cfg:subLine.cfg}, item, el, o);
                         break;
                       }
                     })
@@ -71,9 +77,9 @@ export const widget = {
 
           // El.Div({
           //   path: l,
-          //   class: '-string flx hor',
+          //   class: '-subLine flx hor',
           //   func: (s) => {
-          //     string.forEach(item => {
+          //     subLine.forEach(item => {
           //       switch(item.api){
           //         case 'mal': mal.build(s, 'header', item, el, o);
           //         break;
@@ -103,9 +109,9 @@ export const widget = {
         //             func: (h) => {
         //               El.Div({
         //                 path: l,
-        //                 class: '-string flx hor',
+        //                 class: '-subLine flx hor',
         //                 func: (s) => {
-        //                   string.forEach(item => {
+        //                   subLine.forEach(item => {
         //                     switch(item.api){
         //                       case 'mal': mal.build(s, 'header', item, el, o);
         //                       break;
@@ -126,9 +132,9 @@ export const widget = {
 
         //           // El.Div({
         //           //   path: l,
-        //           //   class: '-string flx hor',
+        //           //   class: '-subLine flx hor',
         //           //   func: (s) => {
-        //           //     string.forEach(item => {
+        //           //     subLine.forEach(item => {
         //           //       switch(item.api){
         //           //         case 'mal': mal.build(s, 'header', item, el, o);
         //           //         break;
@@ -157,12 +163,12 @@ export const widget = {
         //       path: mid,
         //       class: '-list flx hor',
         //       func: (l) => {
-        //         o.cfg.mid.fields.forEach(string => {
+        //         o.cfg.mid.fields.forEach(subLine => {
         //           El.Div({
         //             path: l,
-        //             class: '-string flx hor',
+        //             class: '-subLine flx hor',
         //             func: (s) => {
-        //               string.forEach(item => {
+        //               subLine.forEach(item => {
         //                 switch(item.api){
         //                   case 'mal': mal.build(s, 'mid', item, el, o);
         //                   break;
@@ -186,12 +192,12 @@ export const widget = {
         //   path: m,
         //   class: `-footer lang-${o.cfg.footer.lang} flx hor`,
         //   func: (ft) => {
-        //     o.cfg.footer.fields.forEach(string => {
+        //     o.cfg.footer.fields.forEach(subLine => {
         //       El.Div({
         //         path: ft,
-        //         class: '-string flx hor',
+        //         class: '-subLine flx hor',
         //         func: (s) => {
-        //           string.forEach(item => {
+        //           subLine.forEach(item => {
         //             switch(item.api){
         //               case 'mal': mal.build(s, 'footer', item, el, o);
         //               break;
@@ -211,7 +217,7 @@ export const widget = {
 
     function updater(o){
       function upd(key, val, tar){
-        // console.log('UUUPD', key, val);
+        console.log('UUUPD', key, val);
         switch(key){
           case 'myRating':
             o.s.mal && (o.s.mal.myRating = val);
@@ -270,9 +276,10 @@ export const widget = {
       // o.s.save.watchedEps = 0;
     };
 
-    new Mal().connect(el, o);
-    new Ani().connect(el, o);
+    o.cfg.api.body.mal && new Mal().connect(el, o);
+    o.cfg.api.body.ani && new Ani().connect(el, o);
     updater(o);
+    console.log(el, o.s)
 
     // const eventAwesome = new CustomEvent('status', {
     //   bubbles: true,
