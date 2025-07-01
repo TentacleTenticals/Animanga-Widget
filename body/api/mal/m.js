@@ -55,6 +55,7 @@ export class Mal extends Func(){
         status: {
           title: ['Status', 'St', '⏳\ufe0e', 'Status'],
           value: {
+            not_yet_aired: ['Not aired', 'Not Air'],
             currently_airing: ['Airing', 'Air'],
             finished_airing: ['Finished', 'Fin']
           },
@@ -125,6 +126,7 @@ export class Mal extends Func(){
         title: ['Просмотрено:', 'Watch:', '📽️', 'Просмотрено'],
         status: {
           value: {
+            not_yet_aired: ['Не началось', 'Не нач'],
             currently_airing: ['Выходит', 'Вых'],
             finished_airing: ['Закончено', 'Зак']
           },
@@ -664,6 +666,7 @@ export class Mal extends Func(){
           if(!v) return;
           if(!v.status) return;
           const status = {
+            not_yet_aired: 'nope',
             currently_airing: 'airpublish',
             currently_publishing: 'airpublish',
             finished_airing: 'finished',
@@ -674,15 +677,13 @@ export class Mal extends Func(){
             lvl: e.el[name].status.parentNode.getAttribute('langLvl')||0
           };
 
-          e.el[name].status.textContent = this.lang[l.lang].status.value[v.status][l.lvl];
+          e.el[name].status.textContent = this.lang[l.lang][o.type].status.value[v.status][l.lvl];
           const st = e.el[name].status.parentNode;
           st.classList.add(status[v.status]);
-          
-          // if(e.el[name].status) return;
         }
         break;
         case 'myStatus':
-          e.el[name].statusItem.value = v;
+          e.el[name].myStatus.value = v;
         break;
         case 'airDay': {
           if(!v) return;
