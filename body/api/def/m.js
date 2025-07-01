@@ -3,8 +3,9 @@ import {MalFc as MalApi} from '../../../api/mal/fc.js';
 import {AniFc as AniApi} from '../../../api/ani/fc.js';
 import {Modal} from './modal.js';
 import {Ut} from '../../../funcs/utils.js';
+import {default as Func} from '../utilsClass.js';
 
-export class Def{
+export class Def extends Func(){
   splitter = (o) => {
     const t = o.split('/');
     if(!t.length > 1) return [['lang', t[0]]];
@@ -58,6 +59,9 @@ export class Def{
       save: ['Сохранить', 'Сохр', '💾\ufe0e', 'Сохранить'],
       saveData: ['Последние сохранения', 'ПС', '📚\ufe0e', 'Последние сохранения'],
       modal: {
+        helper: {
+          title: ['Animanga widget статус', 'AMW Status', '', '']
+        },
         search: {
           title: ['Поиск', 'Пск', '', 'Поиск'],
           toDef: ['Вернуть дефолт', 'Вернуть деф', '', 'Вернуть изначальное значение поиска']
@@ -106,12 +110,6 @@ export class Def{
         const o = this.o;
         El.Div({
           path: path,
-          class: 'header',
-          text: 'Status',
-          func: () => {}
-        });
-        El.Div({
-          path: path,
           class: 'list flx ver',
           text: 'list',
           func: (l) => {
@@ -147,7 +145,7 @@ export class Def{
                 });
                 El.Div({
                   path: info,
-                  class: 'pad-list flx ver',
+                  class: 'pad-list api-list flx ver',
                   func: (s) => {
                     // if(s.children.length) s.replaceChildren();
                     // this.api.list(s);
@@ -167,7 +165,7 @@ export class Def{
       };
     }
   };
-  search = (o, path, btnMode, item, string, line) => {
+  search = (o, path, btnMode, item, subLine, line) => {
     // o.search.titleUpd = o.title;
     for(const e of o.cfg.api.list){
       if(!e.search) continue;
@@ -195,7 +193,7 @@ export class Def{
 
               if(btnMode||o.search.start.mode === 'modal' || o.search.start.mode === 'lowMatch' && !(+res.sorted.result.percents.diff >= +o.cfg.textMatch.percents)) El.Dialog({
                 path: path,
-                class: 'mdl search-modal flx ver',
+                class: 'n-search-modal modal flx ver',
                 showM: true,
                 delOnclose: true,
                 func: (m) => {
@@ -206,7 +204,7 @@ export class Def{
                       El.Div({
                         path: h,
                         class: 'title',
-                        text: this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang)].modal.search.title[this.lang.type(item, 0)]
+                        text: this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)].modal.search.title[this.lang.type(item, 0)]
                       });
                       
                       El.Div({
@@ -220,11 +218,11 @@ export class Def{
                           });
                           El.Button({
                             path: h,
-                            text: this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang)].modal.search.toDef[this.lang.type(item, 0)],
+                            text: this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)].modal.search.toDef[this.lang.type(item, 0)],
                             onclick: () => {
                               o.title = o.search.titleDef;
                               m.remove();
-                              this.search(o, p, btnMode, item, string, line);
+                              this.search(o, p, btnMode, item, subLine, line);
                               // h.children[0].textContent = o.title;
                             }
                           });
@@ -320,6 +318,7 @@ export class Def{
                 o.s.mal.rating = res.mean;
                 o.s.mal.link = new MalApi().link.item(o.type, res.id);
                 o.s.mal.popularity = res.popularity;
+                o.s.mal.advices = res.recommendations;
                 o.s.mal.title = res.title;
 
                 if(o.type === 'anime'){
@@ -332,18 +331,19 @@ export class Def{
                   status: res.status,
                   broadcast: res.broadcast
                 };
-                o.s.mal.broadcast = {
+                o.s.mal.airDay = {
                   status: res.status,
-                  broadcast: res.broadcast
+                  broadcast: res.broadcast,
+                  // time: res.broadcast?.time
                 };
-                o.s.mal.broadcastTime = {
+                o.s.mal.airTime = {
                   status: res.status,
                   broadcast: res.broadcast
                 };
                 // o.s.mal.broadcast = res.broadcast||'';
 
                 const my = res.my_list_status;
-                o.s.save.statusItem = my?.status||'';
+                o.s.save.myStatus = my?.status||'';
                 o.s.save.myRating = my?.score||0;
                 o.s.mal.updatedAt = my?.updated_at||'';
 
@@ -354,7 +354,7 @@ export class Def{
                   o.s.save.readedCh = my?.num_chapters_read||0;
                 }
 
-                console.log('COMPLETED!!!!!!!!!');
+                console.log('COMPLETED!!!!!!!!!', o.s.mal);
               }
             )
           )
@@ -463,20 +463,20 @@ export class Def{
       }
     )
   };
-  build = (p, line, string, item, el, o) => {
+  build = (p, line, subLine, item, el, o) => {
     const name = 'def';
     const _this = this;
-    el.run = (o) => this.search(o, p, '', item, string, line);
-    new (this.class(name, p, line, string, item, el, o, _this))().check(p, item)
+    el.run = (o) => this.search(o, p, '', item, subLine, line);
+    new (this.class(name, p, line, subLine, item, el, o, _this))().check(p, item)
   };
-  class = (name, path, line, string, item, el, o, _this) => class {
+  class = (name, path, line, subLine, item, el, o, _this) => class {
     logo = (path, item) => {
       El.Div({
         path: path,
         attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
         classes: ['n-logo', '-item', '-btn', 'flx'],
-        text: _this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang)]['title'][_this.lang.type(item, 1)],
-        title: +_this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, 2)]['title'][3],
+        text: _this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)]['title'][_this.lang.type(item, 1)],
+        title: +_this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang, 2)]['title'][3],
         func: (e) => {
           el.def.title = e;
         },
@@ -490,8 +490,8 @@ export class Def{
         path: path,
         attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
         class: ['reload', 'def', '-item', '-btn', item.pos && ' -'+item.pos||'', 'flx'].join(' '),
-        text: _this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang)]['reload'][_this.lang.type(item, 2)],
-        title: _this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, 2)]['reload'][3],
+        text: _this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)]['reload'][_this.lang.type(item, 2)],
+        title: _this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang, 2)]['reload'][3],
         func: (e) => {
           el.def.reload = e;
           el.def.runner = () => _this.run(o);
@@ -503,7 +503,7 @@ export class Def{
         },
         onclick: () => {
           console.log('YO!', o);
-          _this.search(o, path, '', item, string, line);
+          _this.search(o, path, '', item, subLine, line);
           // this.run(o);
         }
       });
@@ -513,8 +513,8 @@ export class Def{
         path: path,
         attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
         class: ['n-save', 'def', '-item', '-btn', item.pos && ' -'+item.pos||'', 'flx'].join(' '),
-        text: _this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang)]['save'][_this.lang.type(item, 2)],
-        title: _this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, 2)]['save'][3],
+        text: _this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)]['save'][_this.lang.type(item, 2)],
+        title: _this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang, 2)]['save'][3],
         func: (e) => el.def.save = e,
         onclick: (btn) => {
           _this.save(o, el.def.save);
@@ -528,8 +528,8 @@ export class Def{
         attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
         summary: true,
         summaryClass: 'key',
-        summaryT: _this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang)]['saveData'][_this.lang.type(item, 2)],
-        title: _this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, 2)]['saveData'][3],
+        summaryT: _this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)]['saveData'][_this.lang.type(item, 2)],
+        title: _this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang, 2)]['saveData'][3],
         func: (m) => {
           El.Div({
             path: m,
@@ -562,16 +562,18 @@ export class Def{
         path: path,
         attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
         classes: ['widgetStatus', 'def', '-item', '-btn', item.pos && ' -'+item.pos||'', 'flx'],
-        text: _this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang)]['status'][_this.lang.type(item, 2)],
-        title: _this.lang[_this.lng(item.cfg?.lang||string.cfg?.lang||line.cfg?.lang, 2)]['status'][3],
+        text: _this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)]['status'][_this.lang.type(item, 2)],
+        title: _this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang, 2)]['status'][3],
         onclick: (e) => {
           if(!e.target.className.match('-item')) return;
           if(!e.target.children.length) El.Dialog({
             path: path,
-            class: 'mdl',
+            class: 'n-widget-status modal flx ver',
             showM: true,
             delOnclose: true,
             func: (m) => {
+              console.log('YO!', _this.lngSet.text(item, subLine, line, ['modal.helper.title'], 1));
+              // console.log(_this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)]['modal'])
               const el = {
                 mal: {},
                 ani: {},
@@ -579,7 +581,18 @@ export class Def{
               };
               El.Div({
                 path: m,
-                class: 'mdl widgetStatus flx ver',
+                class: 'header flx',
+                func: (h) => {
+                  El.Div({
+                    path: h,
+                    class: 'title',
+                    text: _this.lngSet.text(item, subLine, line, ['modal.helper.title'], 1)
+                  });
+                }
+              });
+              El.Div({
+                path: m,
+                class: 'flx ver',
                 func: (m) => {
                   // console.log('API', api, classList[api]);
                   new _this.modal.Build({o:o}).main(m);
