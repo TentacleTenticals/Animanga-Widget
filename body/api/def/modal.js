@@ -17,14 +17,18 @@ export class Modal{
             title: ['Требования', '', '', ''],
             status: {
               all: ['Все выполнены', '', '', '']
-            }
+            },
+            check: ['Проверить', 'Пров', '🔄\ufe0e', 'Повторная проверка']
           },
           ['tokens status']: {
             title: ['Статус токенов', '', '', ''],
             status: {
               days: ['дней', '', '', ''],
-              left: ['осталось', '', '', '']
+              left: ['осталось', '', '', ''],
+              update: ['требуется обновление', '', '', ''],
+              expired: ['требуется получение новых токенов', '', '', '']
             },
+            check: ['Проверить', 'Пров', '🔄\ufe0e', 'Повторная проверка']
           },
           functions: {
             title: ['Функции', '', '', ''],
@@ -92,15 +96,15 @@ export class Modal{
                     func: (l) => {
                       El.Div({
                         path: l,
-                        class: 'header',
+                        class: 'sub-header',
                         text: this.lang[o.cfg.helper.lang].helper['tokens api']['requrements'].title[0]
                       });
                       El.Button({
                         path: l,
-                        class: 'btn',
-                        text: 'Check',
+                        class: '-btn',
+                        text: this.lang[o.cfg.helper.lang].helper['tokens api']['requrements'].check[2],
                         onclick: (e) => {
-                          this.api.tk.requrements(this.el.requrements, api, modal.arr(api));
+                          this.api.tk.requrements(this.el[api.name].requrements, api, modal.arr(api));
                         }
                       });
                     }
@@ -113,7 +117,7 @@ export class Modal{
                         path: l,
                         class: 'flx ver',
                         func: (l) => {
-                          this.el.requrements = l;
+                          this.el[api.name].requrements = l;
                           this.api.tk.requrements(l, api, modal.arr(api));
                         }
                       });
@@ -132,15 +136,16 @@ export class Modal{
                     func: (l) => {
                       El.Div({
                         path: l,
-                        class: 'header',
+                        class: 'sub-header',
                         text: this.lang[o.cfg.helper.lang].helper['tokens api']['tokens status'].title[0]
                       });
                       El.Button({
                         path: l,
-                        class: 'btn',
-                        text: 'Check',
+                        class: '-btn',
+                        text: this.lang[o.cfg.helper.lang].helper['tokens api']['tokens status'].check[2],
                         onclick: (e) => {
-                          this.api.tk.status(this.el.tokensStatus, api, modal.arr(api));
+                          console.log('CHECK', api)
+                          this.api.tk.status(this.el[api.name].tokensStatus, api, modal.arr(api));
                         }
                       });
                     }
@@ -153,7 +158,7 @@ export class Modal{
                         path: pl,
                         class: 'flx ver',
                         func: (l) => {
-                          this.el.tokensStatus = l;
+                          this.el[api.name].tokensStatus = l;
                           this.api.tk.status(l, api, modal.arr(api));
                         }
                       });
@@ -168,7 +173,7 @@ export class Modal{
                 func: (tkFunctions) => {
                   El.Div({
                     path: tkFunctions,
-                    class: 'header',
+                    class: 'sub-header',
                     text: this.lang[o.cfg.helper.lang].helper['tokens api']['functions'].title[0]
                   });
                   El.Div({
@@ -179,7 +184,7 @@ export class Modal{
                         path: pl,
                         class: 'gap-5 flx ver',
                         func: (l) => {
-                          this.el.tokensFunctions = l;
+                          this.el[api.name].tokensFunctions = l;
                           modal._api.tk.functions(l, api);
                         }
                       });
@@ -287,8 +292,26 @@ export class Modal{
                       path: l,
                       class: 'item ok flx',
                       text: [
-                        status.token.timer[0],
-                        this.lang[o.cfg.helper.lang].helper['tokens api']['tokens status'].status[status.token.timer[1]][0], this.lang[o.cfg.helper.lang].helper['tokens api']['tokens status'].status.left[0]
+                        status.token.timer,
+                        this.lang[o.cfg.helper.lang].helper['tokens api']['tokens status'].status['days'][0], this.lang[o.cfg.helper.lang].helper['tokens api']['tokens status'].status.left[0]
+                      ].join(' ')
+                    });
+                    else
+                    if(status.needUpd) El.Div({
+                      path: l,
+                      class: 'item notOk flx',
+                      text: [
+                        status.token.timer,
+                        this.lang[o.cfg.helper.lang].helper['tokens api']['tokens status'].status['days'][0], this.lang[o.cfg.helper.lang].helper['tokens api']['tokens status'].status.update[0]
+                      ].join(' ')
+                    });
+                    else
+                    if(status.needNew) El.Div({
+                      path: l,
+                      class: 'item notOk flx',
+                      text: [
+                        status.token.timer,
+                        this.lang[o.cfg.helper.lang].helper['tokens api']['tokens status'].status['days'][0], this.lang[o.cfg.helper.lang].helper['tokens api']['tokens status'].status.expired[0]
                       ].join(' ')
                     });
                   }
