@@ -87,9 +87,9 @@ export class Ut{
       };
       
       switch(true){
-        case d.hours < 24: return [d.hours, 'hours'];
-        case d.minutes < 60: return [d.minutes, 'minutes'];
-        case d.seconds < 60: return [d.seconds, 'seconds'];
+        case d.hours <= 24: return [d.hours, 'hours'];
+        case d.minutes <= 60: return [d.minutes, 'minutes'];
+        case d.seconds <= 60: return [d.seconds, 'seconds'];
         default: return [d.days, 'days'];
       }
     },
@@ -145,6 +145,11 @@ export class Ut{
         default: return res;
       }
     },
+    days: (ms) => {
+      return Math.floor(ms / (1000 * 60 * 60 * 24));
+      
+      // return days;
+    },
     parseJwt(token){
       if(!token) return;
       if(!token.split('.').length) return;
@@ -156,96 +161,69 @@ export class Ut{
   
       return JSON.parse(jsonPayload);
     },
-    keyLength: (msKey, max) => {
-      if(!msKey && !max) return;
-      const cur = this.date.get(null, 'ms');
-      if(max > 1){
-        const main = this.token.date(msKey, cur);
-        if(main > 0){
-          const q = this.date.math(main);
-          if(q[1] === 'days'){
-            max = this.date.unitToMs(max, 'day');
-          }
-        }
+    keyLength: (ms, daysLimit) => {
+      if(!ms) return;
+      const _ = {
+        ms: {}
+      };
+      const currTimeMS = this.date.get(null, 'ms');
+      if(daysLimit > 1){
+        _.ms.daysLimit = this.date.unitToMs(daysLimit, 'day');
       }
-      console.log('MAX', max);
-      let main = this.token.date(msKey, cur) - max||0;
-      let res;
-      console.log('M', main);
-      
-      if(main < 0){
-        if(main <= -2592000000) console.log('[TK] Too long. NEED NEW TOKENS!!!', main < 30);
-        else main = Math.abs(main);
-        const q = this.date.math(main);
-        
-        if(q[1] === 'days'){
-          switch(true){
-            case q[0] > 30: console.log('[Tokens] need new tokens!!!', q);
-            res = {
-              check: q,
-              token: {
-                timer: q,
-                date: this.date.msToTimePer(main)
-              }
-            };
-            break;
-            case q[0] > 20: console.log('[Tokens] need new tokens!!!', q);
-            break;
-            case q[0] > 10: console.log('[Tokens] need new tokens!!!', q);
-            break;
-            case q[0] > 5: console.log('[Tokens] need new tokens!!!', q);
-            break;
-          }
-        }
-      }
-      // else main = Math.abs(main);
-      
-      const q = this.date.math(main);
-      
-      if(q[1] === 'days'){
-        switch(true){
-          case q[0] > 30: console.log('[Tokens] ok', q);
-          res = {
-            ok: true,
-            token: {
-              timer: q,
-              date: this.date.msToTimePer(main)
-            }
-          };
-          break;
-          case q[0] > 20: console.log('[Tokens] ok', q);
-          res = {
-            ok: true,
-            token: {
-              timer: q,
-              date: this.date.msToTimePer(main)
-            }
-          };
-          break;
-          case q[0] > 10: console.log('[Tokens] ...update?', q);
-          res = {
-            ok: true,
-            token: {
-              timer: q,
-              date: this.date.msToTimePer(main)
-            }
-          };
-          break;
-          case q[0] > 5: console.log('[Tokens] update!!!', q);
-          res = {
-            ok: true,
-            token: {
-              timer: q,
-              date: this.date.msToTimePer(main)
-            }
-          };
-          break;
-        }
-      }
-      
-      console.log('Q', q);
+      // console.log('MAX', _.ms.daysLimit);
+      _.ms.tokenLength = this.token.date(ms, currTimeMS) - _.ms.daysLimit||0;
+      // console.log('M', _.ms.tokenLength);
 
-      return res;
+      const result = (isOk, negative) => {
+        // negative && (_.tokenLength = -_.tokenLength) || _.tokenLength;
+        return {
+          ok: isOk,
+          needUpd: _.tokenLength <= daysLimit,
+          needNew:  _.tokenLength > daysLimit,
+          token: {
+            timer: _.tokenLength,
+            date: this.date.msToTimePer(_.ms.tokenLength)
+          }
+        };
+      }
+      
+      if(_.ms.tokenLength < 0){
+        // _.ms.tokenLength = Math.abs(_.ms.tokenLength);
+        _.tokenLength = this.token.days(_.ms.tokenLength);
+        const status = result();
+
+        console.log('[Tokens] need upd/new tokens!!!', _.tokenLength);
+
+        if(status.needUpd) console.log('[Tokens] need upd tokens!!!', _.tokenLength);
+        if(status.needNew) console.log('[Tokens] need new tokens!!!', _.tokenLength);
+
+        return status;
+      }else{
+        _.tokenLength = this.token.days(_.ms.tokenLength);
+        const status = result(true);
+      
+        switch(true){
+          case _.tokenLength >= 30: console.log('[Tokens] 30 ok', status);
+          return status;
+          break;
+          case _.tokenLength >= 20: console.log('[Tokens] ok', status);
+          return status;
+          break;
+          case _.tokenLength >= 10: console.log('[Tokens] ...update?', status);
+          return status;
+          break;
+          case _.tokenLength >= 5: console.log('[Tokens] update!!!', status);
+          return status;
+          break;
+          case _.tokenLength >= 1: console.log('[Tokens] update!!! 1', status);
+          return status;
+          break;
+        }
+      }
+      
+      console.log('days', _.tokenLength);
+
+      // return status;
     }
   };
   textMatcher = {
