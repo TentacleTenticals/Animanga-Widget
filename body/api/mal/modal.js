@@ -84,7 +84,7 @@ export const MalModal = () => class extends Modal{
           }
           await o.GM.setValue('secretsList', secretsList);
         }
-        this.api.tk.status(this.el.tokensStatus, api, this.arr(api));
+        this.api.tk.status(this.el[api.name].tokensStatus, api, this.arr(api));
         // checker(api, el.tokensApi);
       }
     )
@@ -135,7 +135,7 @@ export const MalModal = () => class extends Modal{
                 api.secrets.accToken = res.access_token;
                 api.secrets.refToken = res.refresh_token;
                 // checker(api, el.tokensApi);
-                this.api.tk.status(this.el.tokensStatus, api, this.arr(api));
+                this.api.tk.status(this.el[api.name].tokensStatus, api, this.arr(api));
               }
             )
           }
