@@ -2,10 +2,6 @@ import {MalApi} from './m.js';
 import {Ut} from '../../funcs/utils.js';
 
 export class MalFc extends MalApi{
-  url = 'https://api.myanimelist.net/v2';
-  tokenUrl = 'https://myanimelist.net/v1/oauth2/token?';
-  authUrl = 'https://myanimelist.net/v1/oauth2/authorize?';
-  title = 'https://myanimelist.net/';
   fc = {
     auth: {
       cc: (length) => {
@@ -30,34 +26,7 @@ export class MalFc extends MalApi{
         return this.authUrl+new URLSearchParams(data).toString();
       },
       getToken: (o) => this.auth.getToken(o),
-      updToken: (o) => {
-        o.method = 'POST';
-        o.data = {
-          grant_type: 'refresh_token',
-          client_id: o.secrets.clientID,
-          client_secret: o.secrets.clientSecret,
-          redirect_uri: o.secrets.redirectUri,
-          refresh_token: o.secrets.refToken
-        }
-  
-        o.headers = {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: 'Bearer '+o.secrets.accToken,
-          Url: this.tokenUrl
-        };
-  
-        console.log('TK', o);
-  
-        return this.fetch(o).then(
-          res => {
-            if(!res) return;
-            if(!res.access_token) return;
-            console.log('RRR', res);
-            res.jwt = new Ut().token.parseJwt(res.access_token);
-            return res;
-          }
-        )
-      }
+      updToken: (o) => this.auth.updToken(o)
     },
     search: {
       items: {
