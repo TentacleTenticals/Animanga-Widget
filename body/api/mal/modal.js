@@ -1,13 +1,13 @@
 import {El} from '../../../base/classes/m.js';
-import {Modal} from '../def/modal.js';
+// import {Modal} from '../def/modal.js';
 import {MalFc as MalApi} from '../../../api/mal/fc.js';
 
-export const MalModal = () => class extends Modal{
-  constructor(args){
-    super();
-    this.o = args?.o;
-    this.el = args?.el;
-  }
+export default class {
+  // constructor(o){
+  //   console.log('MAL', o);
+  //   // super();
+  //   this.vApi = o.api;
+  // }
   _lang = {
     en: {
       helper: {
@@ -33,7 +33,6 @@ export const MalModal = () => class extends Modal{
     }
   };
   arr = (api) => {
-    const o = this.o;
     console.log('ARGS', this)
     const arr = {
       must: [
@@ -53,38 +52,39 @@ export const MalModal = () => class extends Modal{
       tokensFalse: []
     }
     for(const k of arr.must){
-      if(api.secrets[k]) arr.checkTrue.push(k);
+      if(this.vApi.secrets[k]) arr.checkTrue.push(k);
       else arr.checkFalse.push(k);
     }
     for(const k of arr.tokens){
-      if(api.secrets[k]) arr.tokensTrue.push(k);
+      if(this.vApi.secrets[k]) arr.tokensTrue.push(k);
       else arr.tokensFalse.push(k);
     }
 
     return arr;
   };
   upd = (key, v, api) => {
-    if(key !== 'i') return;
-    const o = this.o;
+    console.log('[UPD]', key, v, api);
+    // if(key !== 'i') return;
+    // this.vApi.secrets.code = v;
     console.log('V', v);
     if(!v.code) return;
-    api.secrets.code = v.code;
+    this.vApi.secrets.code = v.code;
     new MalApi().fc.auth.getToken({
-      secrets: api.secrets
+      secrets: this.vApi.secrets
     }).then(
       async res => {
         console.log('Tokens', res);
-        api.secrets.accToken = res.access_token;
-        api.secrets.refToken = res.refresh_token;
-        if(o.GM){
-          const secretsList = await o.GM.getValue('secretsList');
-          if(secretsList[api.name]){
-            secretsList[api.name].accToken = res.access_token;
-            secretsList[api.name].refToken = res.refresh_token;
+        this.vApi.secrets.accToken = res.access_token;
+        this.vApi.secrets.refToken = res.refresh_token;
+        if(this.o.GM){
+          const secretsList = await this.o.GM.getValue('secretsList');
+          if(secretsList[this.vApi.name]){
+            secretsList[this.vApi.name].accToken = res.access_token;
+            secretsList[this.vApi.name].refToken = res.refresh_token;
           }
-          await o.GM.setValue('secretsList', secretsList);
+          await this.o.GM.setValue('secretsList', secretsList);
         }
-        this.api.tk.status(this.el[api.name].tokensStatus, api, this.arr(api));
+        this.api.tk.status(this.el[this.vApi.name].tokensStatus, api, this.arr(api));
         // checker(api, el.tokensApi);
       }
     )
@@ -92,50 +92,49 @@ export const MalModal = () => class extends Modal{
   _api = {
     tk: {
       functions: (path, api) => {
-        const o = this.o;
         console.log('SUPER',  super.message);
         El.Button({
           path: path,
           class: '-btn',
-          text: this._lang[o.cfg.helper.lang].helper['tokens api']['functions'].login[0],
-          func: (e) => this.el[api.name].btnLogin = e,
+          text: this._lang[this.o.cfg.helper.lang].helper['tokens api']['functions'].login[0],
+          func: (e) => this.el[this.vApi.name].btnLogin = e,
           onclick: () => {
             const Mal = new MalApi();
             console.log('CLICK');
-            api.secrets.codeChall = Mal.fc.auth.cc(128);
-            const data = new Proxy({}, El.ProxyHandler(this.upd, api));
-            this.el[api.name].window = window.open(Mal.auth.url({
-              secrets: api.secrets
+            this.vApi.secrets.codeChall = Mal.fc.auth.cc(128);
+            // const data = new Proxy({}, El.ProxyHandler(this.upd, api));
+            this.el[this.vApi.name].window = window.open(Mal.auth.url({
+              secrets: this.vApi.secrets
             }));
-            window.addEventListener('message', this.message.bind(this, data, api));
+            window.addEventListener('message', this.message.bind(this, this.upd, api), {once:true});
           }
         });
-        if(api.secrets.refToken) El.Button({
+        if(this.vApi.secrets.refToken) El.Button({
           path: path,
           class: '-btn',
-          text: this._lang[o.cfg.helper.lang].helper['tokens api']['functions'].update[0],
-          func: (e) => this.el[api.name].btnUpdate = e,
+          text: this._lang[this.o.cfg.helper.lang].helper['tokens api']['functions'].update[0],
+          func: (e) => this.el[this.vApi.name].btnUpdate = e,
           onclick: () => {
             const Mal = new MalApi();
             // const data = new Proxy({}, El.ProxyHandler(this.modal.upd, api));
             Mal.fc.auth.updToken({
-              secrets: api.secrets
+              secrets: this.vApi.secrets
             }).then(
               async res => {
                 console.log('Tokens', res);
 
-                if(o.GM){
-                  const secretsList = await o.GM.getValue('secretsList');
-                  if(secretsList[api.name]){
-                    secretsList[api.name].accToken = res.access_token;
-                    secretsList[api.name].refToken = res.refresh_token;
+                if(this.o.GM){
+                  const secretsList = await this.o.GM.getValue('secretsList');
+                  if(secretsList[this.vApi.name]){
+                    secretsList[this.vApi.name].accToken = res.access_token;
+                    secretsList[this.vApi.name].refToken = res.refresh_token;
                   }
-                  await o.GM.setValue('secretsList', secretsList);
+                  await this.o.GM.setValue('secretsList', secretsList);
                 }
-                api.secrets.accToken = res.access_token;
-                api.secrets.refToken = res.refresh_token;
+                this.vApi.secrets.accToken = res.access_token;
+                this.vApi.secrets.refToken = res.refresh_token;
                 // checker(api, el.tokensApi);
-                this.api.tk.status(this.el[api.name].tokensStatus, api, this.arr(api));
+                this.api.tk.status(this.el[this.vApi.name].tokensStatus, api, this.arr(api));
               }
             )
           }
