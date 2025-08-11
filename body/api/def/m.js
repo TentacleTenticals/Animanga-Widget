@@ -377,22 +377,23 @@ export class Def extends Func(){
   };
   build = (p, line, subLine, item, el, o) => {
     const name = 'def';
-    const _this = this;
+    // const _this = this;
     el.run = (o) => this.search(o, p, '', item, subLine, line);
-    new (this.class(name, p, line, subLine, item, el, o, _this))().check(p, item)
+    new (this.class(name, p, line, subLine, item, el, o, this))({o:o, base:this}).check(p, item)
   };
-  class = (name, path, line, subLine, item, el, o, _this) => class {
-    // constructor(o){
-    //   console.log('TH', _this)
-    // }
-    o = _this.o;
+  class = (name, path, line, subLine, item, el, o) => class {
+    constructor(o){
+      console.log('TH', o)
+      this.o = o.o;
+      this.base = o.base;
+    }
     logo = (path, item) => {
       El.Div({
         path: path,
-        attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+        attrs: [['api', name], ...(item.cfg ? this.base.attrs(item.cfg) : [])],
         classes: ['n-logo', '-item', '-btn', 'flx'],
-        text: _this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)]['title'][_this.lang.type(item, 1)],
-        title: +_this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang, 2)]['title'][3],
+        text: this.base.lang[this.base.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)]['title'][this.base.lang.type(item, 1)],
+        title: +this.base.lang[this.base.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang, 2)]['title'][3],
         func: (e) => {
           el.def.title = e;
         },
@@ -404,22 +405,22 @@ export class Def extends Func(){
     reload = (path, item) => {
       El.Button({
         path: path,
-        attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+        attrs: [['api', name], ...(item.cfg ? this.base.attrs(item.cfg) : [])],
         class: ['reload', 'def', '-item', '-btn', item.pos && ' -'+item.pos||'', 'flx'].join(' '),
-        text: _this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)]['reload'][_this.lang.type(item, 2)],
-        title: _this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang, 2)]['reload'][3],
+        text: this.base.lang[this.base.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)]['reload'][this.base.lang.type(item, 2)],
+        title: this.base.lang[this.base.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang, 2)]['reload'][3],
         func: (e) => {
           el.def.reload = e;
-          el.def.runner = () => _this.run(this.o);
+          el.def.runner = () => this.base.run(this.o);
           path.closest('#animanga-widget').addEventListener('rel', () => {
             console.log('q', el.def.reload)
             // el.def.reload.focus();
-            _this.run(this.o);
+            this.base.run(this.o);
           });
         },
         onclick: () => {
           console.log('YO!', this.o);
-          _this.search(this.o, path, '', item, subLine, line);
+          this.base.search(this.o, path, '', item, subLine, line);
           // this.run(this.o);
         }
       });
@@ -427,13 +428,13 @@ export class Def extends Func(){
     save = (path, item) => {
       El.Button({
         path: path,
-        attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+        attrs: [['api', name], ...(item.cfg ? this.base.attrs(item.cfg) : [])],
         class: ['n-save', 'def', '-item', '-btn', item.pos && ' -'+item.pos||'', 'flx'].join(' '),
-        text: _this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)]['save'][_this.lang.type(item, 2)],
-        title: _this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang, 2)]['save'][3],
+        text: this.base.lang[this.base.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)]['save'][this.base.lang.type(item, 2)],
+        title: this.base.lang[this.base.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang, 2)]['save'][3],
         func: (e) => el.def.save = e,
         onclick: (btn) => {
-          _this.save(this.o, el.def.save);
+          this.base.save(this.o, el.def.save);
         }
       });
     };
@@ -441,11 +442,11 @@ export class Def extends Func(){
       El.Details({
         path: path,
         classes: ['n-updatedAt', '-itemMini', 'flx', 'ver'],
-        attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+        attrs: [['api', name], ...(item.cfg ? this.base.attrs(item.cfg) : [])],
         summary: true,
         summaryClass: 'key',
-        summaryT: _this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)]['saveData'][_this.lang.type(item, 2)],
-        title: _this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang, 2)]['saveData'][3],
+        summaryT: this.base.lang[this.base.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)]['saveData'][this.base.lang.type(item, 2)],
+        title: this.base.lang[this.base.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang, 2)]['saveData'][3],
         func: (m) => {
           El.Div({
             path: m,
@@ -476,10 +477,10 @@ export class Def extends Func(){
     status = (path, item) => {
       El.Button({
         path: path,
-        attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+        attrs: [['api', name], ...(item.cfg ? this.base.attrs(item.cfg) : [])],
         classes: ['widgetStatus', 'def', '-item', '-btn', item.pos && ' -'+item.pos||'', 'flx'],
-        text: _this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)]['status'][_this.lang.type(item, 2)],
-        title: _this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang, 2)]['status'][3],
+        text: this.base.lang[this.base.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)]['status'][this.base.lang.type(item, 2)],
+        title: this.base.lang[this.base.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang, 2)]['status'][3],
         onclick: (e) => {
           if(!e.target.className.match('-item')) return;
           if(!e.target.children.length) El.Dialog({
@@ -488,7 +489,7 @@ export class Def extends Func(){
             showM: true,
             delOnclose: true,
             func: (m) => {
-              // console.log(_this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)]['modal'])
+              // console.log(this.base.lang[this.base.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)]['modal'])
               const el = {
                 mal: {},
                 ani: {},
@@ -501,7 +502,7 @@ export class Def extends Func(){
                   El.Div({
                     path: h,
                     class: 'title',
-                    text: _this.langSet.text(item, subLine, line, ['modal.helper.title'], 1)
+                    text: this.base.langSet.text(item, subLine, line, ['modal.helper.title'], 1)
                   });
                 }
               });
@@ -509,9 +510,9 @@ export class Def extends Func(){
                 path: m,
                 class: 'flx ver',
                 func: (m) => {
-                  console.log('VVV', _this)
+                  console.log('VVV', this.base)
                   // console.log('API', api, classList[api]);
-                  new Nfo({o:this.o, _this:this, vApi:_this.vApi}).main(m);
+                  new Nfo({o:this.o, base:this, vApi:this.base.vApi}).main(m);
               
                   // window.addEventListener('message', (e) => {
                   //   if(e.data.type && e.data.type === 'PREVIEW_INSTANTIATE_DIFF') return;
@@ -543,7 +544,7 @@ export class Def extends Func(){
       div: (path, item) => {
         El.Div({
           path: path,
-          attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+          attrs: [['api', name], ...(item.cfg ? this.base.attrs(item.cfg) : [])],
           classes: ['container', 'flx'],
           func: (i) => {
             item.items.forEach(it => {
@@ -556,7 +557,7 @@ export class Def extends Func(){
         El.Label({
           path: path,
           classes: ['lab', 'flx'],
-          attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+          attrs: [['api', name], ...(item.cfg ? this.base.attrs(item.cfg) : [])],
           func: (i) => {
             item.items.forEach(it => {
               this.check(i, it);
@@ -569,7 +570,7 @@ export class Def extends Func(){
         El.Div({
           path: path,
           classes: ['item-group', 'flx'],
-          attrs: [['api', name], ...(item.cfg ? _this.attrs(item.cfg) : [])],
+          attrs: [['api', name], ...(item.cfg ? this.base.attrs(item.cfg) : [])],
           func: (i) => {
             item.items.forEach(it => {
               this.check(i, it);
