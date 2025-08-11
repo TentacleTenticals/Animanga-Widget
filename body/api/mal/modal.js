@@ -36,7 +36,7 @@ export default class {
     console.log('ARGS', this)
     const arr = {
       must: [
-        'url',
+        'proxyUrl',
         'redirectUri',
         'clientSecret',
         'clientID',
