@@ -1,4 +1,4 @@
-import {Ut} from '../../funcs/utils.js';
+import {default as Ut} from '../../funcs/utils.js';
 
 export class MalApi{
   url = 'https://api.myanimelist.net/v2';
