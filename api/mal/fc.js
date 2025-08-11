@@ -1,5 +1,5 @@
 import {MalApi} from './m.js';
-import {Ut} from '../../funcs/utils.js';
+import {default as Ut} from '../../funcs/utils.js';
 
 export class MalFc extends MalApi{
   fc = {
