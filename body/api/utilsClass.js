@@ -1,4 +1,7 @@
-export default () => class {
+export default (Base) => (Base ? Base = Base : Base = class {}) && class extends Base {
+  // constructor(){
+  //   super()
+  // }
   len = (o, len) => String(o).length*(len/2)+'px';
   getPath = (key) => {
     // console.log(key)
@@ -16,7 +19,7 @@ export default () => class {
     if(!l.length > 1||!n) return l[0];
     else return l[n] ? l[n] : l[0];
   };
-  lngSet = {
+  langSet = {
     type: (item, v) => {
       if(!item.title && !v) return 1;
       else
@@ -38,12 +41,12 @@ export default () => class {
       if(item.title === 'sh') return 1;
     },
     gp: (t, path) => {
-      console.log(path);
-      return path.filter(e => e).map(e => e.split('.')).flat().reduce((r, k) => k ? r[k] : r, t);
+      // console.log(path);
+      return (Array.isArray(path) ? path.flat() : path).filter(e => e).map(e => e.split('.')).flat().reduce((r, k) => k ? r[k] : r, t);
     },
-    text: (item, subLine, line, keys, type) => this.lngSet.gp(this.lang, [this.lng(item.cfg?.lang||subLine.cfg?.lang||
-      line.cfg?.lang), ...keys ? keys : []])[type||this.lngSet.type(item, 2)],
-    title: (item, subLine, line, keys) => this.lngSet.gp(this.lang, [this.lng(item.cfg?.lang||subLine.cfg?.lang||
+    text: (item, subLine, line, keys, type) => this.langSet.gp(this.lang, [this.lng(item.cfg?.lang||subLine.cfg?.lang||
+      line.cfg?.lang), Array.isArray(keys) ? keys : keys.key])[type||this.langSet.type(item, 2)],
+    title: (item, subLine, line, keys) => this.langSet.gp(this.lang, [this.lng(item.cfg?.lang||subLine.cfg?.lang||
       line.cfg?.lang), ...keys ? keys : []])[3]
   };
 };
