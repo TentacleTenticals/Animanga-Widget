@@ -7,8 +7,6 @@ export const widget = {
   build: (o) => {
     const el = {
       mal: {
-        anime: {},
-        my: {}
       },
       ani: {
         anime: {},
@@ -55,13 +53,16 @@ export const widget = {
                   ],
                   class: '-subLine flx',
                   func: (s) => {
+                    const mal = new Mal({vApi:o.cfg.api.list.find(e => e.name === 'mal'), el:el, o:o});
+                    const ani = new Ani({vApi:o.cfg.api.list.find(e => e.name === 'ani'), el:el, o:o});
+                    const def = new Def({vApi:{name:'def'}, el:el, o:o});
                     subLine.items.forEach(item => {
                       switch(item.api){
-                        case 'mal': o.cfg.api.body.mal && new Mal().build(s, {name:line.name, cfg:line.cfg}, {name:subLine.name, cfg:subLine.cfg}, item, el, o);
+                        case 'mal': o.cfg.api.body.mal && mal.build(s, {name:line.name, cfg:line.cfg}, {name:subLine.name, cfg:subLine.cfg}, item, el, o);
                         break;
-                        case 'ani': o.cfg.api.body.ani && new Ani().build(s, {name:line.name, cfg:line.cfg}, {name:subLine.name, cfg:subLine.cfg}, item, el, o);
+                        case 'ani': o.cfg.api.body.ani && ani.build(s, {name:line.name, cfg:line.cfg}, {name:subLine.name, cfg:subLine.cfg}, item, el, o);
                         break;
-                        default: new Def().build(s, {name:line.name, cfg:line.cfg}, {name:subLine.name, cfg:subLine.cfg}, item, el, o);
+                        default: def.build(s, {name:line.name, cfg:line.cfg}, {name:subLine.name, cfg:subLine.cfg}, item, el, o);
                         break;
                       }
                     })
@@ -276,8 +277,8 @@ export const widget = {
       // o.s.save.watchedEps = 0;
     };
 
-    o.cfg.api.body.mal && new Mal().connect(el, o);
-    o.cfg.api.body.ani && new Ani().connect(el, o);
+    o.cfg.api.body.mal && new Mal({o:o, el:el}).connect(el, o);
+    o.cfg.api.body.ani && new Ani({o:o, el:el}).connect(el, o);
     updater(o);
     console.log(el, o.s)
 
