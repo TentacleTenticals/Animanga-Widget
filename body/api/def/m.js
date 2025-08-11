@@ -1,7 +1,7 @@
 import {El} from '../../../base/classes/m.js';
 import {MalFc as MalApi} from '../../../api/mal/fc.js';
 import {AniFc as AniApi} from '../../../api/ani/fc.js';
-import {Ut} from '../../../funcs/utils.js';
+import {default as Ut} from '../../../funcs/utils.js';
 import {default as Func} from '../utilsClass.js';
 
 import {default as Nfo} from '../../modal/m.js';
