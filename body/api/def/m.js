@@ -1,11 +1,19 @@
 import {El} from '../../../base/classes/m.js';
 import {MalFc as MalApi} from '../../../api/mal/fc.js';
 import {AniFc as AniApi} from '../../../api/ani/fc.js';
-import {Modal} from './modal.js';
 import {Ut} from '../../../funcs/utils.js';
 import {default as Func} from '../utilsClass.js';
 
+import {default as Nfo} from '../../modal/m.js';
+
 export class Def extends Func(){
+  constructor(o){
+    super();
+    console.log('OO', o)
+    this.o = o.o;
+    this._this = this;
+    this.vApi = o.vApi;
+  }
   splitter = (o) => {
     const t = o.split('/');
     if(!t.length > 1) return [['lang', t[0]]];
@@ -60,7 +68,7 @@ export class Def extends Func(){
       saveData: ['Последние сохранения', 'ПС', '📚\ufe0e', 'Последние сохранения'],
       modal: {
         helper: {
-          title: ['Animanga widget статус', 'AMW Status', '', '']
+          title: ['Виджет статус', 'AMW Статус', '', '']
         },
         search: {
           title: ['Поиск', 'Пск', '', 'Поиск'],
@@ -69,129 +77,33 @@ export class Def extends Func(){
       }
     }
   };
-  modal = {
-    Build: class extends Modal {
-      constructor(_){
-        super();
-        this.args = _;
-        this.o = _.o;
-
-        // function mixin(target, ...sources){
-        //   for(const source of sources){
-        //     for(const key of Object.keys(source)){
-        //       // console.log('Q', source[key])
-        //       target[key] = source[key];
-        //     }
-        //   }
-        //   return target;
-        // }
-        // function extend(target, source) {
-        //   console.log(
-        //     Object.getOwnPropertyNames(source.prototype)
-        //     // .filter(key => {
-        //     //   console.log('K', key)
-        //     // })
-        //   )
-        //   Object.getOwnPropertyNames(source.prototype)
-        //     .filter((key) => !~['constructor', 'prototype'].indexOf(key))
-        //     .forEach((key) => {
-        //       console.log('KEY', key)
-        //       Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source.prototype, key));
-        //     });
-        // }
-        // for(const api in this.o.cfg.api.list){
-        //   console.log('API', this.ap[api]);
-        //   extend(this, this.ap[api]);
-        // }
-        // console.log('BUILDER', this);
-      }
-      o = this.o;
-      main = (path) => {
-        const o = this.o;
-        El.Div({
-          path: path,
-          class: 'list flx ver',
-          text: 'list',
-          func: (l) => {
-            // El.Div({
-            //   path: l,
-            //   class: 'info pad-item flx ver',
-            //   func: (info) => {
-            //     El.Div({
-            //       path: info,
-            //       class: 'header',
-            //       text: this.lang[o.cfg.helper.lang].helper['info api'].title[0],
-            //       title: this.lang[o.cfg.helper.lang].helper['info api'].title[3]
-            //     });
-            //     El.Div({
-            //       path: info,
-            //       class: 'list flx ver',
-            //       func: (l) => {
-            //         this.api.info(l);
-            //       }
-            //     });
-            //   }
-            // });
-    
-            El.Div({
-              path: l,
-              class: 'info pad-item flx ver',
-              func: (info) => {
-                El.Div({
-                  path: info,
-                  class: 'header',
-                  text: this.lang[o.cfg.helper.lang].helper['tokens api'].title[0],
-                  title: this.lang[o.cfg.helper.lang].helper['tokens api'].title[3]
-                });
-                El.Div({
-                  path: info,
-                  class: 'pad-list api-list flx ver',
-                  func: (s) => {
-                    // if(s.children.length) s.replaceChildren();
-                    // this.api.list(s);
-
-                    for(const api of o.cfg.api.list){
-                      console.log('API', api);
-                      this.api.item(s, api);
-                    }
-                  }
-                });
-                // tokensapi
-                // info.textContent = text;
-              }
-            });
-          }
-        });
-      };
-    }
-  };
   search = (o, path, btnMode, item, subLine, line) => {
     // o.search.titleUpd = o.title;
-    for(const e of o.cfg.api.list){
+    for(const e of this.o.cfg.api.list){
       if(!e.search) continue;
       switch(e.name){
         case 'mal': {
           return new MalApi().fc.searchNsort.items.byTitle({
-            type: o.type,
-            title: o.title,
+            type: this.o.type,
+            title: this.o.title,
             secrets: e.secrets,
-            textMatch: o.cfg.textMatch
+            textMatch: this.o.cfg.textMatch
           }).then(
             res => {
               // res.results.toSorted((a,b) => (a.result.percents.diff > b.result.percents.diff) ? -1 : ((b.result.percents.diff > a.result.percents.diff) ? 1 : 0))
-              if(!btnMode && o.search.start.mode === 'bestMatch'){
+              if(!btnMode && this.o.search.start.mode === 'bestMatch'){
                 const item = res.items[res.sorted.item.ind];
                 // console.log('ITEMMMMMM', item)
                 // o.title = item.title;
                 // o.search.titleUpd = e.item.title;
-                o.search.malId = item.id;
-                o.malId = item.id;
-                o.s.mal.search = res.sorted.result.percents.diff;
-                this.run(o);
+                this.o.search.malId = item.id;
+                this.o.malId = item.id;
+                this.o.s.mal.search = res.sorted.result.percents.diff;
+                this.run(this.o);
               }else
               // if(res) return res;
 
-              if(btnMode||o.search.start.mode === 'modal' || o.search.start.mode === 'lowMatch' && !(+res.sorted.result.percents.diff >= +o.cfg.textMatch.percents)) El.Dialog({
+              if(btnMode||this.o.search.start.mode === 'modal' || this.o.search.start.mode === 'lowMatch' && !(+res.sorted.result.percents.diff >= +this.o.cfg.textMatch.percents)) El.Dialog({
                 path: path,
                 class: 'n-search-modal modal flx ver',
                 showM: true,
@@ -214,15 +126,15 @@ export class Def extends Func(){
                           El.Div({
                             path: h,
                             class: 'text',
-                            text: o.title
+                            text: this.o.title
                           });
                           El.Button({
                             path: h,
                             text: this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)].modal.search.toDef[this.lang.type(item, 0)],
                             onclick: () => {
-                              o.title = o.search.titleDef;
+                              this.o.title = this.o.search.titleDef;
                               m.remove();
-                              this.search(o, p, btnMode, item, subLine, line);
+                              this.search(this.o, p, btnMode, item, subLine, line);
                               // h.children[0].textContent = o.title;
                             }
                           });
@@ -243,12 +155,12 @@ export class Def extends Func(){
                           onclick: () => {
                             m.remove();
                             const item = res.items[e.item.ind];
-                            o.title = item.title;
-                            // o.search.titleUpd = e.item.title;
-                            o.search.malId = item.id;
-                            o.malId = item.id;
-                            o.s.mal.search = e.result.percents.diff;
-                            this.run(o);
+                            this.o.title = item.title;
+                            // this.o.search.titleUpd = e.item.title;
+                            this.o.search.malId = item.id;
+                            this.o.malId = item.id;
+                            this.o.s.mal.search = e.result.percents.diff;
+                            this.run(this.o);
                           },
                           func: (item) => {
                             El.Div({
@@ -276,14 +188,14 @@ export class Def extends Func(){
   };
   run = (o) => {
     const runs = [];
-    for(const e of o.cfg.api.list){
+    for(const e of this.o.cfg.api.list){
       if(!e.info.active) continue;
       switch(e.name){
         case 'mal': {
           runs.push(
-            (o.malId ? new MalApi().fc.search.item.byId({
-              type: o.type,
-              id: o.malId,
+            (this.o.malId ? new MalApi().fc.search.item.byId({
+              type: this.o.type,
+              id: this.o.malId,
               query: {
                 fields: ['id', 'title', 'media_type', 'rank', 'rating', 'popularity', 'score', 'mean', 'status', 'broadcast', 'statistics', 'start_date', 'my_list_status', 'num_episodes', 'num_volumes', 'num_chapters', 'recommendations', 'related_manga', 'related_anime', 'priority'].join(),
                 limit: 10
@@ -291,14 +203,14 @@ export class Def extends Func(){
               login: e.info.login,
               secrets: e.secrets
             }) : new MalApi().fc.search.item.m({
-              type: o.type,
-              title: o.title,
+              type: this.o.type,
+              title: this.o.title,
               query: {
                 limit: 10
               },
               login: e.info.login,
               secrets: e.secrets,
-              textMatch: o.cfg.textMatch
+              textMatch: this.o.cfg.textMatch
             })).then(
               res => {
                 if(!res) throw new Ut().MyError(['[MAL Load]', 'No data']);
@@ -314,47 +226,47 @@ export class Def extends Func(){
                 // };
 
                 console.log('MAL RESULT', res);
-                o.s.mal.id = res.id;
-                o.s.mal.rating = res.mean;
-                o.s.mal.link = new MalApi().link.item(o.type, res.id);
-                o.s.mal.popularity = res.popularity;
-                o.s.mal.advices = res.recommendations;
-                o.s.mal.title = res.title;
+                this.o.s.mal.id = res.id;
+                this.o.s.mal.rating = res.mean;
+                this.o.s.mal.link = new MalApi().link.item(this.o.type, res.id);
+                this.o.s.mal.popularity = res.popularity;
+                this.o.s.mal.advices = res.recommendations;
+                this.o.s.mal.title = res.title;
 
-                if(o.type === 'anime'){
-                  o.s.mal.episodes = res.num_episodes||'?';
+                if(this.o.type === 'anime'){
+                  this.o.s.mal.episodes = res.num_episodes||'?';
                 }else{
-                  o.s.mal.volumes = res.num_volumes||'?';
-                  o.s.mal.chapters = res.num_chapters||'?';
+                  this.o.s.mal.volumes = res.num_volumes||'?';
+                  this.o.s.mal.chapters = res.num_chapters||'?';
                 }
-                o.s.mal.status = {
+                this.o.s.mal.status = {
                   status: res.status,
                   broadcast: res.broadcast
                 };
-                o.s.mal.airDay = {
+                this.o.s.mal.airDay = {
                   status: res.status,
                   broadcast: res.broadcast,
                   // time: res.broadcast?.time
                 };
-                o.s.mal.airTime = {
+                this.o.s.mal.airTime = {
                   status: res.status,
                   broadcast: res.broadcast
                 };
-                // o.s.mal.broadcast = res.broadcast||'';
+                // this.o.s.mal.broadcast = res.broadcast||'';
 
                 const my = res.my_list_status;
-                o.s.save.myStatus = my?.status||'';
-                o.s.save.myRating = my?.score||0;
-                o.s.mal.updatedAt = my?.updated_at||'';
+                this.o.s.save.myStatus = my?.status||'';
+                this.o.s.save.myRating = my?.score||0;
+                this.o.s.mal.updatedAt = my?.updated_at||'';
 
-                if(o.type === 'anime'){
-                  o.s.save.watchedEps = my?.num_episodes_watched||0;
+                if(this.o.type === 'anime'){
+                  this.o.s.save.watchedEps = my?.num_episodes_watched||0;
                 }else{
-                  o.s.save.readedVol = my?.num_volumes_read||0;
-                  o.s.save.readedCh = my?.num_chapters_read||0;
+                  this.o.s.save.readedVol = my?.num_volumes_read||0;
+                  this.o.s.save.readedCh = my?.num_chapters_read||0;
                 }
 
-                console.log('COMPLETED!!!!!!!!!', o.s.mal);
+                console.log('COMPLETED!!!!!!!!!', this.o.s.mal);
               }
             )
           )
@@ -362,40 +274,40 @@ export class Def extends Func(){
         break;
         case 'ani': {
           runs.push(
-            (o.malId ? new AniApi().fc.search.item.byId({
-              type: o.type,
-              idMal: o.malId,
+            (this.o.malId ? new AniApi().fc.search.item.byId({
+              type: this.o.type,
+              idMal: this.o.malId,
               query: {
                 limit: 10
               },
               login: e.info.login,
               secrets: e.secrets
             }) : new AniApi().fc.search.item.m({
-              type: o.type,
-              title: o.title,
+              type: this.o.type,
+              title: this.o.title,
               query: {
                 limit: 10
               },
               login: e.info.login,
               secrets: e.secrets,
-              textMatch: o.cfg.textMatch
+              textMatch: this.o.cfg.textMatch
             })).then(
               res => {
                 console.log('ANI RES', res);
                 if(!res) throw new Ut().MyError(['[MAL Load]', 'No data']);
                 if(e.main){
-                  o.s.save.myRating = res.mediaListEntry?.score;
-                  if(o.type === 'anime'){
-                    o.s.save.watchedEps = res.mediaListEntry?.progress||0;
+                  this.o.s.save.myRating = res.mediaListEntry?.score;
+                  if(this.o.type === 'anime'){
+                    this.o.s.save.watchedEps = res.mediaListEntry?.progress||0;
                   }else{
-                    o.s.save.readedVol = res.mediaListEntry?.progressVolumes||0;
-                    o.s.save.readedCh = res.mediaListEntry?.progress||0;
+                    this.o.s.save.readedVol = res.mediaListEntry?.progressVolumes||0;
+                    this.o.s.save.readedCh = res.mediaListEntry?.progress||0;
                   }
                 };
 
-                o.s.ani.id = res.id;
-                o.s.ani.rating = res.meanScore;
-                o.s.ani.link = new AniApi().link.item(o.type, res.id);
+                this.o.s.ani.id = res.id;
+                this.o.s.ani.rating = res.meanScore;
+                this.o.s.ani.link = new AniApi().link.item(this.o.type, res.id);
               }
             )
           )
@@ -410,40 +322,40 @@ export class Def extends Func(){
   };
   save = (o, save) => {
     const runs = [];
-    for(const e of o.cfg.api.list){
+    for(const e of this.o.cfg.api.list){
       if(!e.save.active) continue;
       if(!e.secrets.accToken) continue;
       switch(e.name){
         case 'mal': {
-          if(!o.s.mal.id) continue;
+          if(!this.o.s.mal.id) continue;
           const status = () => {
-            if(o.s.mal.statusItem === 'repeating') return 'completed';
+            if(this.o.s.mal.statusItem === 'repeating') return 'completed';
             else
-            return o.s.mal.statusItem||(o.type === 'anime' ? 'watching':'reading')
+            return this.o.s.mal.statusItem||(this.o.type === 'anime' ? 'watching':'reading')
           };
           runs.push(new MalApi().user.list.upd({
-            type: o.type,
-            id: o.s.mal.id,
+            type: this.o.type,
+            id: this.o.s.mal.id,
             secrets: e.secrets,
             data: {
               status: status(),
-              score: o.s.mal.myRating,
+              score: this.o.s.mal.myRating,
               // priority: o.s.mal.priority,
-              ...(o.type === 'anime' && {
-                num_watched_episodes: o.s.mal.watchedEps,
-                is_rewatching: o.s.mal.repeating
+              ...(this.o.type === 'anime' && {
+                num_watched_episodes: this.o.s.mal.watchedEps,
+                is_rewatching: this.o.s.mal.repeating
               }),
-              ...(o.type === 'manga' && {
-                num_volumes_read: o.s.mal.volumes,
-                num_chapters_read: o.s.mal.chapters,
-                is_rereading: o.s.mal.repeating
+              ...(this.o.type === 'manga' && {
+                num_volumes_read: this.o.s.mal.volumes,
+                num_chapters_read: this.o.s.mal.chapters,
+                is_rereading: this.o.s.mal.repeating
               })
             },
           }).then(
             sav => {
               console.log('[MAL Widget] UPDATE', sav);
               const time = El.getTime(sav?.updated_at, 'full');
-              time && (o.s.mal.updatedAt = time.date+' '+time.time);
+              time && (this.o.s.mal.updatedAt = time.date+' '+time.time);
             }
           ))
         }
@@ -470,6 +382,10 @@ export class Def extends Func(){
     new (this.class(name, p, line, subLine, item, el, o, _this))().check(p, item)
   };
   class = (name, path, line, subLine, item, el, o, _this) => class {
+    // constructor(o){
+    //   console.log('TH', _this)
+    // }
+    o = _this.o;
     logo = (path, item) => {
       El.Div({
         path: path,
@@ -481,7 +397,7 @@ export class Def extends Func(){
           el.def.title = e;
         },
         onclick: () => {
-          console.log('YO!', o);
+          console.log('YO!', this.o);
         }
       });
     };
@@ -494,17 +410,17 @@ export class Def extends Func(){
         title: _this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang, 2)]['reload'][3],
         func: (e) => {
           el.def.reload = e;
-          el.def.runner = () => _this.run(o);
+          el.def.runner = () => _this.run(this.o);
           path.closest('#animanga-widget').addEventListener('rel', () => {
             console.log('q', el.def.reload)
             // el.def.reload.focus();
-            _this.run(o);
+            _this.run(this.o);
           });
         },
         onclick: () => {
-          console.log('YO!', o);
-          _this.search(o, path, '', item, subLine, line);
-          // this.run(o);
+          console.log('YO!', this.o);
+          _this.search(this.o, path, '', item, subLine, line);
+          // this.run(this.o);
         }
       });
     };
@@ -517,7 +433,7 @@ export class Def extends Func(){
         title: _this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang, 2)]['save'][3],
         func: (e) => el.def.save = e,
         onclick: (btn) => {
-          _this.save(o, el.def.save);
+          _this.save(this.o, el.def.save);
         }
       });
     };
@@ -535,7 +451,7 @@ export class Def extends Func(){
             path: m,
             class: 'list flx ver',
             func: (m) => {
-              for(const i of o.cfg.api.list){
+              for(const i of this.o.cfg.api.list){
                 if(i.save.active){
                   El.Div({
                     path: m,
@@ -572,7 +488,6 @@ export class Def extends Func(){
             showM: true,
             delOnclose: true,
             func: (m) => {
-              console.log('YO!', _this.lngSet.text(item, subLine, line, ['modal.helper.title'], 1));
               // console.log(_this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)]['modal'])
               const el = {
                 mal: {},
@@ -586,7 +501,7 @@ export class Def extends Func(){
                   El.Div({
                     path: h,
                     class: 'title',
-                    text: _this.lngSet.text(item, subLine, line, ['modal.helper.title'], 1)
+                    text: _this.langSet.text(item, subLine, line, ['modal.helper.title'], 1)
                   });
                 }
               });
@@ -594,8 +509,9 @@ export class Def extends Func(){
                 path: m,
                 class: 'flx ver',
                 func: (m) => {
+                  console.log('VVV', _this)
                   // console.log('API', api, classList[api]);
-                  new _this.modal.Build({o:o}).main(m);
+                  new Nfo({o:this.o, _this:this, vApi:_this.vApi}).main(m);
               
                   // window.addEventListener('message', (e) => {
                   //   if(e.data.type && e.data.type === 'PREVIEW_INSTANTIATE_DIFF') return;
@@ -649,7 +565,7 @@ export class Def extends Func(){
         })
       },
       itemGroup: (path, item) => {
-        if(item.type !== o.type) return;
+        if(item.type !== this.o.type) return;
         El.Div({
           path: path,
           classes: ['item-group', 'flx'],
@@ -691,6 +607,6 @@ export class Def extends Func(){
         break;
       }
     };
-    o.s.def = new Proxy(o.data.def, El.ProxyHandler(upd, {el:el, o:o}));
+    this.o.s.def = new Proxy(this.o.data.def, El.ProxyHandler(upd, {el:el, o:this.o}));
   }
 }
