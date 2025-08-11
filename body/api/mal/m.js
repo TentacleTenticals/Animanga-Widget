@@ -5,6 +5,10 @@ import {default as Base} from '../class.js';
 import {default as Func} from '../utilsClass.js';
 
 export class Mal extends Func(){
+  constructor(o){
+    super();
+    this.o = o.o;
+  }
   lang = {
     en: {
       id: ['ID', 'ID', '🆔\ufe0e', 'MAL ID'],
@@ -182,6 +186,7 @@ export class Mal extends Func(){
     }
   };
   class = (path, name, line, subLine, item, el, o, _this) => class extends Base(path, name, line, subLine, item, el, o, this) {
+    o = _this.o;
     check = (path, item) => {
       switch(item.n){
         case 'div': this.containers.div(path, item);
@@ -194,7 +199,7 @@ export class Mal extends Func(){
         case 'advices': this.other.advices(path, item);
         break;
 
-        case 'status.my': this[o.type].inputs.myStatus(path, item);
+        case 'status.my': this[this.o.type].inputs.myStatus(path, item);
         break;
         case 'rating.my': this.other.myRating(path, item);
         break;
@@ -365,15 +370,15 @@ export class Mal extends Func(){
                 El.Div({
                   path: e,
                   class: 'header',
-                  text: [this.lng.text(item, subLine, line, {key:['advices'], num:3}, o), ' ', o.s.mal.advices.length].join('')
+                  text: [this.lng.text(item, subLine, line, {key:['advices'], num:3}, this.o), ' ', this.o.s.mal.advices.length].join('')
                 });
                 El.Div({
                   path: e,
                   class: 'list flx ver',
                   func: (list) => {
-                    if(!o.s.mal.advices) return;
+                    if(!this.o.s.mal.advices) return;
                     const url = new MalApi().title;
-                    o.s.mal.advices.forEach(e => {
+                    this.o.s.mal.advices.forEach(e => {
                       El.Div({
                         path: list,
                         class: 'item flx ver',
@@ -382,7 +387,7 @@ export class Mal extends Func(){
                             path: item,
                             class: 'title',
                             text: e.node.title,
-                            url: url+o.type+'/'+e.node.id
+                            url: url+this.o.type+'/'+e.node.id
                           });
                           El.Div({
                             path: item,
@@ -444,7 +449,7 @@ export class Mal extends Func(){
             key: ['item.search', 'search'],
             func: (e) => el[name].search = e,
             onclick: () => {
-              new Def().search(o, path, true, item, subLine, line);
+              new Def().search(this.o, path, true, item, subLine, line);
             }
           });
         },
@@ -510,8 +515,8 @@ export class Mal extends Func(){
               classes: ['numBtn', '-btn'],
               type: 'mini',
               onclick: () => {
-                if(o.s.save.watchedEps === undefined) o.s.save.watchedEps = 0;
-                o.s.save.watchedEps++;
+                if(this.o.s.save.watchedEps === undefined) this.o.s.save.watchedEps = 0;
+                this.o.s.save.watchedEps++;
               }
             });
           },
@@ -521,9 +526,9 @@ export class Mal extends Func(){
               classes: ['numBtn', '-btn'],
               type: 'mini',
               onclick: () => {
-                if(o.s.save.watchedEps === undefined) o.s.save.watchedEps = 0;
-                if(o.s.save.watchedEps === 0) return;
-                o.s.save.watchedEps--;
+                if(this.o.s.save.watchedEps === undefined) this.o.s.save.watchedEps = 0;
+                if(this.o.s.save.watchedEps === 0) return;
+                this.o.s.save.watchedEps--;
               }
             });
           }
@@ -579,8 +584,8 @@ export class Mal extends Func(){
               key: ['manga.chapters.plus', ''],
               type: 'mini incdecBtn',
               onclick: () => {
-                if(o.s.save.readedCh === undefined) o.s.save.readedCh = 0;
-                o.s.save.readedCh++;
+                if(this.o.s.save.readedCh === undefined) this.o.s.save.readedCh = 0;
+                this.o.s.save.readedCh++;
               }
             });
           },
@@ -589,9 +594,9 @@ export class Mal extends Func(){
               key: ['manga.chapters.minus', ''],
               type: 'mini incdecBtn',
               onclick: () => {
-                if(o.s.save.readedCh === undefined) o.s.save.readedCh = 0;
-                if(o.s.save.readedCh === 0) return;
-                o.s.save.readedCh--;
+                if(this.o.s.save.readedCh === undefined) this.o.s.save.readedCh = 0;
+                if(this.o.s.save.readedCh === 0) return;
+                this.o.s.save.readedCh--;
               }
             });
           },
@@ -616,8 +621,8 @@ export class Mal extends Func(){
               key: ['manga.volumes.plus', ''],
               type: 'mini incdecBtn',
               onclick: () => {
-                if(o.s.save.readedVol === undefined) o.s.save.readedVol = 0;
-                o.s.save.readedVol++;
+                if(this.o.s.save.readedVol === undefined) this.o.s.save.readedVol = 0;
+                this.o.s.save.readedVol++;
               }
             });
           },
@@ -626,9 +631,9 @@ export class Mal extends Func(){
               key: ['manga.volumes.minus', ''],
               type: 'mini incdecBtn',
               onclick: () => {
-                if(o.s.save.readedVol === undefined) o.s.save.readedVol = 0;
-                if(o.s.save.readedVol === 0) return;
-                o.s.save.readedVol--;
+                if(this.o.s.save.readedVol === undefined) this.o.s.save.readedVol = 0;
+                if(this.o.s.save.readedVol === 0) return;
+                this.o.s.save.readedVol--;
               }
             });
           },
@@ -654,7 +659,7 @@ export class Mal extends Func(){
         break;
         case 'id':
           e.el[name].id.textContent = v;
-          e.el[name].id.href = new MalApi().link.item(o.type, v);
+          e.el[name].id.href = new MalApi().link.item(this.o.type, v);
         break;
         case 'link':
           e.el[name].link.href = v;
@@ -677,7 +682,7 @@ export class Mal extends Func(){
             lvl: e.el[name].status.parentNode.getAttribute('langLvl')||0
           };
 
-          e.el[name].status.textContent = this.lang[l.lang][o.type].status.value[v.status][l.lvl];
+          e.el[name].status.textContent = this.lang[l.lang][this.o.type].status.value[v.status][l.lvl];
           const st = e.el[name].status.parentNode;
           st.classList.add(status[v.status]);
         }
@@ -735,31 +740,31 @@ export class Mal extends Func(){
         break;
         case 'search':
           e.el[name].search.textContent = v+'%';
-          if(+o.cfg.textMatch.percents > +v) e.el[name].search.setAttribute('status', '-');
+          if(+this.o.cfg.textMatch.percents > +v) e.el[name].search.setAttribute('status', '-');
           else e.el[name].search.setAttribute('status', '+');
         break;
         case 'watchedEps':
           // console.log('QQ', e.el[name].watchedEps)
           e.el[name].watchedEps.value = v;
-          e.el[name].watchedEps.style.width = this.len(v, o.cfg.css.fontSize)
+          e.el[name].watchedEps.style.width = this.len(v, this.o.cfg.css.fontSize)
         break;
         case 'myRating':
           e.el[name].myRating.value = v;
-          e.el[name].myRating.style.width = this.len(v, o.cfg.css.fontSize)
+          e.el[name].myRating.style.width = this.len(v, this.o.cfg.css.fontSize)
         break;
         case 'episodes':
           e.el[name].episodes.textContent = v;
         break;
         case 'readedVol':
           e.el[name].readedVol.value = v;
-          e.el[name].readedVol.style.width = this.len(v, o.cfg.css.fontSize)
+          e.el[name].readedVol.style.width = this.len(v, this.o.cfg.css.fontSize)
         break;
         case 'volumes':
           e.el[name].volumes.textContent = v;
         break;
         case 'readedCh':
           e.el[name].readedCh.value = v;
-          e.el[name].readedCh.style.width = this.len(v, o.cfg.css.fontSize)
+          e.el[name].readedCh.style.width = this.len(v, this.o.cfg.css.fontSize)
         break;
         case 'chapters':
           e.el[name].chapters.textContent = v;
@@ -773,7 +778,7 @@ export class Mal extends Func(){
       }
       return true;
     };
-    o.s[name] = new Proxy(o.data[name], El.ProxyHandler(upd, {el:el, o:o}));
+    this.o.s[name] = new Proxy(this.o.data[name], El.ProxyHandler(upd, {el:el, o:this.o}));
 
     // o.s[name].myRating && (o.s[name].myRating = 0);
     // if(o.type === 'anime'){
