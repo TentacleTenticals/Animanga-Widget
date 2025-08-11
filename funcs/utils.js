@@ -1,4 +1,4 @@
-export class Ut{
+export default class {
   getType = (o) => o && o.constructor.toString().split(/[\(\) ]/)[1];
   MyError = (n, options) => {
     class MyError extends Error {
