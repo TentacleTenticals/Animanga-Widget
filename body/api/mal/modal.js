@@ -32,36 +32,38 @@ export default class {
       }
     }
   };
-  arr = (api) => {
-    console.log('ARGS', this)
-    const arr = {
-      must: [
-        'proxyUrl',
-        'redirectUri',
-        'clientSecret',
-        'clientID',
-        // 'bla'
-      ],
-      tokens: [
-        'accToken',
-        'refToken'
-      ],
-      checkTrue: [],
-      checkFalse: [],
-      tokensTrue: [],
-      tokensFalse: []
+  tokens = {
+    getRequrements: () => {
+      console.log('ARGS', this);
+      const arr = {
+        must: [
+          'proxyUrl',
+          'redirectUri',
+          'clientSecret',
+          'clientID',
+          // 'bla'
+        ],
+        tokens: [
+          'accToken',
+          'refToken'
+        ],
+        checkTrue: [],
+        checkFalse: [],
+        tokensTrue: [],
+        tokensFalse: []
+      }
+      for(const k of arr.must){
+        if(this.vApi.secrets[k]) arr.checkTrue.push(k);
+        else arr.checkFalse.push(k);
+      }
+      for(const k of arr.tokens){
+        if(this.vApi.secrets[k]) arr.tokensTrue.push(k);
+        else arr.tokensFalse.push(k);
+      }
+  
+      return arr;
     }
-    for(const k of arr.must){
-      if(this.vApi.secrets[k]) arr.checkTrue.push(k);
-      else arr.checkFalse.push(k);
-    }
-    for(const k of arr.tokens){
-      if(this.vApi.secrets[k]) arr.tokensTrue.push(k);
-      else arr.tokensFalse.push(k);
-    }
-
-    return arr;
-  };
+  }
   upd = (key, v, api) => {
     console.log('[UPD]', key, v, api);
     // if(key !== 'i') return;
@@ -84,15 +86,15 @@ export default class {
           }
           await this.o.GM.setValue('secretsList', secretsList);
         }
-        this.api.tk.status(this.el[this.vApi.name].tokensStatus, api, this.arr(api));
+        this.api.tokens.status(this.el[this.vApi.name].tokensStatus, this.tokens.getRequrements());
         // checker(api, el.tokensApi);
       }
     )
   }
   _api = {
-    tk: {
-      functions: (path, api) => {
-        console.log('SUPER',  super.message);
+    tokens: {
+      functions: (path) => {
+        // console.log('SUPER',  super.message);
         El.Button({
           path: path,
           class: '-btn',
@@ -106,7 +108,7 @@ export default class {
             this.el[this.vApi.name].window = window.open(Mal.auth.url({
               secrets: this.vApi.secrets
             }));
-            window.addEventListener('message', this.message.bind(this, this.upd, api), {once:true});
+            window.addEventListener('message', this.message.bind(this, this.upd), {once:true});
           }
         });
         if(this.vApi.secrets.refToken) El.Button({
@@ -134,7 +136,7 @@ export default class {
                 this.vApi.secrets.accToken = res.access_token;
                 this.vApi.secrets.refToken = res.refresh_token;
                 // checker(api, el.tokensApi);
-                this.api.tk.status(this.el[this.vApi.name].tokensStatus, api, this.arr(api));
+                this.api.tokens.status(this.el[this.vApi.name].tokensStatus, this.tokens.getRequrements());
               }
             )
           }
