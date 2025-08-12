@@ -57,7 +57,7 @@ export default (Base) => class extends Base {
   //   }
   // }
 
-  message = (data, api, msg) => {
+  message = (data, msg) => {
     console.log('MSG', 'data', data, 'msg', msg, this.vApi);
     if(!msg.data) return;
     if(msg.data?.type && msg.data?.type === 'PREVIEW_INSTANTIATE_DIFF') return;
@@ -116,7 +116,7 @@ export default (Base) => class extends Base {
                         class: '-btn',
                         text: this.lang[this.o.cfg.helper.lang].helper['tokens api']['requrements'].check[2],
                         onclick: (e) => {
-                          this.api.tk.requrements(this.el[this.vApi.name].requrements, api, this.arr(api));
+                          this.api.tokens.requrements(this.el[this.vApi.name].requrements, this.tokens.getRequrements());
                         }
                       });
                     }
@@ -130,7 +130,7 @@ export default (Base) => class extends Base {
                         class: 'flx ver',
                         func: (l) => {
                           this.el[this.vApi.name].requrements = l;
-                          this.api.tk.requrements(l, api, this.arr(api));
+                          this.api.tokens.requrements(l, this.tokens.getRequrements());
                         }
                       });
                     }
@@ -141,9 +141,9 @@ export default (Base) => class extends Base {
               El.Div({
                 path: itm,
                 class: 'pad-item flx ver',
-                func: (tkStatus) => {
+                func: (tokensStatus) => {
                   El.Div({
-                    path: tkStatus,
+                    path: tokensStatus,
                     class: 'flx gap-5',
                     func: (l) => {
                       El.Div({
@@ -157,13 +157,13 @@ export default (Base) => class extends Base {
                         text: this.lang[this.o.cfg.helper.lang].helper['tokens api']['tokens status'].check[2],
                         onclick: (e) => {
                           console.log('CHECK', api)
-                          this.api.tk.status(this.el[this.vApi.name].tokensStatus, api, this.arr(api));
+                          this.api.tokens.status(this.el[this.vApi.name].tokensStatus, this.tokens.getRequrements());
                         }
                       });
                     }
                   });
                   El.Div({
-                    path: tkStatus,
+                    path: tokensStatus,
                     class: 'pad-list flx ver',
                     func: (pl) => {
                       El.Div({
@@ -171,7 +171,7 @@ export default (Base) => class extends Base {
                         class: 'flx ver',
                         func: (l) => {
                           this.el[this.vApi.name].tokensStatus = l;
-                          this.api.tk.status(l, api, this.arr(api));
+                          this.api.tokens.status(l, this.tokens.getRequrements());
                         }
                       });
                     }
@@ -182,14 +182,14 @@ export default (Base) => class extends Base {
               El.Div({
                 path: itm,
                 class: 'pad-item flx ver',
-                func: (tkFunctions) => {
+                func: (tokensFunctions) => {
                   El.Div({
-                    path: tkFunctions,
+                    path: tokensFunctions,
                     class: 'sub-header',
                     text: this.lang[this.o.cfg.helper.lang].helper['tokens api']['functions'].title[0]
                   });
                   El.Div({
-                    path: tkFunctions,
+                    path: tokensFunctions,
                     class: 'pad-list flx ver',
                     func: (pl) => {
                       El.Div({
@@ -197,7 +197,7 @@ export default (Base) => class extends Base {
                         class: 'gap-5 flx ver',
                         func: (l) => {
                           this.el[this.vApi.name].tokensFunctions = l;
-                          this._api.tk.functions(l, api);
+                          this._api.tokens.functions(l, api);
                         }
                       });
                     }
@@ -252,8 +252,8 @@ export default (Base) => class extends Base {
         });
       });
     },
-    tk: {
-      requrements: (path, api, arr) => {
+    tokens: {
+      requrements: (path, arr) => {
         if(path.children.length) path.replaceChildren();
         const checker = (arr, target) => target.every(v => arr.includes(v));
         if(checker(arr.checkTrue, arr.must)) El.Div({
@@ -274,18 +274,18 @@ export default (Base) => class extends Base {
           });
         }
       },
-      status: (path, api, arr) => {
+      status: (path, tokensReq) => {
         if(path.children.length) path.replaceChildren();
-        const checker = (arr, target) => target.every(v => arr.includes(v));
+        const checker = (tokensReq, target) => target.every(v => tokensReq.includes(v));
         El.Div({
           path: path,
           class: 'pad-list flx ver',
           func: (l) => {
-            if(checker(arr.tokensTrue, arr.tokens)){
+            if(checker(tokensReq.tokensTrue, tokensReq.tokens)){
               El.Div({
                 path: l,
                 class: 'item ok flx',
-                text: arr.tokensTrue.join(', ')
+                text: tokensReq.tokensTrue.join(', ')
               });
 
               if(this.vApi.secrets.accToken){
@@ -328,15 +328,15 @@ export default (Base) => class extends Base {
               }
             }
             else{
-              if(arr.tokensTrue.length) El.Div({
+              if(tokensReq.tokensTrue.length) El.Div({
                 path: l,
                 class: 'item ok flx',
-                text: arr.tokensTrue.join(', ')
+                text: tokensReq.tokensTrue.join(', ')
               });
-              if(arr.tokensFalse.length) El.Div({
+              if(tokensReq.tokensFalse.length) El.Div({
                 path: l,
                 class: 'item notOk flx',
-                text: arr.tokensFalse.join(', ')
+                text: tokensReq.tokensFalse.join(', ')
               });
             };
           }
