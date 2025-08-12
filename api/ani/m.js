@@ -5,44 +5,11 @@ export class AniApi{
   title = 'https://anilist.co/';
   authUrl = 'https://anilist.co/api/v2/oauth/authorize';
   tokenUrl = 'https://anilist.co/api/v2/oauth/token';
-  dataConverter = (o) => {
-    if(!o.data) return;
-    return JSON.stringify(o.data);
-  };
-  fetch = (o) => {
-    return fetch(o?.url||this.url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...o.headers
-      },
-      ...(o.data) && {body: this.dataConverter(o)}
-      // body: JSON.stringify({
-      //   'query': o.query,
-      //   'variables': o.variables
-      // })
-    }).then(
-      r => {
-        console.log('[ANI API] R', r);
-        if(!r.ok){
-          throw new Ut().MyError(['[ANI API]', 'Err', {type:'log'}], {response:r});
-        }else return r.json();
-      }).then(
-        res => {
-          console.log('QQQQQQ', res)
-          if(res && res.error) throw new Ut().MyError(['[ANI API]', 'Wrong response', {type:'log'}], {response:r});
-          else return res;
-        },
-        err => {
-          console.log(err, err.error);
-          throw new Ut().MyError(['[ANI API]', 'Err', {type:'log'}], {err:err});
-        }
-      )
-  };
+  fetch = (o) => new Ut().fetch.run(o);
   search = {
     item: {
       byId: (o) => {
-        o.login && o.secrets?.url && (o.url = o.secrets.url);
+        o.login && o.secrets?.proxyUrl && (o.proxyUrl = o.secrets.proxyUrl);
         o.headers = {
           ...o.login && o.secrets?.accToken && {Url: this.url},
           ...o.login && o.secrets?.accToken && {Authorization: 'Bearer ' + o.secrets.accToken}
@@ -227,9 +194,9 @@ export class AniApi{
         }
       }`,
       byTitle: (o) => {
-        o.login && o.secrets?.url && (o.url = o.secrets.url);
+        o.login && o.secrets?.proxyUrl && (o.proxyUrl = o.secrets.proxyUrl);
         o.headers = {
-          ...o.login && o.secrets?.accToken && {Url: this.url},
+          // ...o.login && o.secrets?.accToken && {Url: this.url},
           ...o.login && o.secrets?.accToken && {Authorization: 'Bearer ' + o.secrets.accToken}
         };
         const query = `
@@ -260,7 +227,9 @@ export class AniApi{
   };
   auth = {
     getToken: (o) => {
-      // o.url = this.tokenUrl;
+      o.secrets?.proxyUrl && (o.proxyUrl = o.secrets.proxyUrl);
+      o.url = this.tokenUrl;
+      o.method = 'POST';
       o.data = {
         grant_type: "authorization_code",
         client_id: o.secrets.clientID,
@@ -272,10 +241,10 @@ export class AniApi{
       o.headers = {
         'Content-Type': 'application/json',
         Accept: "application/json",
-        Url: this.tokenUrl
+        // Url: this.tokenUrl
       };
 
-      console.log('TK', o);
+      console.log('TOK', o);
 
       return this.fetch(o);
     },
