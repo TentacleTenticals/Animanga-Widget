@@ -20,35 +20,11 @@ export class MalApi{
       default: return o.data;
     }
   };
-  fetch = (o) => {
-    return fetch(o?.url||this.url, {
-      method: o.method||'GET',
-      headers: {
-        ...o.headers
-      },
-      ...(o.data) && {body: this.dataConverter(o)}
-    }).then(
-      r => {
-        // console.log('[MAL API] R', r);
-        if(!r.ok){
-          new Ut().MyError(['[MAL API]', 'Err', {type:'log'}], {response:r});
-        }else return r.json();
-      }).then(
-        res => {
-          // console.log('QQQQQQ', res)
-          if(res && res.error) throw new Ut().MyError(['[MAL API]', 'Wrong response', {type:'log'}], {response:res});
-          else return res;
-        },
-        err => {
-          // console.log(err, err.error);
-          throw new Ut().MyError(['[MAL API]', 'Err', {type:'log'}], {err:err});
-        }
-      )
-  };
+  fetch = (o) => new Ut().fetch.run(o);
   search = {
     item: {
       byId: (o) => {
-        o.secrets?.url && (o.url = o.secrets.url);
+        o.secrets?.proxyUrl && (o.proxyUrl = o.secrets.proxyUrl);
         const query = {
           // q: o.title,
           ...o.query
@@ -65,15 +41,16 @@ export class MalApi{
     },
     items: {
       byTitle: (o) => {
-        o.secrets?.url && (o.url = o.secrets.url);
-        const query = {
+        o.secrets?.proxyUrl && (o.proxyUrl = o.secrets.proxyUrl);
+        o.url = `${this.url}/${o.type}`;
+        o.urlParams = {
           q: o.title.slice(0, 64),
           ...o.query
         };
         o.headers = {
           // 'Content-Type': 'application/json',
           ...(o.login && o.secrets?.accToken) && {Authorization: 'Bearer ' + o.secrets.accToken} || {'X-MAL-CLIENT-ID': o.secrets.clientID},
-          Url: `${this.url}/${o.type}?${new URLSearchParams(query)}`
+          // Url: `${this.url}/${o.type}?${new URLSearchParams(query)}`
         };
 
         // console.log('Lolo', o);
@@ -105,7 +82,8 @@ export class MalApi{
       return text;
     },
     getToken: (o) => {
-      o.secrets?.url && (o.url = o.secrets.url);
+      o.secrets?.proxyUrl && (o.proxyUrl = o.secrets.proxyUrl);
+      o.url = this.tokenUrl;
       o.method = 'POST';
       o.data = {
         grant_type: 'authorization_code',
@@ -119,10 +97,11 @@ export class MalApi{
       o.headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
         // Accept: 'application/json',
-        Url: this.tokenUrl
+        // Url: this.tokenUrl
       };
 
       console.log('TK', o);
+      // console.log('QEQEEQQEEQQE', this.fetch)
 
       return this.fetch(o).then(
         res => {
@@ -134,7 +113,8 @@ export class MalApi{
       )
     },
     updToken: (o) => {
-      o.secrets?.url && (o.url = o.secrets.url);
+      o.secrets?.proxyUrl && (o.proxyUrl = o.secrets.proxyUrl);
+      o.url = this.tokenUrl;
       o.method = 'POST';
       o.data = {
         grant_type: 'refresh_token',
@@ -147,7 +127,7 @@ export class MalApi{
       o.headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
         Authorization: 'Bearer '+o.secrets.accToken,
-        Url: this.tokenUrl
+        // Url: this.tokenUrl
       };
 
       console.log('TK', o);
@@ -176,13 +156,14 @@ export class MalApi{
   user = {
     list: {
       upd: (o) => {
-        o.secrets?.url && (o.url = o.secrets.url);
+        o.url = `${this.url}/${o.type||''}/${o.id||''}/my_list_status`;
+        o.secrets?.proxyUrl && (o.proxyUrl = o.secrets.proxyUrl);
         o.method = 'PUT';
     
         o.headers = {
           'Content-Type': 'application/x-www-form-urlencoded',
           'Authorization': 'Bearer '+o.secrets.accToken,
-          Url: `${this.url}/${o.type||''}/${o.id||''}/my_list_status?`
+          // Url: `${this.url}/${o.type||''}/${o.id||''}/my_list_status?`
         }
 
         console.log('AE', o);
