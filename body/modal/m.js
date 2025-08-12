@@ -80,6 +80,17 @@ export default class {
                       // new Modal().api.item()
                       new m({api:api, o:this.o}).api.item(s)
                     }
+                    break
+                    case 'ani': {
+                      const item = (await import('../api/ani/modal.js'))//.default({api:api});
+                      console.log('ITEM', item);
+                      //const modal = Modal//({api:api, o:this.o});
+                      const m = Modal(item.default);
+                      console.log('Modal', new m({api:api, o:this.o}));
+                      //modal.api.item(s)
+                      // new Modal().api.item()
+                      new m({api:api, o:this.o}).api.item(s)
+                    }
                   }
                   // console.log('IT', it);
                   //this.api.item(s, api);
