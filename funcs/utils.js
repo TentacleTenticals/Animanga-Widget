@@ -1,5 +1,69 @@
 export default class {
   getType = (o) => o && o.constructor.toString().split(/[\(\) ]/)[1];
+  fetch = {
+    dataConverter: (o) => {
+      if(!o.data) return;
+      if(o.method === 'get') return;
+      if(!o.headers['Content-Type']) return;
+      console.log('R', o.headers['Content-Type'])
+      switch(o.headers['Content-Type']){
+        case 'application/json': return JSON.stringify(o.data);
+        case 'application/text': return JSON.stringify(o.data);
+        case 'text/json': return JSON.stringify(o.data);
+        case 'text/json; charset=utf-8': return JSON.stringify(o.data);
+        case 'text/html': return o.data;
+        case 'application/x-www-form-urlencoded': return new URLSearchParams(o.data);
+        default: return o.data;
+      }
+    },
+    run: (o, text) => {
+      console.log('OO', o);
+      if(o.proxyUrl){
+        o.proxyUrl = new URL(o.proxyUrl);
+        for(const i in o.proxyParams){
+          o.proxyParams[i] !== null && o.proxyUrl.searchParams.set(i, o.proxyParams[i]);
+        }
+      }
+      if(o.url){
+        o.url = new URL(o.url);
+        for(const i in o.urlParams){
+          o.urlParams[i] !== null && o.url.searchParams.set(i, o.urlParams[i]);
+        }
+      }
+      return fetch(o.proxyUrl||o.url, {
+        method: o.method||'GET',
+        headers: {
+          ...o.headers,
+          ...(o.proxyUrl) && {url: o.url}
+        },
+        ...(o.data) && {body: this.fetch.dataConverter(o)}
+      }).then(
+        r => this.fetch.return(r, o.reformat, text)
+      )
+    },
+    return: (r, format, text) => {
+      console.log('RET', format)
+      if(!text) text = '[Fetch]';
+      const head = {};
+      const contentType = r.headers.get('content-type');
+      console.log('cc', contentType);
+      head.rateLimit && (head.rateLimit.limit = r.headers.get('X-RateLimit-Limit'));
+      head.rateLimit && (head.rateLimit.remaining = r.headers.get('X-RateLimit-Remaining'));
+      if(format && format.match(/json/)||contentType && contentType.match(/application\/json|text\/json/)) return r.json().then(
+        res => {
+          if(res && res.error) throw this.MyError([text, 'Wrong response', {type:'log'}], {response:res});
+          else {
+            // res.hd = head;
+            return res
+          };
+        },
+        err => {
+          throw this.MyError([text, 'Err', {type:'log'}], {err:err});
+        }
+      )
+      else return r.text()
+    }
+  };
   MyError = (n, options) => {
     class MyError extends Error {
       constructor(){
