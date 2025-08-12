@@ -1,13 +1,11 @@
 import {El} from '../../../base/classes/m.js';
-import {Modal} from '../def/modal.js';
 import {AniFc as AniApi} from '../../../api/ani/fc.js';
 
-export const AniModal = () => class extends Modal{
-  constructor(args){
-    super();
-    this.o = args?.o;
-    this.el = args?.el;
-  }
+export default class {
+  // constructor(o){
+  //   // super();
+  //   this.vApi = o.api;
+  // }
   _lang = {
     en: {
       helper: {
@@ -32,103 +30,83 @@ export const AniModal = () => class extends Modal{
       }
     }
   };
-  arr = (api) => {
-    const o = this.o;
-    const arr = {
-      must: [
-        'url',
-        'clientID',
-        'clientSecret',
-        'redirectUri',
-        // 'bla'
-      ],
-      tokens: [
-        'accToken',
-        'refToken'
-      ],
-      checkTrue: [],
-      checkFalse: [],
-      tokensTrue: [],
-      tokensFalse: []
+  tokens = {
+    getRequrements: () => {
+      const arr = {
+        must: [
+          'proxyUrl',
+          'clientID',
+          'clientSecret',
+          'redirectUri',
+          // 'bla'
+        ],
+        tokens: [
+          'accToken',
+          'refToken'
+        ],
+        checkTrue: [],
+        checkFalse: [],
+        tokensTrue: [],
+        tokensFalse: []
+      }
+      // const check = o.cfg.api.list[api].secrets;
+      for(const k of arr.must){
+        if(this.vApi.secrets[k]) arr.checkTrue.push(k);
+        else arr.checkFalse.push(k);
+      }
+      for(const k of arr.tokens){
+        // console.log('TOKENS', api, o.cfg.api.list[api].secrets[k]);
+        if(this.vApi.secrets[k]) arr.tokensTrue.push(k);
+        else arr.tokensFalse.push(k);
+      }
+  
+      console.log('ARR', arr)
+  
+      return arr;
     }
-    // const check = o.cfg.api.list[api].secrets;
-    for(const k of arr.must){
-      if(api.secrets[k]) arr.checkTrue.push(k);
-      else arr.checkFalse.push(k);
-    }
-    for(const k of arr.tokens){
-      // console.log('TOKENS', api, o.cfg.api.list[api].secrets[k]);
-      if(api.secrets[k]) arr.tokensTrue.push(k);
-      else arr.tokensFalse.push(k);
-    }
-
-    console.log('ARR', arr)
-
-    return arr;
   };
   upd = (key, v, api) => {
-    if(key !== 'i') return;
-    const o = this.o;
+    // if(key !== 'i') return;
     console.log('V', v);
     if(!v.code) return;
-    api.secrets.code = v.code;
+    this.vApi.secrets.code = v.code;
     new AniApi().fc.auth.getToken({
-      secrets: api.secrets
+      secrets: this.vApi.secrets
     }).then(
       async res => {
         console.log('Tokens', res);
-        api.secrets.accToken = res.access_token;
-        api.secrets.refToken = res.refresh_token;
-        if(o.GM){
-          const secretsList = await o.GM.getValue('secretsList');
-          if(secretsList[api.name]){
-            secretsList[api.name].accToken = res.access_token;
-            secretsList[api.name].refToken = res.refresh_token;
+        this.vApi.secrets.accToken = res.access_token;
+        this.vApi.secrets.refToken = res.refresh_token;
+        if(this.o.GM){
+          const secretsList = await this.o.GM.getValue('secretsList');
+          if(secretsList[this.vApi.name]){
+            secretsList[this.vApi.name].accToken = res.access_token;
+            secretsList[this.vApi.name].refToken = res.refresh_token;
           }
-          await o.GM.setValue('secretsList', secretsList);
+          await this.o.GM.setValue('secretsList', secretsList);
         }
-        this.api.tk.status(this.el.tokensStatus, api, this.arr(api));
+        this.api.tokens.status(this.el[this.vApi.name].tokensStatus, this.tokens.getRequrements());
         // checker(api, el.tokensApi);
       }
     )
   }
   _api = {
-    tk: {
+    tokens: {
       functions: (path, api) => {
-        const o = this.o;
         El.Button({
           path: path,
           class: '-btn',
-          text: this._lang[o.cfg.helper.lang].helper['tokens api']['functions'].login[0],
-          func: (e) => this.el[api.name].btnLogin = e,
+          text: this._lang[this.o.cfg.helper.lang].helper['tokens api']['functions'].login[0],
+          func: (e) => this.el[this.vApi.name].btnLogin = e,
           onclick: () => {
             const Ani = new AniApi();
-            const data = new Proxy({}, El.ProxyHandler(this.upd, api));
-            this.el[api.name].window = window.open(Ani.auth.url({
-              secrets: api.secrets
+            // const data = new Proxy({}, El.ProxyHandler(this.upd, api));
+            this.el[this.vApi.name].window = window.open(Ani.auth.url({
+              secrets: this.vApi.secrets
             }));
-            window.addEventListener('message', this.message.bind(this, data, api));
+            window.addEventListener('message', this.message.bind(this, this.upd), {once:true});
           }
         });
-        // if(o.cfg.api.list[api].secrets.refToken) El.Button({
-        //   path: path,
-        //   text: this._lang[o.cfg.helper.lang].helper['tokens api']['functions'].update[0],
-        //   func: (e) => this.el[api].btnUpdate = e,
-        //   onclick: () => {
-        //     const Ani = new AniApi();
-        //     Ani.fc.auth.updToken({
-        //       secrets: o.cfg.api.list[api].secrets
-        //     }).then(
-        //       res => {
-        //         console.log('Tokens', res);
-        //         o.cfg.api.list[api].secrets.accToken = res.access_token;
-        //         o.cfg.api.list[api].secrets.refToken = res.refresh_token;
-        //         // checker(api, el.tokensApi);
-        //         this.api.tk.status(this.el.tokensStatus, api, this.arr(api));
-        //       }
-        //     )
-        //   }
-        // });
       }
     }
   }
