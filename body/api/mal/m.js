@@ -449,7 +449,8 @@ export class Mal extends Func(){
             key: ['item.search', 'search'],
             func: (e) => el[name].search = e,
             onclick: () => {
-              new Def().search(this.o, path, true, item, subLine, line);
+              console.log('QQ', this.o, path, item, subLine, line);
+              new Def({o: this.o}).search(path, true, item, subLine, line);
             }
           });
         },
