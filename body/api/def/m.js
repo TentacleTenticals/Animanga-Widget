@@ -9,7 +9,7 @@ import {default as Nfo} from '../../modal/m.js';
 export class Def extends Func(){
   constructor(o){
     super();
-    console.log('OO', o)
+    console.log('OO1', o);
     this.o = o.o;
     this._this = this;
     this.vApi = o.vApi;
@@ -77,7 +77,7 @@ export class Def extends Func(){
       }
     }
   };
-  search = (o, path, btnMode, item, subLine, line) => {
+  search = (path, btnMode, item, subLine, line) => {
     // o.search.titleUpd = o.title;
     for(const e of this.o.cfg.api.list){
       if(!e.search) continue;
@@ -90,6 +90,7 @@ export class Def extends Func(){
             textMatch: this.o.cfg.textMatch
           }).then(
             res => {
+              console.log('RESOS', path, res);
               // res.results.toSorted((a,b) => (a.result.percents.diff > b.result.percents.diff) ? -1 : ((b.result.percents.diff > a.result.percents.diff) ? 1 : 0))
               if(!btnMode && this.o.search.start.mode === 'bestMatch'){
                 const item = res.items[res.sorted.item.ind];
@@ -116,7 +117,7 @@ export class Def extends Func(){
                       El.Div({
                         path: h,
                         class: 'title',
-                        text: this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)].modal.search.title[this.lang.type(item, 0)]
+                        text: this.lang[this._this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)].modal.search.title[this.lang.type(item, 0)]
                       });
                       
                       El.Div({
@@ -130,11 +131,11 @@ export class Def extends Func(){
                           });
                           El.Button({
                             path: h,
-                            text: this.lang[_this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)].modal.search.toDef[this.lang.type(item, 0)],
+                            text: this.lang[this._this.lng(item.cfg?.lang||subLine.cfg?.lang||line.cfg?.lang)].modal.search.toDef[this.lang.type(item, 0)],
                             onclick: () => {
                               this.o.title = this.o.search.titleDef;
                               m.remove();
-                              this.search(this.o, p, btnMode, item, subLine, line);
+                              this.search(p, btnMode, item, subLine, line);
                               // h.children[0].textContent = o.title;
                             }
                           });
@@ -420,7 +421,7 @@ export class Def extends Func(){
         },
         onclick: () => {
           console.log('YO!', this.o);
-          this.base.search(this.o, path, '', item, subLine, line);
+          this.base.search(path, '', item, subLine, line);
           // this.run(this.o);
         }
       });
